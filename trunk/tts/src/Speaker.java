@@ -1,14 +1,14 @@
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
-//import com.sun.speech.freetts.audio.JavaClipAudioPlayer;
-import java.io.*;
+
+
 
 public class Speaker {
-	Object locationData;
+	POIdata locationData;
 	Voice dbVoice;
 	
     
-	public Speaker(Object incoming)
+	public Speaker(POIdata incoming)
 	{
 		locationData = incoming;
 		/* Set up freetts voice object */ 
@@ -22,6 +22,8 @@ public class Speaker {
 	{
 		String toSpeak;
 		toSpeak = "The location is " + locationData.name() + " and it is of type " + locationData.location_type();
+		dbVoice.speak(toSpeak);
+		toSpeak = "Here is a short description " + locationData.description(); 
 		dbVoice.speak(toSpeak);
 		dbVoice.deallocate();
 	}
