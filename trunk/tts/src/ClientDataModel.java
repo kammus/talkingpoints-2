@@ -44,7 +44,8 @@ public class ClientDataModel{
         String name, type, description;
         boolean matched = false;
         private POIdata data;
-                        
+        TalkingPointsGUI ourGUI = new TalkingPointsGUI();
+        
         private static NodeList getElement(Document doc , String tagName , int index ){
                 //given an XML document and a tag, return an Element at a given index
                 NodeList rows = doc.getDocumentElement().getElementsByTagName(tagName);
@@ -52,43 +53,56 @@ public class ClientDataModel{
             return ele.getChildNodes();
             
           }
-                
-        public ClientDataModel(String file) {
-                try{
-                        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-                        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-                        
-                        Document doc = docBuilder.parse(new File(file));
-                        
-                        doc.getDocumentElement().normalize();
-                        
-                        //NodeList listofLocations = doc.getElementsByTagName ("location");
-                        
-                        NodeList tpidText = getElement(doc, "tpid", 0);
-                        NodeList nameText = getElement(doc, "name", 0);
-                        NodeList typeText = getElement(doc, "type", 0);
-                        NodeList descriptionText = getElement(doc, "description", 0);
-                                                        
-                        String temp = ((Node)tpidText.item(0)).getNodeValue(); // temporarily, use tpid as an identifier
-                        tpid = Long.valueOf(temp).longValue();
-                        
-                        name = ((Node)nameText.item(0)).getNodeValue();
-                        type = ((Node)typeText.item(0)).getNodeValue();
-                        description = ((Node)descriptionText.item(0)).getNodeValue();
-                        
-                        data = new POIdata(name, type, description); //object creation
-                        Speaker locationSpeaker = new Speaker(data);
-                        locationSpeaker.createDialog();
-                        
-                        }catch (SAXParseException err) {
-                                System.out.println ("** Parsing error" + ", line " +err.getLineNumber() + ", uri " + err.getSystemId());
-                                System.out.println(" " + err.getMessage ());    
-                        }catch (SAXException e) {
-                                Exception x = e.getException ();
-                                ((x == null) ? e : x).printStackTrace ();
-                        }catch (Throwable t) {
-                                t.printStackTrace ();
-                        }
+           
+        public void parseXML(String file) {
+        	 try{
+                 DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+                 
+                 Document doc = docBuilder.parse(new File(file));
+                 
+                 doc.getDocumentElement().normalize();
+                 
+                 //NodeList listofLocations = doc.getElementsByTagName ("location");
+                 
+                 NodeList tpidText = getElement(doc, "tpid", 0);
+                 NodeList nameText = getElement(doc, "name", 0);
+                 NodeList typeText = getElement(doc, "type", 0);
+                 NodeList descriptionText = getElement(doc, "description", 0);
+                                                 
+                 String temp = ((Node)tpidText.item(0)).getNodeValue(); // temporarily, use tpid as an identifier
+                 tpid = Long.valueOf(temp).longValue();
+                 
+                 name = ((Node)nameText.item(0)).getNodeValue();
+                 type = ((Node)typeText.item(0)).getNodeValue();
+                 description = ((Node)descriptionText.item(0)).getNodeValue();
+                 
+                 data = new POIdata(name, type, description); //object creation
+                 boolean blind = false;
+                 if (blind == true)
+                 {
+                 	Speaker locationSpeaker = new Speaker(data);
+                 	locationSpeaker.createDialog(); 
+                 }
+                 else 
+                 {	
+                 	ourGUI.addItem(data);
+                 }
+                 
+                 
+                 }catch (SAXParseException err) {
+                         System.out.println ("** Parsing error" + ", line " +err.getLineNumber() + ", uri " + err.getSystemId());
+                         System.out.println(" " + err.getMessage ());    
+                 }catch (SAXException e) {
+                         Exception x = e.getException ();
+                         ((x == null) ? e : x).printStackTrace ();
+                 }catch (Throwable t) {
+                         t.printStackTrace ();
+                 }	
+        }
+        
+        public ClientDataModel() {
+               /* empty for the moment*/
         }
         
         /*public void tagChecking(long tagID){ //for test function

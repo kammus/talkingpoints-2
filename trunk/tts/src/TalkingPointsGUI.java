@@ -2,7 +2,7 @@
  * 
  */
 
-package talkingPoints;
+//package talkingPoints;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
