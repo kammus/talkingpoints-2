@@ -1,6 +1,6 @@
 public class ClientMessageHandler {
 	 // after contacting the server, we'll pass xml file
-	ClientDataModel clientDataModel = null; // for now, just use dummy xml file
+	ClientDataModel clientDataModel = new ClientDataModel();  //changing 
 		
 	public ClientMessageHandler(){
 		
@@ -12,9 +12,9 @@ public class ClientMessageHandler {
 		// for now, we are just testing...
 		System.out.println("Tag was read: " + tagID);
 		if(tagID == 123)
-			clientDataModel = new ClientDataModel("espresso-royale.xml");
+			clientDataModel.parseXML("espresso-royale.xml");
 		if(tagID == 124)
-			clientDataModel = new ClientDataModel("stucchis.xml");
+			clientDataModel.parseXML("stucchis.xml");
 		//clientDataModel.tagChecking(tagID); // just for test, pass tagID to tagChecking
 	}
 
