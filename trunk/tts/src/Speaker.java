@@ -1,3 +1,5 @@
+package talkingPoints;
+
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 import edu.cmu.sphinx.* ;
