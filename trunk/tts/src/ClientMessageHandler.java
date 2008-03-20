@@ -1,3 +1,5 @@
+package talkingPoints;
+
 public class ClientMessageHandler {
 	 // after contacting the server, we'll pass xml file
 	ClientDataModel clientDataModel = new ClientDataModel();  //changing 

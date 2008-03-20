@@ -1,3 +1,5 @@
+package talkingPoints;
+
 
 public class TagReaderTest {
 

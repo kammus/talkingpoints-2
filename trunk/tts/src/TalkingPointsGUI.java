@@ -176,6 +176,9 @@ public class TalkingPointsGUI  {
 		// TODO: Update if number of columns changes
 		public Object getValueAt(int row, int column) {
 			
+			if(data[row] == null)
+				return null;
+			
 			if(column == 1)
 				return data[row].name();
 			else if (column == 2)
