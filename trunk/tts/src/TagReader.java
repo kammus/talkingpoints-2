@@ -27,11 +27,11 @@ public class TagReader implements DiscoveryListener{
 		
 	}
 	
-	// constructuror with ClientMessageHandler
+	// constructor with ClientMessageHandler
 	public TagReader(ClientMessageHandler cmh) {
 		clientMessageHandler = cmh;
 	}
-
+	
 	// Temporarily, making fakeTag
 	public void generateFakeTagEvent() {
 		notifyTagWasRead(fakeTagIDs[currentFakeTagIndex]);
