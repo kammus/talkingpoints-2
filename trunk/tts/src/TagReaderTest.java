@@ -1,5 +1,7 @@
 package talkingPoints;
 
+import java.io.IOException;
+
 
 public class TagReaderTest {
 
@@ -10,10 +12,15 @@ public class TagReaderTest {
 		final java.util.Timer timer = new java.util.Timer();
 		java.util.TimerTask timerTask = new java.util.TimerTask() {
 			public void run() {
-				tagReader.generateFakeTagEvent();			// generate faketag	
+				try{
+					tagReader.bluetoothSearch();				// search Bluetooth MacAddress
+					//tagReader.generateFakeTagEvent();
+				}catch(IOException e){
+					
+				}	
 			}
 		};
-		// will fire a new TimerTask every 5 sec, each of which will generate a fake tag event
-		timer.scheduleAtFixedRate(timerTask, 0, 1000);
+		// will fire a new TimerTask every 1 sec, each of which will generate a fake tag event
+		timer.scheduleAtFixedRate(timerTask, 0, 200);
 	}	
 }
