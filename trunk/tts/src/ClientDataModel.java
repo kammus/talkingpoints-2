@@ -1,6 +1,3 @@
-package talkingPoints;
-
-
 import java.io.File;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -12,7 +9,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
 
 class POIdata {
         String name;
@@ -39,6 +35,34 @@ class POIdata {
         
         public String description(){
                 return (description);
+        }
+        
+        public String country() {
+        		return (country);
+        }
+        
+        public String postalCode() {
+        	return postalCode;
+        }
+        
+        public String url() {
+        	return (url);
+        }
+        
+        public String phone() {
+        	return (phone);
+        }
+        
+        public String city() {
+        	return (city);
+        }
+        
+        public String street() {
+        	return (street);
+        }
+        
+        public String state() {
+        	return (state);
         }
 }
 
