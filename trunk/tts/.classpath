@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/freeTTS"/>
 	<classpathentry kind="lib" path="lib/sphinx4.jar"/>
+	<classpathentry kind="lib" path="lib/jsr082.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

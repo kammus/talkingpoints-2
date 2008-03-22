@@ -1,4 +1,3 @@
-package talkingPoints;
 
 /* Author: Peter Kretschman
  * Created: 3/16/08
