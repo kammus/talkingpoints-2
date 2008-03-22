@@ -2,7 +2,7 @@
  * 
  */
 
-package talkingPoints;
+
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -255,8 +255,9 @@ public class TalkingPointsGUI  {
 				else
 					System.out.println("object #" + i + " is unallocated.");
 			}
-		
-		data[0] = new POIdata(p.name(), p.location_type(), p.description());
+		/* does this work instead of creating a new POIdata object every time*/ 
+		data[0] = p;
+		//data[0] = new POIdata(p.name(), p.location_type(), p.description()); ;
 		
 		fireTableDataChanged();
 			
