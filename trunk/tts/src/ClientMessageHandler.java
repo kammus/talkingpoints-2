@@ -3,7 +3,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-package talkingPoints;
+
 
 public class ClientMessageHandler {
 	 
