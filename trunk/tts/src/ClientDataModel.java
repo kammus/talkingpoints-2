@@ -84,7 +84,7 @@ public class ClientDataModel{
         long tpid;
         boolean matched = false;
         private POIdata data;
-        //TalkingPointsGUI ourGUI = new TalkingPointsGUI();
+        TalkingPointsGUI ourGUI = new TalkingPointsGUI();
         
         private static NodeList getElement(Document doc , String tagName , int index ){
             //given an XML document and a tag, return an Element at a given index
@@ -137,9 +137,7 @@ public class ClientDataModel{
                  
                  data = new POIdata(name, type, description, country, postalCode, street, state, phone, url, city); //object creation
                  objectNotify(data);
-                 /* What are we doing here? Did we change how the GUI / SUI gets activated */ 
-                 //boolean blind = false;
-                 /*
+                 boolean blind = false;
                  if (blind == true)
                  {
                  	Speaker locationSpeaker = new Speaker(data);
@@ -150,8 +148,7 @@ public class ClientDataModel{
                  	ourGUI.addItem(data);
                  }
                  
-                 */
-                 
+                                 
                  }catch (SAXParseException err) {
                          System.out.println ("** Parsing error" + ", line " +err.getLineNumber() + ", uri " + err.getSystemId());
                          System.out.println(" " + err.getMessage ());    
