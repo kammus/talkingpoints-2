@@ -6,7 +6,7 @@
  * Consists of three String objects. 
  */
 
-//package talkingPoints;
+package talkingPoints;
 
 public class TableEntry {
 
