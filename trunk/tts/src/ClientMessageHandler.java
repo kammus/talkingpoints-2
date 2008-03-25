@@ -12,11 +12,16 @@ public class ClientMessageHandler {
 		
 	}
 	
-	public void tagWasRead(long tagID) throws Exception{
-		// for test, use absolute URL address
-		URL url = new URL("http://grocs.dmc.dc.umich.edu:3000/locations/show_by_bluetooth_mac");
+	public void tagWasRead(String macAddress) throws Exception{
 		
-		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+		URL url = new URL("http://grocs.dmc.dc.umich.edu:3000/locations/show_by_bluetooth_mac/");
+		
+		StringBuffer urlSB = new StringBuffer(url.toString());
+		urlSB.append(macAddress);
+		
+		URL nurl = new URL(urlSB.toString());
+			
+		HttpURLConnection conn = (HttpURLConnection)nurl.openConnection();
 		conn.setDoInput(true);
 		conn.setDoOutput(true);
 		conn.setRequestMethod("GET");
@@ -24,24 +29,12 @@ public class ClientMessageHandler {
 		conn.setRequestProperty("Content-Type","text/xml");
 		//conn.connect();
 		
-		InputStream in = conn.getInputStream(); // InputStream for espresso-royale.xml
-		
-		// in real life, we will send a message to the backend (TP2S)
-
-		System.out.println("Tag was read: " + tagID);
-		if(tagID == 123)
-		{
-			clientDataModel.parseXML(in);
-			clientDataModel.tagChecking(123);
-		}
+		InputStream in = conn.getInputStream(); // Inputstream for xml data
+	
+		System.out.println("MacAddress was read: " + macAddress);
+		clientDataModel.parseXML(in);
 		
 		conn.disconnect();
-		/*
-		if(tagID == 124)
-			clientDataModel.parseXML("stucchis.xml"); // no later
-			*/
-		//clientDataModel.tagChecking(tagID); // just for test, pass tagID to tagChecking
-	}
-
 	
+	}	
 }
