@@ -44,6 +44,8 @@ public class Speaker {
 	{
 		String toSpeak;
 		toSpeak = "The name is " + locationData.name() + " and it is of type " + locationData.location_type();
+		
+		System.out.println("toSpeak: " + toSpeak);
 		dbVoice.speak(toSpeak);
 		System.out.println();
 		dbVoice.deallocate();
