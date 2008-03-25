@@ -1,6 +1,10 @@
 import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
-import edu.cmu.sphinx.* ;
+import edu.cmu.sphinx.frontend.util.Microphone;
+import edu.cmu.sphinx.recognizer.Recognizer;
+import edu.cmu.sphinx.result.Result;
+import edu.cmu.sphinx.util.props.ConfigurationManager;
+import edu.cmu.sphinx.util.props.PropertyException; ;
 
 
 public class Speaker {
@@ -39,39 +43,4 @@ dbVoice.speak(welcomeString);
 		Object empty = new Object();
 		return empty;
 	}
-	
-	/* public static void main(String args[]){
-		System.out.println("Running main");
-	      //voice manager, gets and verifies voice for use
-		;
-	     
-	      //verifies voice
-	    if (dbVoice == null) {
-	    	System.err.println("Cannot find " +voiceName);
-	    	System.exit(1);
-	    }//end if
-	    
-	    dbVoice.allocate();
-	    
-		try {
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		
-		String toSpeak = "";
-		while(toSpeak != "quit")
-		{
-			try{
-				BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-				System.out.print("Speak this: ");
-				toSpeak = input.readLine();
-				System.out.println("\nid= " + toSpeak);   
-			}catch(IOException ioe){ioe.printStackTrace();}
-			if (toSpeak != "")
-			{
-				System.out.println("speaking...");
-				dbVoice.speak(toSpeak);
-			}	
-		}
-	}*/
 }
