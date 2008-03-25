@@ -15,15 +15,21 @@ public class Speaker {
 		String voiceName = "kevin16";
 	    VoiceManager voiceManager = VoiceManager.getInstance();
 	    dbVoice = voiceManager.getVoice(voiceName);
+	    String welcomeString =  "Welcome to Talking Points." + 
+		" At any time, To go back to home, say HOME." + 
+"To stop listening, say STOP or SKIP. " + 
+"To repeat the previous sentence, say REPEAT. " +
+"To go back to the previous menu, say BACK. " + 
+"To skip the current item and go to the next one, say NEXT To pause, say PAUSE" + 
+"To contine, say CONTINUE"; 
+dbVoice.speak(welcomeString);
 	    dbVoice.allocate();
 	}
 	/* create a dialog with the user */ 
 	public void createDialog()
 	{
 		String toSpeak;
-		toSpeak = "The location is " + locationData.name() + " and it is of type " + locationData.location_type();
-		dbVoice.speak(toSpeak);
-		toSpeak = "Here is a short description " + locationData.description(); 
+		toSpeak = "The name is " + locationData.name() + " and it is of type " + locationData.location_type();
 		dbVoice.speak(toSpeak);
 		dbVoice.deallocate();
 	}
