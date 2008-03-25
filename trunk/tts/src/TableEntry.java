@@ -6,8 +6,6 @@
  * Consists of three String objects. 
  */
 
-package talkingPoints;
-
 public class TableEntry {
 
 	// Default constructor
