@@ -84,7 +84,7 @@ public class ClientDataModel{
         long tpid;
         boolean matched = false;
         private POIdata data;
-        //TalkingPointsGUI ourGUI = new TalkingPointsGUI();
+        TalkingPointsGUI ourGUI = new TalkingPointsGUI();
         
         private static NodeList getElement(Document doc , String tagName , int index ){
             //given an XML document and a tag, return an Element at a given index
