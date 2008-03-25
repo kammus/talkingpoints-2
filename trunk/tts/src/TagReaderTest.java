@@ -14,13 +14,13 @@ public class TagReaderTest {
 			public void run() {
 				//try{
 					//tagReader.bluetoothSearch();				// search Bluetooth MacAddress
-					tagReader.generateFakeTagEvent(); // for Tag Test
+					tagReader.generateFakeEvent(); // for MacAddress test
 				//}catch(IOException e){
 					
 				//}	
 			}
 		};
-		// will fire a new TimerTask every 5 sec, each of which will generate a fake tag event
-		timer.scheduleAtFixedRate(timerTask, 0, 1000);
+		// will fire a new TimerTask every 10 sec, each of which will generate a fake tag event
+		timer.scheduleAtFixedRate(timerTask, 0, 2000);
 	}	
 }

@@ -2,25 +2,26 @@ package talkingPoints;
 
 import java.io.IOException;
 import java.util.Vector;
-
+/*
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
+*/
 
-
-public class TagReader implements DiscoveryListener{
+public class TagReader{// implements DiscoveryListener{
 	
 	private ClientMessageHandler clientMessageHandler = null;
 	private static Object lock=new Object();
 	private static Vector vecDevices=new Vector();
-	private static String macAddress;
+	private static String macAddress[];
 
-	// array of tag ids for testing--these need to match the ids in the DummyDatabase
-	long fakeTagIDs[] = new long [] { 123 , 124, 125, 126 };
-	int currentFakeTagIndex = 0;
+	// fakeMacAdress list
+	String fakeMacAddress[] = new String [] { "1234567890ab" , "0123456789cd", "1234567890ef"};
+	//The Macaddress of Espresso Royale, TCF, Underground Printing in order
+	int currentIndex = 0;
 
 	// make default constructor private to ensure it's never called. Can't make a TagReader w/o a message handler!
 	private TagReader() {
@@ -33,21 +34,21 @@ public class TagReader implements DiscoveryListener{
 	}
 	
 	// Temporarily, making fakeTag
-	public void generateFakeTagEvent() {
-		notifyTagWasRead(fakeTagIDs[currentFakeTagIndex]);
-		currentFakeTagIndex++;
-		if (currentFakeTagIndex >= fakeTagIDs.length) currentFakeTagIndex = 0;
+	public void generateFakeEvent() {
+		notifyMacAddressWasRead(fakeMacAddress[currentIndex]);
+		currentIndex++;
+		if (currentIndex >= fakeMacAddress.length) currentIndex = 0;
 	}
 	
-	private void notifyTagWasRead(long tagID) {
+	private void notifyMacAddressWasRead(String MacAddress) {
 		try{
-		clientMessageHandler.tagWasRead(tagID);
+		clientMessageHandler.tagWasRead(MacAddress);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
+/*
 	// bluetoothSearch function
-
 	public static void bluetoothSearch() throws IOException{
 	
 		TagReader tagReader = new TagReader();
@@ -110,5 +111,5 @@ public class TagReader implements DiscoveryListener{
 		break;
 			}
 	}//end method
-
+*/
 }
