@@ -6,15 +6,18 @@ import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException; ;
 
-
+/*
+ * Perhaps have some graphical output for the moment 
+ * 
+ * 
+ */
 public class Speaker {
 	POIdata locationData;
 	Voice dbVoice;
 	
     
-	public Speaker(POIdata incoming)
+	public Speaker()
 	{
-		locationData = incoming;
 		/* Set up freetts voice object */ 
 		String voiceName = "kevin16";
 	    VoiceManager voiceManager = VoiceManager.getInstance();
@@ -26,15 +29,23 @@ public class Speaker {
 "To go back to the previous menu, say BACK. " + 
 "To skip the current item and go to the next one, say NEXT To pause, say PAUSE" + 
 "To contine, say CONTINUE"; 
-dbVoice.speak(welcomeString);
+		System.out.println("Startup string: " + welcomeString);
 	    dbVoice.allocate();
+	    dbVoice.speak(welcomeString);
 	}
+	public void addPOI(POIdata incoming)
+	{
+		locationData = incoming; 
+	}
+	
+	
 	/* create a dialog with the user */ 
 	public void createDialog()
 	{
 		String toSpeak;
 		toSpeak = "The name is " + locationData.name() + " and it is of type " + locationData.location_type();
 		dbVoice.speak(toSpeak);
+		System.out.println();
 		dbVoice.deallocate();
 	}
 	/* Eventually will return some type of object */

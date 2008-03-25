@@ -85,7 +85,7 @@ public class ClientDataModel{
         boolean matched = false;
         private POIdata data;
         TalkingPointsGUI ourGUI = new TalkingPointsGUI();
-        
+        Speaker locationSpeaker = new Speaker();
         private static NodeList getElement(Document doc , String tagName , int index ){
             //given an XML document and a tag, return an Element at a given index
             NodeList rows = doc.getDocumentElement().getElementsByTagName(tagName);
@@ -134,10 +134,10 @@ public class ClientDataModel{
                  
                  data = new POIdata(name, description, country,postalCode,street,state, url,city); //object creation
                  objectNotify(data);
-                 boolean blind = false;
+                 boolean blind = true;
                  if (blind == true)
                  {
-                 	Speaker locationSpeaker = new Speaker(data);
+                 	locationSpeaker.addPOI(data);
                  	locationSpeaker.createDialog(); 
                  }
                  else 

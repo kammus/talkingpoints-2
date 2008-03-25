@@ -1,5 +1,3 @@
-package talkingPoints;
-
 import java.io.IOException;
 
 
