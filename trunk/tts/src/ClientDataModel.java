@@ -24,10 +24,10 @@ class POIdata {
         POIdata(){
         }
         
-        POIdata (String name_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t)// String phone_t,
+        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t)// String phone_t,
         {
                 name = name_t;
-                //type = type_t;
+                type = type_t;
                 description = description_t;
                 country = country_t;
                 postalCode = postalCode_t;
@@ -110,7 +110,7 @@ public class ClientDataModel{
                  //NodeList tpidText = getElement(doc, "tpid", 0); //XML changed
                  NodeList nameText, typeText, descriptionText, countryText, postalCodeText, streetText, phoneText, urlText, stateText, cityText;
                  nameText = getElement(doc, "name", 0);
-                 //typeText = getElement(doc, "type", 0); //XML changed
+                 typeText = getElement(doc, "location_type", 0); //XML changed
                  descriptionText = getElement(doc, "description", 0);
                  streetText = getElement(doc, "street",0);
                  cityText = getElement(doc, "city",0);
@@ -122,7 +122,7 @@ public class ClientDataModel{
                   
                  
                  name = ((Node)nameText.item(0)).getNodeValue();
-                 //type = ((Node)typeText.item(0)).getNodeValue(); //type is not included in XML now.
+                 type = ((Node)typeText.item(0)).getNodeValue(); //type is not included in XML now.
                  description = ((Node)descriptionText.item(0)).getNodeValue();
                  country = ((Node)countryText.item(0)).getNodeValue();
                  postalCode =((Node)postalCodeText.item(0)).getNodeValue();
@@ -132,7 +132,7 @@ public class ClientDataModel{
                  url = ((Node)urlText.item(0)).getNodeValue();
                  city = ((Node)cityText.item(0)).getNodeValue();
                  
-                 data = new POIdata(name, description, country,postalCode,street,state, url,city); //object creation
+                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city); //object creation
                  objectNotify(data);
                  boolean blind = true;
                  if (blind == true)
