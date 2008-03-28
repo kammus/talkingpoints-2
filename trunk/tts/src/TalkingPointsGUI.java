@@ -2,11 +2,14 @@
  * 
  */
 
+import javax.swing.SwingConstants;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.JButton;
+import javax.swing.JRadioButton;
 import javax.swing.JLabel;
 import javax.swing.BoxLayout;
 import javax.swing.border.LineBorder;
@@ -19,6 +22,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
+import javax.swing.JEditorPane;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
 import java.awt.event.ActionEvent;
@@ -28,10 +35,20 @@ import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.lang.StringBuffer;
 
 public class TalkingPointsGUI implements ActionListener {
-
+	
 	// Constants
+	static final int BG_COLOR_R = 241;
+	static final int BG_COLOR_G = 215;
+	static final int BG_COLOR_B = 161;
+	static final int COMP_BG_COLOR_R = 255;
+	static final int COMP_BG_COLOR_G = 255;
+	static final int COMP_BG_COLOR_B = 255;
 	static final int COMP_SPACER_X = 10;
 	static final int COMP_SPACER_Y = 10;
 	static final int TOP_SPACER_X = 50;
@@ -57,11 +74,15 @@ public class TalkingPointsGUI implements ActionListener {
 			
 		// Allocate components for the GUI's pages
 		ImageIcon forward = createImageIcon("images/forward.png", "Button that advances to a screen with more information about this point of interest.");
+		ImageIcon seen = createImageIcon("images/seen.png", "icon that represents a visible location.");
+		ImageIcon notseen = createImageIcon("images/notseen.png", "icon that represents a hidden location.");
+		ImageIcon forwardsm = createImageIcon("images/forwardsm.png", "small version of forward.png.");
 		
 		mainFrame = new JFrame("Talking Points");
 		mainContentPane = new JPanel(new BorderLayout());
 		locationList = new JTable(5, 3);
-		ourModel = new locListModel(forward);
+		locationListB = new JTable(5, 3);
+		ourModel = new locListModel(seen);
 		frontScroll = new JScrollPane(locationList);
 		logoButton = new JButton(createImageIcon("images/logo.jpg", "TalkingPoints Logo"));
 		viewAll = new JButton("View All");
@@ -69,14 +90,14 @@ public class TalkingPointsGUI implements ActionListener {
 				javax.swing.SwingConstants.CENTER);
 		tableTitle = new JLabel("<html><font size = 4><u>Detected Points of Interest</font></u></html>", javax.swing.SwingConstants.CENTER);
 		centralPane = new JPanel(new CardLayout());
-		locationName = new JLabel("Empty");
-		locationDesc = new JLabel("Empty");
-		
+		locationTitle = new JLabel("Empty");
+		coreInfo = new JEditorPane("text/html", "blahblahblah");
+				
 		// Pre-calculate our desired component sizes to save time/computation
-		int forwardWidth = forward.getIconWidth() ;
-		int forwardHeight = forward.getIconHeight();
+		int seenWidth = seen.getIconWidth() ;
+		int seenHeight = seen.getIconHeight();
 	
-		int tableHeight = (forwardHeight * 5) + tableTitle.getHeight() + 15;
+		int tableHeight = (seenHeight * 5) + tableTitle.getHeight() + 15;
 		
 		int legendWidth = legend.getIcon().getIconWidth();
 		int legendHeight = legend.getIcon().getIconHeight();
@@ -84,12 +105,12 @@ public class TalkingPointsGUI implements ActionListener {
 		int logoWidth = logoButton.getIcon().getIconWidth();
 		int logoHeight = logoButton.getIcon().getIconHeight();	
 
-		int windowWidth = legend.getIcon().getIconWidth() + logoButton.getIcon().getIconWidth() + TOP_SPACER_X;
+		int windowWidth = legend.getIcon().getIconWidth() + logoButton.getIcon().getIconWidth() + TOP_SPACER_X + COMP_SPACER_X + COMP_SPACER_X;
 		int tallest = (legendHeight > logoHeight) ? legendHeight : logoHeight;
 		int windowHeight = COMP_SPACER_Y + tallest + COMP_SPACER_Y + tableHeight + (COMP_SPACER_Y / 2) 
 		+ VIEWALL_Y + COMP_SPACER_Y + 38;
 		
-		int infoFieldsWidth = windowWidth - forward.getIconWidth() - (COMP_SPACER_X * 2);
+		int infoFieldsWidth = windowWidth - seen.getIconWidth() - (COMP_SPACER_X * 2);
 		
 		// Configure main frame
 		mainFrame.setResizable(false);
@@ -110,25 +131,31 @@ public class TalkingPointsGUI implements ActionListener {
 		locationList.setModel(ourModel);
 		locationList.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer());
 		locationList.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(new JCheckBox()));
-		locationList.getColumnModel().getColumn(0).setPreferredWidth(forwardWidth);
-		locationList.getColumnModel().getColumn(0).setMinWidth(forwardWidth);
-		locationList.getColumnModel().getColumn(0).setMaxWidth(forwardWidth);
+		locationList.getColumnModel().getColumn(0).setPreferredWidth(seenWidth);
+		locationList.getColumnModel().getColumn(0).setMinWidth(seenWidth);
+		locationList.getColumnModel().getColumn(0).setMaxWidth(seenWidth);
 		locationList.getColumnModel().getColumn(1).setPreferredWidth((int)Math.floor(infoFieldsWidth * 0.25));
 		locationList.getColumnModel().getColumn(1).setMinWidth((int)Math.floor(infoFieldsWidth * 0.25));
 		locationList.getColumnModel().getColumn(1).setMaxWidth((int)Math.floor(infoFieldsWidth * 0.25));
 		locationList.getColumnModel().getColumn(2).setPreferredWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
 		locationList.getColumnModel().getColumn(2).setMinWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
 		locationList.getColumnModel().getColumn(2).setMaxWidth(infoFieldsWidth * 2);
-		locationList.setRowHeight(forwardHeight);
+		locationList.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
+		locationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		locationList.setRowSelectionAllowed(false);
+		locationList.setColumnSelectionAllowed(false);
+		locationList.setRowHeight(seenHeight);
 		locationList.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		locationList.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 		locationList.setFillsViewportHeight(true);
 		locationList.setShowHorizontalLines(false);
 		locationList.setShowVerticalLines(false);
-		
 		locationList.getTableHeader().setResizingAllowed(false);
 		locationList.getTableHeader().setReorderingAllowed(false);
 		locationList.getTableHeader().setVisible(false);
+		// Add selection listener to table
+		ListSelectionModel selectionModel = locationList.getSelectionModel();
+		selectionModel.addListSelectionListener(new cellListener());
 		
 		// Configure Legend label
 		legend.setPreferredSize(new Dimension(legendWidth, legendHeight));
@@ -149,22 +176,20 @@ public class TalkingPointsGUI implements ActionListener {
 		viewAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		viewAll.setAlignmentY(Component.CENTER_ALIGNMENT);
 		
-		// CONFIGURE MORE INFORMATION PANEL
-		// Configure title labels
-		locationName.setPreferredSize(new Dimension(100, 15));
-		locationDesc.setPreferredSize(new Dimension(100, 15));
-		
 		// Set up horizontal layer at top of window
 		JPanel topButtons = new JPanel();
+		topButtons.setBackground(new Color(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B));
 		topButtons.setLayout(new BoxLayout(topButtons, BoxLayout.LINE_AXIS));
 		topButtons.setBorder(BorderFactory.createEmptyBorder(COMP_SPACER_X, 2, COMP_SPACER_Y, 2));
 		topButtons.add(Box.createRigidArea(new Dimension(COMP_SPACER_X, COMP_SPACER_Y)));
 		topButtons.add(legend);
 		topButtons.add(Box.createGlue());
 		topButtons.add(logoButton);
+		topButtons.add(Box.createRigidArea(new Dimension(COMP_SPACER_X, COMP_SPACER_Y)));
 		
 		// Set up vertical layer consisting of title + scroll pane + location list table
 		JPanel middlePane = new JPanel();
+		middlePane.setBackground(new Color(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B));
 		middlePane.setLayout(new BoxLayout(middlePane, BoxLayout.Y_AXIS));
 		middlePane.add(tableTitle);
 		middlePane.add(Box.createRigidArea(new Dimension(COMP_SPACER_X, (COMP_SPACER_Y / 2))));
@@ -175,26 +200,123 @@ public class TalkingPointsGUI implements ActionListener {
 		
 		/// Set up final horizontal layer of only the view all button
 		JPanel bottomButton = new JPanel();
+		bottomButton.setBackground(new Color(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B));
 		bottomButton.setLayout(new BoxLayout(bottomButton, BoxLayout.LINE_AXIS));
 		bottomButton.add(Box.createGlue());
 		bottomButton.add(viewAll);
 		bottomButton.add(Box.createRigidArea(new Dimension(COMP_SPACER_X, COMP_SPACER_Y))); 
 		middlePane.add(bottomButton);
+	
 		centralPane.add(middlePane, MAINPANE);
 		
+		// CONFIGURE MORE INFORMATION PANEL
 		// Set up More Information pane
 		JPanel moreInfo = new JPanel();
+		JPanel moreInfoLeftSide = new JPanel();
+		JPanel moreInfoRightSide = new JPanel();
+		JPanel moreInfoMiddle = new JPanel();
 		
-		// Set up title bar
+		// Configure title 
 		JPanel title = new JPanel();
-		title.setLayout(new BoxLayout(title, BoxLayout.X_AXIS));
+		locationTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+		title.setBackground(new Color(COMP_BG_COLOR_R,COMP_BG_COLOR_G,COMP_BG_COLOR_B));
 		title.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-		title.setBackground(new Color(172,193,174));
-		title.add(locationName);
-		title.add(Box.createRigidArea(new Dimension(COMP_SPACER_X, COMP_SPACER_Y)));
-		title.add(locationDesc);
+		title.add(locationTitle, BorderLayout.PAGE_START);
+		title.setAlignmentX(Component.LEFT_ALIGNMENT);
+		title.setPreferredSize(new Dimension(400, 35));
+		title.setMinimumSize(new Dimension(400, 35));
+		title.setMaximumSize(new Dimension(400, 35));
 		
-		moreInfo.add(title);
+		// Configure Core Information text pane
+		coreInfo.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
+		coreInfo.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+		coreInfo.setEditable(false);
+		
+		// TODO: Put this in the right spot, as it is no longer in the same group as the title labels
+		JLabel recentlyPassed = new JLabel("<html><font size = 4>Points You Have <u>Recently Passed</u></font></html>");
+		recentlyPassed.setBackground(new Color(COMP_BG_COLOR_R,COMP_BG_COLOR_G,COMP_BG_COLOR_B));
+		recentlyPassed.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+		recentlyPassed.setVerticalAlignment(SwingConstants.NORTH);
+		recentlyPassed.setAlignmentX(Component.CENTER_ALIGNMENT);
+		recentlyPassed.setAlignmentY(Component.TOP_ALIGNMENT);
+		recentlyPassed.setPreferredSize(new Dimension(150, 50));
+		recentlyPassed.setMinimumSize(new Dimension(150, 50));
+		recentlyPassed.setMaximumSize(new Dimension(150, 50));
+		
+		// Configure panel of radio buttons
+		JPanel moreInfoMenu = new JPanel();
+		moreInfoMenu.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
+		JRadioButton menu = new JRadioButton("Menu", forwardsm);
+		JRadioButton hours = new JRadioButton("Hours", forwardsm);
+		JRadioButton history = new JRadioButton("History", forwardsm);
+		JRadioButton comments = new JRadioButton("Comments", forwardsm);
+		JRadioButton contact = new JRadioButton("Contact", forwardsm);
+		JRadioButton accessibility = new JRadioButton("Accessibility", forwardsm);
+		moreInfoMenu.setLayout(new BoxLayout(moreInfoMenu, BoxLayout.Y_AXIS));
+		moreInfoMenu.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+		moreInfoMenu.setBackground(new Color(237,241,238));
+		moreInfoMenu.setMaximumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
+		moreInfoMenu.setMinimumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
+		moreInfoMenu.setPreferredSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
+		moreInfoMenu.add(menu);
+		moreInfoMenu.add(hours);
+		moreInfoMenu.add(history);
+		moreInfoMenu.add(accessibility);
+		moreInfoMenu.add(contact);
+		moreInfoMenu.add(comments);
+		
+		// Configure location list table B
+		locationListB.setModel(ourModel);
+		locationListB.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer());
+		locationListB.getColumnModel().getColumn(0).setPreferredWidth(0);
+		locationListB.getColumnModel().getColumn(0).setMinWidth(0);
+		locationListB.getColumnModel().getColumn(0).setMaxWidth(0);
+		/*locationListB.getColumnModel().getColumn(1).setPreferredWidth((int)Math.floor(infoFieldsWidth * 0.25));
+		locationListB.getColumnModel().getColumn(1).setMinWidth((int)Math.floor(infoFieldsWidth * 0.25));
+		locationListB.getColumnModel().getColumn(1).setMaxWidth((int)Math.floor(infoFieldsWidth * 0.25));
+		locationListB.getColumnModel().getColumn(2).setPreferredWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
+		locationListB.getColumnModel().getColumn(2).setMinWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
+		locationListB.getColumnModel().getColumn(2).setMaxWidth(infoFieldsWidth * 2);
+		locationListB.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
+		locationListB.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		locationListB.setRowSelectionAllowed(false);
+		locationListB.setColumnSelectionAllowed(false);
+		locationListB.setRowHeight(seenHeight);
+		locationListB.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		locationListB.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+		locationListB.setFillsViewportHeight(true);
+		locationListB.setShowHorizontalLines(false);
+		locationListB.setShowVerticalLines(false);
+		locationListB.getTableHeader().setResizingAllowed(false);
+		locationListB.getTableHeader().setReorderingAllowed(false);
+		locationListB.getTableHeader().setVisible(false); */
+				
+		// Add components to More Info pane
+		moreInfo.setLayout(new GridBagLayout());
+		moreInfo.setBackground(new Color(BG_COLOR_R,BG_COLOR_G,BG_COLOR_B));
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 4;
+		c.gridheight = 1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.FIRST_LINE_START;
+		c.insets = new Insets(0, 0, COMP_SPACER_Y, 0);
+		moreInfo.add(title, c);
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 2;
+		c.gridheight = 5;
+		c.insets = new Insets(COMP_SPACER_Y, 0, 0, COMP_SPACER_X);
+		moreInfo.add(moreInfoMenu, c);
+		c = new GridBagConstraints();
+		c.gridx = 3;
+		c.gridy = 1;
+		c.gridwidth = 4;
+		c.gridheight = 5;
+		c.fill = GridBagConstraints.BOTH;
+		moreInfo.add(coreInfo, c);
 		
 		centralPane.add(moreInfo, MOREINFO);
 		
@@ -220,24 +342,67 @@ public class TalkingPointsGUI implements ActionListener {
 	}
 	
 	// Listener for the table model that is assigned to the main pane table
-	// TODO: In case the table gets changed, we need to make a copy of the data while we're looking at its details
+	// This is used to detect when the button in column 0 is "edited", ie clicked.
 	class mainModelListener implements TableModelListener {
 		
-		public void tableChanged(TableModelEvent evt) {
-		
-			if(evt.getColumn() == 123) {
-				int row = evt.getFirstRow();
+		public void tableChanged(TableModelEvent e) {
+			
+			if(e.getColumn() == 123) {
+				int row = e.getFirstRow();
 				locListModel model = (locListModel)locationList.getModel();
-				locationName.setText((String)model.getValueAt(row, 1));
-				locationDesc.setText((String)model.getValueAt(row, 2));
-				CardLayout cl = (CardLayout)centralPane.getLayout();
-				cl.show(centralPane, MOREINFO);
+				if(model.getValueAt(row, 1) != null) {
+	//				locationName.setText((String)model.getValueAt(row, 1));
+					CardLayout cl = (CardLayout)centralPane.getLayout();
+					cl.show(centralPane, MOREINFO);
+				}
+			
 			}
 		}
 		
 	}
 	
+	/* Listener for user selection of a table cell
+	   For some reason, getFirstIndex() and getLastIndex() are inconsistent in the values they return when selecting rows,
+	   so we need to find the row selected by converting the output of getSource() to a string, and then
+	   the character after the first '{' to int, before subtracting the unicode integer value of '0'.  */
+	class cellListener implements ListSelectionListener {
+		
+		public void valueChanged(ListSelectionEvent e) {
+			locListModel model = (locListModel)locationList.getModel();
+			
+			if(!(e.getValueIsAdjusting())) {
+				String eventString = e.getSource().toString();
+				int index = eventString.lastIndexOf('{');
+				index++;
+				int row = (int)eventString.charAt(index) - (int)'0';
+				System.out.println("Row " + row + " selected. " + e.getSource());
+				if(model.getValueAt(row, 1) != null) {
+					cachedData = new POIdata((String)model.getValueAt(row, 1), 
+							(String)model.getValueAt(row,2),
+							(String)model.getValueAt(row,3),
+							(String)model.getValueAt(row,4),
+							(String)model.getValueAt(row,5),
+							(String)model.getValueAt(row,6),
+							(String)model.getValueAt(row,7),
+							(String)model.getValueAt(row,8));
+					locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
+							+ cachedData.description() + "]</font></b></html>");
+					StringBuffer sb = new StringBuffer();
+					String s = createString(cachedData);
+					coreInfo.setText(s);
+					CardLayout cl = (CardLayout)centralPane.getLayout();
+					cl.show(centralPane, MOREINFO);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
 	// Listener for the Talking Points logo button (may expand to cover other types of buttons if needed)
+	// Unlike the other listeners, this is not its own object, but part of TalkingPointsGUI.
 	public void actionPerformed(ActionEvent e) {
 		if(e.getActionCommand() == "home")  {
 		CardLayout cl = (CardLayout)centralPane.getLayout();
@@ -247,12 +412,18 @@ public class TalkingPointsGUI implements ActionListener {
 	
 	/**
 	 * @param args is unused
-	 */  /*
-	public static void main(String[] args) {
+	 */   /*
+	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
-		ourGUI.addItem(new POIdata("things", "place", "stuff", "words", "bleh", "duder", "blah", "schmelding", "potrzebie", "arglglg"));
-		System.out.println("Adding item");
+		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Middle Earth", "Kitsch Store", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Pinball Pete's", "Video Arcade", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Good Time Charley's", "Restaurant", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Scorekeeper's", "Bar", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Michigan Theater", "Movie Theater", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("The Backroom", "Pizzeria", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Dawn Treader", "Bookstore", "stuff", "48104", "1234 Cross Ave", "MI", "http://www.google.com", "Ann Arbor"));
 	}  */
 
 	/* Custom table model for locationList.
@@ -262,9 +433,8 @@ public class TalkingPointsGUI implements ActionListener {
 	class locListModel extends AbstractTableModel {
 			
 		locListModel(ImageIcon icon) {
-			data = new POIdata[5];
-			forward = icon;
-			System.out.println("Location list model created.");
+			data = new POIdata[10];
+			ourIcon = icon;
 		}
 		
 		// Required method getRowCount()
@@ -297,17 +467,34 @@ public class TalkingPointsGUI implements ActionListener {
 		}
 		
 		// Required method getValueAt()
+		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
 			
 			if(data[row] == null)
 				return null;
 			
-			if(column == 1)
+			switch(column) {
+			case(0):
+				return ourIcon;
+			case(1):
 				return data[row].name();
-			else if (column == 2)
+			case(2):
 				return data[row].description();
-			else
-				return forward;
+			case(3):
+				return data[row].country();
+			case(4):
+				return data[row].postalCode();
+			case(5):
+				return data[row].street();
+			case(6):
+				return data[row].state();
+			case(7):
+				return data[row].url();
+			case(8):
+				return data[row].city();
+			default:
+				return null;     }
+		
 		}
 		
 		// Push a new data entry onto the list.  The
@@ -327,9 +514,9 @@ public class TalkingPointsGUI implements ActionListener {
 		}
 		
 		
-		// Queue to store location data; this will consist of two strings contained in the class TableEntry.
+		// variable definitions
 		private POIdata[] data;
-		private ImageIcon forward;
+		private ImageIcon ourIcon;
 	} 
 	
 	// Custom renderer for the button fields that will appear in the tables
@@ -407,6 +594,22 @@ public class TalkingPointsGUI implements ActionListener {
 		protected JButton button;
 		private boolean isPushed;
 	}
+		
+	// Fills a stringbuffer with the necessary text for the Core Info pane, then returns it as a string.
+	public String createString(POIdata p) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<font size = 5>&nbsp;Core Information</font><hr><pre>");
+		sb.append(" Name:          " + p.name() + " <br>");
+		sb.append(" Location Type: " + p.location_type() + " <br>");
+		sb.append(" Description:   " + p.description() + " <br>");
+		sb.append(" Address:       " + p.street() + " <br>");
+		sb.append("                " + p.city() + " " + p.state() + " " + p.postalCode() + " <br>");
+		sb.append(" Phone:         " + p.phone() + " <br>");
+		sb.append(" URL:           <a href=" + p.url() + ">" + p.url() + "</a> </pre>");
+		
+		String s = new String(sb);
+		return s;
+	}
 	
 	// Variable definitions
 	private locListModel ourModel;
@@ -415,10 +618,13 @@ public class TalkingPointsGUI implements ActionListener {
 	private JPanel centralPane;
 	private JScrollPane frontScroll;
 	private JTable locationList;
+	private JTable locationListB;
 	private JButton logoButton;
 	private JButton viewAll;
 	private JLabel legend;
 	private JLabel tableTitle;
-	private JLabel locationName;
-	private JLabel locationDesc;
+	private JLabel locationTitle;
+	private JEditorPane coreInfo;
+	// A copy of the POIdata currently being viewed
+	private POIdata cachedData;
 }
