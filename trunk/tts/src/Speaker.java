@@ -36,11 +36,10 @@ public class Speaker {
 "To skip the current item and go to the next one, say NEXT To pause, say PAUSE" + 
 "To contine, say CONTINUE"; 
 		System.out.println("Startup string: " + welcomeString);
-	    dbVoice.allocate();
-	    dbVoice.speak(welcomeString);
+	
 	    
 	    /* Set up for recognizer */
-	    url = Speaker.class.getResource("talkingpoints.config.xml");
+	    url = Speaker.class.getResource("talkingpoints-config.xml");
         System.out.println("Loading...");
         try {
         	manager = new ConfigurationManager(url);
@@ -63,7 +62,9 @@ public class Speaker {
         	System.err.println("Problem creating Recognizer: " + e);
         	e.printStackTrace();
         }
-	    
+	    System.out.println("Done loading!");
+	    dbVoice.allocate();
+	    //dbVoice.speak(welcomeString);
 	}
 	public void addPOI(POIdata incoming)
 	{
