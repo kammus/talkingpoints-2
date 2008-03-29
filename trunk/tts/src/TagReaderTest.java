@@ -7,18 +7,19 @@ public class TagReaderTest {
 	public static void main (String args[]){
 		ClientMessageHandler clientMessageHandler = new ClientMessageHandler(); // also loading xml file
 		final TagReader tagReader = new TagReader(clientMessageHandler);
-		final java.util.Timer timer = new java.util.Timer();
+		tagReader.generateFakeEvent(); // for MacAddress test
+		/* final java.util.Timer timer = new java.util.Timer();
 		java.util.TimerTask timerTask = new java.util.TimerTask() {
-			public void run() {
+			public void run() { */
 				//try{
 					//tagReader.bluetoothSearch();				// search Bluetooth MacAddress
-					tagReader.generateFakeEvent(); // for MacAddress test
+					
 				//}catch(IOException e){
 					
 				//}	
-			}
-		};
+		
+		
 		// will fire a new TimerTask every 10 sec, each of which will generate a fake tag event
-		timer.scheduleAtFixedRate(timerTask, 0, 2000);
+		//timer.scheduleAtFixedRate(timerTask, 0, 2000);
 	}	
 }

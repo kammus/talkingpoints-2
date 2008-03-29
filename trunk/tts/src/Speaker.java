@@ -20,6 +20,8 @@ public class Speaker {
 	ConfigurationManager manager;
 	Microphone microphone;
 	Recognizer recognizer;
+    enum menuStatus {INITIAL_SPEAK, MORE_INFO, };
+    String toSpeak;
     
 	public Speaker()
 	{
@@ -28,16 +30,15 @@ public class Speaker {
 	    VoiceManager voiceManager = VoiceManager.getInstance();
 	    dbVoice = voiceManager.getVoice(voiceName);
 	    /* some control over whether or not to speak here */ 
-	    String welcomeString =  "Welcome to Talking Points." + 
+	    toSpeak =  "Welcome to Talking Points." + 
 		" At any time, To go back to home, say HOME." + 
 "To stop listening, say STOP or SKIP. " + 
 "To repeat the previous sentence, say REPEAT. " +
 "To go back to the previous menu, say BACK. " + 
 "To skip the current item and go to the next one, say NEXT To pause, say PAUSE" + 
 "To contine, say CONTINUE"; 
-		System.out.println("Startup string: " + welcomeString);
+		System.out.println("Startup string: " + toSpeak);
 	
-	    
 	    /* Set up for recognizer */
 	    url = Speaker.class.getResource("talkingpoints-config.xml");
         System.out.println("Loading...");
@@ -71,17 +72,60 @@ public class Speaker {
 		locationData = incoming; 
 	}
 	
+	public void listener()
+	{
+		if(microphone.startRecording())
+		{	
+			while(true)
+			{
+				Result result = recognizer.recognize();
+				if (result != null) 
+			    {
+					String resultText = result.getBestFinalResultNoFiller();
+					System.out.println("You said: " + resultText + "\n");
+					//microphone.stopRecording();
+					resultHandler(resultText);
+					break;
+				} 
+			    else 
+			    {
+					String error = "I can't hear or understaid what you said.";
+					microphone.stopRecording();
+					dbVoice.speak(error);
+					dbVoice.speak(toSpeak);
+					microphone.startRecording();
+					break;
+				}
+			}
+		}
+	}
+	
 	
 	/* create a dialog with the user */ 
 	public void createDialog()
 	{
-		String toSpeak;
 		toSpeak = "The name is " + locationData.name() + " and it is of type " + locationData.location_type();
 		System.out.println("toSpeak: " + toSpeak);
 		dbVoice.speak(toSpeak);
 		System.out.println();
-		dbVoice.deallocate();
+		toSpeak = "To Hear more, say More.";
+		System.out.println("toSpeak: " + toSpeak);
+		dbVoice.speak(toSpeak);
+		listener();
+		
 	}
+	
+	public void resultHandler(String result)
+	{
+		if (result.toLowerCase().compareTo("more") == 0)
+		{			
+			toSpeak = "To Listen to comments, say Comments. To Listen to Specials, say Specials. To listen to the Menu, say Menu.";
+			System.out.println("toSpeak: " + toSpeak);
+			dbVoice.speak(toSpeak);
+			listener();
+		}
+	}
+	
 	/* Eventually will return some type of object */
 	public Object getDialogResult()
 	{
