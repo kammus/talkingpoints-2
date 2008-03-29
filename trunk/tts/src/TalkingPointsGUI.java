@@ -73,10 +73,11 @@ public class TalkingPointsGUI implements ActionListener {
 	private void initGUI() {
 			
 		// Allocate components for the GUI's pages
-		ImageIcon forward = createImageIcon("images/forward.png", "Button that advances to a screen with more information about this point of interest.");
-		ImageIcon seen = createImageIcon("images/seen.png", "icon that represents a visible location.");
-		ImageIcon notseen = createImageIcon("images/notseen.png", "icon that represents a hidden location.");
-		ImageIcon forwardsm = createImageIcon("images/forwardsm.png", "small version of forward.png.");
+		forward = createImageIcon("images/forward.png", "Button that advances to a screen with more information about this point of interest.");
+		seen = createImageIcon("images/seen.png", "icon that represents a visible location.");
+		notseen = createImageIcon("images/notseen.png", "icon that represents a hidden location.");
+		forwardsm = createImageIcon("images/forwardsm.png", "small version of forward.png.");
+		bulletpoint = createImageIcon("images/bulletpoint.png", "bullet point");
 		
 		mainFrame = new JFrame("Talking Points");
 		mainContentPane = new JPanel(new BorderLayout());
@@ -84,6 +85,7 @@ public class TalkingPointsGUI implements ActionListener {
 		locationListB = new JTable(5, 3);
 		ourModel = new locListModel(seen);
 		frontScroll = new JScrollPane(locationList);
+		infoScroll = new JScrollPane(locationListB);
 		logoButton = new JButton(createImageIcon("images/logo.jpg", "TalkingPoints Logo"));
 		viewAll = new JButton("View All");
 		legend = new JLabel(createImageIcon("images/legend.png", "Legend for this page's icons."),
@@ -108,7 +110,7 @@ public class TalkingPointsGUI implements ActionListener {
 		int windowWidth = legend.getIcon().getIconWidth() + logoButton.getIcon().getIconWidth() + TOP_SPACER_X + COMP_SPACER_X + COMP_SPACER_X;
 		int tallest = (legendHeight > logoHeight) ? legendHeight : logoHeight;
 		int windowHeight = COMP_SPACER_Y + tallest + COMP_SPACER_Y + tableHeight + (COMP_SPACER_Y / 2) 
-		+ VIEWALL_Y + COMP_SPACER_Y + 38;
+		+ VIEWALL_Y + COMP_SPACER_Y + 50;
 		
 		int infoFieldsWidth = windowWidth - seen.getIconWidth() - (COMP_SPACER_X * 2);
 		
@@ -142,6 +144,7 @@ public class TalkingPointsGUI implements ActionListener {
 		locationList.getColumnModel().getColumn(2).setMaxWidth(infoFieldsWidth * 2);
 		locationList.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
 		locationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		locationList.setCellSelectionEnabled(true);
 		locationList.setRowSelectionAllowed(false);
 		locationList.setColumnSelectionAllowed(false);
 		locationList.setRowHeight(seenHeight);
@@ -212,9 +215,7 @@ public class TalkingPointsGUI implements ActionListener {
 		// CONFIGURE MORE INFORMATION PANEL
 		// Set up More Information pane
 		JPanel moreInfo = new JPanel();
-		JPanel moreInfoLeftSide = new JPanel();
-		JPanel moreInfoRightSide = new JPanel();
-		JPanel moreInfoMiddle = new JPanel();
+		JPanel recentlyPassedPanel = new JPanel();
 		
 		// Configure title 
 		JPanel title = new JPanel();
@@ -223,26 +224,15 @@ public class TalkingPointsGUI implements ActionListener {
 		title.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		title.add(locationTitle, BorderLayout.PAGE_START);
 		title.setAlignmentX(Component.LEFT_ALIGNMENT);
-		title.setPreferredSize(new Dimension(400, 35));
-		title.setMinimumSize(new Dimension(400, 35));
-		title.setMaximumSize(new Dimension(400, 35));
+//		title.setPreferredSize(new Dimension(400, 35));
+//		title.setMinimumSize(new Dimension(400, 35));
+//		title.setMaximumSize(new Dimension(400, 35));
 		
 		// Configure Core Information text pane
 		coreInfo.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
 		coreInfo.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		coreInfo.setEditable(false);
-		
-		// TODO: Put this in the right spot, as it is no longer in the same group as the title labels
-		JLabel recentlyPassed = new JLabel("<html><font size = 4>Points You Have <u>Recently Passed</u></font></html>");
-		recentlyPassed.setBackground(new Color(COMP_BG_COLOR_R,COMP_BG_COLOR_G,COMP_BG_COLOR_B));
-		recentlyPassed.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-		recentlyPassed.setVerticalAlignment(SwingConstants.NORTH);
-		recentlyPassed.setAlignmentX(Component.CENTER_ALIGNMENT);
-		recentlyPassed.setAlignmentY(Component.TOP_ALIGNMENT);
-		recentlyPassed.setPreferredSize(new Dimension(150, 50));
-		recentlyPassed.setMinimumSize(new Dimension(150, 50));
-		recentlyPassed.setMaximumSize(new Dimension(150, 50));
-		
+			
 		// Configure panel of radio buttons
 		JPanel moreInfoMenu = new JPanel();
 		moreInfoMenu.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
@@ -255,9 +245,9 @@ public class TalkingPointsGUI implements ActionListener {
 		moreInfoMenu.setLayout(new BoxLayout(moreInfoMenu, BoxLayout.Y_AXIS));
 		moreInfoMenu.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		moreInfoMenu.setBackground(new Color(237,241,238));
-		moreInfoMenu.setMaximumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
-		moreInfoMenu.setMinimumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
-		moreInfoMenu.setPreferredSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
+	//	moreInfoMenu.setMaximumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
+	//	moreInfoMenu.setMinimumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
+	//	moreInfoMenu.setPreferredSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
 		moreInfoMenu.add(menu);
 		moreInfoMenu.add(hours);
 		moreInfoMenu.add(history);
@@ -265,23 +255,43 @@ public class TalkingPointsGUI implements ActionListener {
 		moreInfoMenu.add(contact);
 		moreInfoMenu.add(comments);
 		
+		// Configure recentlypassed label
+		JLabel recentlyPassed = new JLabel("<html><font size = 4>Points You Have <u>Recently Passed</u></font></html>");
+//		recentlyPassed.setBackground(new Color(COMP_BG_COLOR_R,COMP_BG_COLOR_G,COMP_BG_COLOR_B));
+//		recentlyPassed.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+		recentlyPassed.setVerticalAlignment(SwingConstants.NORTH);
+		recentlyPassed.setAlignmentX(Component.CENTER_ALIGNMENT);
+//		recentlyPassed.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+		recentlyPassed.setPreferredSize(new Dimension(120, 50));
+		recentlyPassed.setMinimumSize(new Dimension(120, 50));
+		recentlyPassed.setMaximumSize(new Dimension(120, 50));
+		
+		recentlyPassedPanel.setBackground(new Color(COMP_BG_COLOR_R,COMP_BG_COLOR_G,COMP_BG_COLOR_B));
+		recentlyPassedPanel.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
+		recentlyPassedPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		recentlyPassedPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+		recentlyPassedPanel.setPreferredSize(new Dimension(125, 50));
+		recentlyPassedPanel.setMinimumSize(new Dimension(150, 50));
+		recentlyPassedPanel.setMaximumSize(new Dimension(150, 50));
+		recentlyPassedPanel.add(recentlyPassed);
+		
 		// Configure location list table B
 		locationListB.setModel(ourModel);
 		locationListB.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer());
-		locationListB.getColumnModel().getColumn(0).setPreferredWidth(0);
-		locationListB.getColumnModel().getColumn(0).setMinWidth(0);
-		locationListB.getColumnModel().getColumn(0).setMaxWidth(0);
-		/*locationListB.getColumnModel().getColumn(1).setPreferredWidth((int)Math.floor(infoFieldsWidth * 0.25));
-		locationListB.getColumnModel().getColumn(1).setMinWidth((int)Math.floor(infoFieldsWidth * 0.25));
-		locationListB.getColumnModel().getColumn(1).setMaxWidth((int)Math.floor(infoFieldsWidth * 0.25));
-		locationListB.getColumnModel().getColumn(2).setPreferredWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
-		locationListB.getColumnModel().getColumn(2).setMinWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
-		locationListB.getColumnModel().getColumn(2).setMaxWidth(infoFieldsWidth * 2);
+		locationListB.getColumnModel().getColumn(0).setPreferredWidth(12);
+		locationListB.getColumnModel().getColumn(0).setMinWidth(12);
+		locationListB.getColumnModel().getColumn(0).setMaxWidth(12);
+		locationListB.getColumnModel().getColumn(1).setPreferredWidth((int)Math.floor(infoFieldsWidth * 0.2));
+		locationListB.getColumnModel().getColumn(1).setMinWidth((int)Math.floor(infoFieldsWidth * 0.2));
+		locationListB.getColumnModel().getColumn(1).setMaxWidth((int)Math.floor(infoFieldsWidth * 0.2));
+		locationListB.getColumnModel().getColumn(2).setPreferredWidth(0);
+		locationListB.getColumnModel().getColumn(2).setMinWidth(0);
+		locationListB.getColumnModel().getColumn(2).setMaxWidth(0);
 		locationListB.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
 		locationListB.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		locationListB.setRowSelectionAllowed(false);
 		locationListB.setColumnSelectionAllowed(false);
-		locationListB.setRowHeight(seenHeight);
+		locationListB.setRowHeight(14);
 		locationListB.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		locationListB.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 		locationListB.setFillsViewportHeight(true);
@@ -289,34 +299,50 @@ public class TalkingPointsGUI implements ActionListener {
 		locationListB.setShowVerticalLines(false);
 		locationListB.getTableHeader().setResizingAllowed(false);
 		locationListB.getTableHeader().setReorderingAllowed(false);
-		locationListB.getTableHeader().setVisible(false); */
-				
+		locationListB.getTableHeader().setVisible(false); 
+	
 		// Add components to More Info pane
 		moreInfo.setLayout(new GridBagLayout());
 		moreInfo.setBackground(new Color(BG_COLOR_R,BG_COLOR_G,BG_COLOR_B));
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		c.gridwidth = 4;
+		c.gridwidth = 6;
 		c.gridheight = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
-		c.insets = new Insets(0, 0, COMP_SPACER_Y, 0);
+	//	c.insets = new Insets(0, 0, COMP_SPACER_Y, 0);
 		moreInfo.add(title, c);
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 2;
-		c.gridheight = 5;
-		c.insets = new Insets(COMP_SPACER_Y, 0, 0, COMP_SPACER_X);
+		c.gridheight = 4;
+	//	c.insets = new Insets(COMP_SPACER_Y, 0, 0, COMP_SPACER_X);
 		moreInfo.add(moreInfoMenu, c);
 		c = new GridBagConstraints();
-		c.gridx = 3;
+		c.gridx = 2;
 		c.gridy = 1;
 		c.gridwidth = 4;
 		c.gridheight = 5;
 		c.fill = GridBagConstraints.BOTH;
 		moreInfo.add(coreInfo, c);
+		c = new GridBagConstraints();
+		c.gridx = 6;
+		c.gridy = 0;
+		c.gridwidth = 2;
+		c.gridheight = 1;
+		c.fill = GridBagConstraints.NONE;
+		c.anchor = GridBagConstraints.FIRST_LINE_END;
+		moreInfo.add(recentlyPassedPanel, c);
+		c = new GridBagConstraints();
+		c.gridx = 6;
+		c.gridy = 1;
+		c.gridwidth = 2;
+		c.gridheight = 4;
+		c.fill = GridBagConstraints.BOTH;
+		//c.anchor = GridBagConstraints.LAST_LINE_END;
+		moreInfo.add(locationListB, c);
 		
 		centralPane.add(moreInfo, MOREINFO);
 		
@@ -374,6 +400,8 @@ public class TalkingPointsGUI implements ActionListener {
 				String eventString = e.getSource().toString();
 				int index = eventString.lastIndexOf('{');
 				index++;
+				if(eventString.charAt(index) == '}')
+					return;
 				int row = (int)eventString.charAt(index) - (int)'0';
 				System.out.println("Row " + row + " selected. " + e.getSource());
 				if(model.getValueAt(row, 1) != null) {
@@ -384,7 +412,8 @@ public class TalkingPointsGUI implements ActionListener {
 							(String)model.getValueAt(row,5),
 							(String)model.getValueAt(row,6),
 							(String)model.getValueAt(row,7),
-							(String)model.getValueAt(row,8));
+							(String)model.getValueAt(row,8),
+							(String)model.getValueAt(row,9));
 					locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
 							+ cachedData.description() + "]</font></b></html>");
 					StringBuffer sb = new StringBuffer();
@@ -392,7 +421,7 @@ public class TalkingPointsGUI implements ActionListener {
 					coreInfo.setText(s);
 					CardLayout cl = (CardLayout)centralPane.getLayout();
 					cl.show(centralPane, MOREINFO);
-					
+					locationList.clearSelection();
 				}
 				
 			}
@@ -412,19 +441,19 @@ public class TalkingPointsGUI implements ActionListener {
 	
 	/**
 	 * @param args is unused
-	 */   /*
+	 */   
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
-		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Middle Earth", "Kitsch Store", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Pinball Pete's", "Video Arcade", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Good Time Charley's", "Restaurant", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Scorekeeper's", "Bar", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Michigan Theater", "Movie Theater", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("The Backroom", "Pizzeria", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Dawn Treader", "Bookstore", "stuff", "48104", "1234 Cross Ave", "MI", "http://www.google.com", "Ann Arbor"));
-	}  */
+		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Middle Earth", "Kitsch Store", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Pinball Pete's", "Video Arcade", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Good Time Charley's", "Restaurant", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Scorekeeper's", "Bar", "stuff", "empty", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Michigan Theater", "Movie Theater", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("The Backroom", "Pizzeria", "stuff", "empty", "words", "bleh", "duder", "blah", "schmelding"));
+		ourGUI.addItem(new POIdata("Dawn Treader", "Bookstore", "stuff", "empty", "48104", "1234 Cross Ave", "MI", "http://www.google.com", "Ann Arbor"));
+	}  
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -465,7 +494,7 @@ public class TalkingPointsGUI implements ActionListener {
 			else
 				return("We should never get here.");
 		}
-		
+			
 		// Required method getValueAt()
 		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
@@ -479,18 +508,20 @@ public class TalkingPointsGUI implements ActionListener {
 			case(1):
 				return data[row].name();
 			case(2):
-				return data[row].description();
+				return data[row].location_type();
 			case(3):
-				return data[row].country();
+				return data[row].description();
 			case(4):
-				return data[row].postalCode();
+				return data[row].country();
 			case(5):
-				return data[row].street();
+				return data[row].postalCode();
 			case(6):
-				return data[row].state();
+				return data[row].street();
 			case(7):
-				return data[row].url();
+				return data[row].state();
 			case(8):
+				return data[row].url();
+			case(9):
 				return data[row].city();
 			default:
 				return null;     }
@@ -617,6 +648,7 @@ public class TalkingPointsGUI implements ActionListener {
 	private JPanel mainContentPane;
 	private JPanel centralPane;
 	private JScrollPane frontScroll;
+	private JScrollPane infoScroll;
 	private JTable locationList;
 	private JTable locationListB;
 	private JButton logoButton;
@@ -627,4 +659,10 @@ public class TalkingPointsGUI implements ActionListener {
 	private JEditorPane coreInfo;
 	// A copy of the POIdata currently being viewed
 	private POIdata cachedData;
+	// Images for locationlist table
+	ImageIcon forward;
+	ImageIcon seen;
+	ImageIcon notseen;
+	ImageIcon forwardsm;
+	ImageIcon bulletpoint;
 }
