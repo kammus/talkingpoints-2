@@ -15,5 +15,5 @@ public <continue> = (Continue);
 public <more> = (More);
 public <comments> = (Comments);
 public <specials> = (Specials);
-public <previous> = (Previous Location);
-public <nextloc< = (Next Location);
+public <previous> = (Previous)(Location);
+public <nextloc> = (Next)(Location);

@@ -7,6 +7,7 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException; 
 import java.net.URL;
 import java.io.*;
+import java.util.*;
 
 /*
  * Perhaps have some graphical output for the moment 
@@ -14,17 +15,23 @@ import java.io.*;
  * 
  */
 public class Speaker {
-	POIdata locationData;
+	POIdata currentLocation;
 	Voice dbVoice;
 	URL url;
 	ConfigurationManager manager;
 	Microphone microphone;
 	Recognizer recognizer;
-    enum menuStatus {INITIAL_SPEAK, MORE_INFO, };
+	LinkedList<POIdata> locationCache;
+    final static int ENCOUNTER = 0;
+    final static int MORE_INFO = 1;
+    final static int COMMENTS = 2;
+    final static int HOME = 3;
+    int menuStatus;
     String toSpeak;
     
 	public Speaker()
 	{
+		locationCache = new LinkedList<POIdata>();
 		/* Set up freetts voice object */ 
 		String voiceName = "kevin16";
 	    VoiceManager voiceManager = VoiceManager.getInstance();
@@ -69,33 +76,29 @@ public class Speaker {
 	}
 	public void addPOI(POIdata incoming)
 	{
-		locationData = incoming; 
+		currentLocation = incoming;
+		locationCache.add(incoming);
+		
 	}
 	
 	public void listener()
 	{
-		if(microphone.startRecording())
-		{	
-			while(true)
-			{
-				Result result = recognizer.recognize();
-				if (result != null) 
-			    {
-					String resultText = result.getBestFinalResultNoFiller();
-					System.out.println("You said: " + resultText + "\n");
-					//microphone.stopRecording();
-					resultHandler(resultText);
-					break;
-				} 
-			    else 
-			    {
-					String error = "I can't hear or understaid what you said.";
-					microphone.stopRecording();
-					dbVoice.speak(error);
-					dbVoice.speak(toSpeak);
-					microphone.startRecording();
-					break;
-				}
+		while(true)
+		{
+			Result result = recognizer.recognize();
+			if (result != null) 
+		    {
+				String resultText = result.getBestFinalResultNoFiller();
+				System.out.println("You said: " + resultText + "\n");
+				resultHandler(resultText);
+				break;
+			} 
+		    else 
+		    {
+				String error = "I can't hear or understaid what you said.";
+				dbVoice.speak(error);
+				dbVoice.speak(toSpeak);
+				break;
 			}
 		}
 	}
@@ -104,26 +107,79 @@ public class Speaker {
 	/* create a dialog with the user */ 
 	public void createDialog()
 	{
-		toSpeak = "The name is " + locationData.name() + " and it is of type " + locationData.location_type();
+		menuStatus = ENCOUNTER; 
+		toSpeak = "The name is " + currentLocation.name() + " and it is of type " + currentLocation.location_type() + ".  To Hear more, say More.";
 		System.out.println("toSpeak: " + toSpeak);
 		dbVoice.speak(toSpeak);
-		System.out.println();
-		toSpeak = "To Hear more, say More.";
-		System.out.println("toSpeak: " + toSpeak);
-		dbVoice.speak(toSpeak);
+		if (!(microphone.isRecording()))
+			microphone.startRecording();
 		listener();
-		
 	}
 	
 	public void resultHandler(String result)
 	{
-		if (result.toLowerCase().compareTo("more") == 0)
-		{			
-			toSpeak = "To Listen to comments, say Comments. To Listen to Specials, say Specials. To listen to the Menu, say Menu.";
-			System.out.println("toSpeak: " + toSpeak);
-			dbVoice.speak(toSpeak);
-			listener();
+		switch(menuStatus)
+		{
+		case MORE_INFO:  //menu
+			if (result.toLowerCase().compareTo("repeat") == 0)
+			{
+				dbVoice.speak(toSpeak);
+				listener(); 
+			}
+			else if(result.toLowerCase().compareTo("back") == 0)
+			{
+				menuStatus = ENCOUNTER;
+				createDialog();
+			}
+			else if(result.toLowerCase().compareTo("comments") == 0)
+			{
+				menuStatus = COMMENTS; 
+			
+			}
+			else
+			{
+				String error  = "I'm sorry that command is not available at this menu. Please try again.";
+				dbVoice.speak(error);
+				listener();
+			}	
+			
+			
+			break;
+		case ENCOUNTER:
+			if (result.toLowerCase().compareTo("repeat") == 0)
+			{
+				createDialog();
+			}
+			else if (result.toLowerCase().compareTo("more") == 0)
+			{
+				menuStatus = MORE_INFO;
+				toSpeak = "To Listen to comments, say Comments. To Listen to Specials, say Specials. To listen to the Menu, say Menu.";
+				System.out.println("toSpeak: " + toSpeak);
+				dbVoice.speak(toSpeak);
+				listener();
+			}
+			else if(result.toLowerCase().compareTo("back") == 0)
+			{
+				menuStatus = HOME;
+			}
+			else
+			{
+				String error  = "I'm sorry that command is not available at this menu. Please try again.";
+				dbVoice.speak(error);
+				listener();
+			}
+			
+		
+			break;
+		case HOME:
+			//menuStatus = ;
+			break;
+		case COMMENTS:
+			//menuStatus = ;
+			break;
 		}
+		
+		
 	}
 	
 	/* Eventually will return some type of object */
