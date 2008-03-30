@@ -13,6 +13,7 @@ public <next> = (Next);
 public <pause> = (Pause);
 public <continue> = (Continue);
 public <more> = (More);
+public <description> = (More);
 public <comments> = (Comments);
 public <specials> = (Specials);
 public <previous> = (Previous)(Location);
