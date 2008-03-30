@@ -39,8 +39,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.lang.StringBuffer;
+import java.util.Stack;
 
-public class TalkingPointsGUI implements ActionListener {
+public class TalkingPointsGUI implements ActionListener, TableModelListener, ListSelectionListener {
 	
 	// Constants
 	static final int BG_COLOR_R = 241;
@@ -73,17 +74,18 @@ public class TalkingPointsGUI implements ActionListener {
 	private void initGUI() {
 			
 		// Allocate components for the GUI's pages
-		forward = createImageIcon("images/forward.png", "Button that advances to a screen with more information about this point of interest.");
-		seen = createImageIcon("images/seen.png", "icon that represents a visible location.");
-		notseen = createImageIcon("images/notseen.png", "icon that represents a hidden location.");
-		forwardsm = createImageIcon("images/forwardsm.png", "small version of forward.png.");
-		bulletpoint = createImageIcon("images/bulletpoint.png", "bullet point");
+		ImageIcon forward = createImageIcon("images/forward.png", "Button that advances to a screen with more information about this point of interest.");
+		ImageIcon seen = createImageIcon("images/seen.png", "icon that represents a visible location.");
+		ImageIcon notseen = createImageIcon("images/notseen.png", "icon that represents a hidden location.");
+		ImageIcon forwardsm = createImageIcon("images/forwardsm.png", "small version of forward.png.");
+		ImageIcon bulletpoint = createImageIcon("images/bulletpoint.png", "bullet point");
+		ImageIcon back = createImageIcon("images/back.png", "Back button");
 		
 		mainFrame = new JFrame("Talking Points");
 		mainContentPane = new JPanel(new BorderLayout());
 		locationList = new JTable(5, 3);
 		locationListB = new JTable(5, 3);
-		ourModel = new locListModel(seen);
+		ourModel = new locListModel(seen, notseen, bulletpoint);
 		frontScroll = new JScrollPane(locationList);
 		infoScroll = new JScrollPane(locationListB);
 		logoButton = new JButton(createImageIcon("images/logo.jpg", "TalkingPoints Logo"));
@@ -94,7 +96,8 @@ public class TalkingPointsGUI implements ActionListener {
 		centralPane = new JPanel(new CardLayout());
 		locationTitle = new JLabel("Empty");
 		coreInfo = new JEditorPane("text/html", "blahblahblah");
-				
+		history = new Stack<String>();
+		
 		// Pre-calculate our desired component sizes to save time/computation
 		int seenWidth = seen.getIconWidth() ;
 		int seenHeight = seen.getIconHeight();
@@ -129,7 +132,7 @@ public class TalkingPointsGUI implements ActionListener {
 		frontScroll.setMaximumSize(new Dimension((windowWidth - COMP_SPACER_X - COMP_SPACER_X), tableHeight));
 		
 		// Configure location list table
-		ourModel.addTableModelListener(new mainModelListener());
+		ourModel.addTableModelListener(this);
 		locationList.setModel(ourModel);
 		locationList.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer());
 		locationList.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(new JCheckBox()));
@@ -158,7 +161,7 @@ public class TalkingPointsGUI implements ActionListener {
 		locationList.getTableHeader().setVisible(false);
 		// Add selection listener to table
 		ListSelectionModel selectionModel = locationList.getSelectionModel();
-		selectionModel.addListSelectionListener(new cellListener());
+		selectionModel.addListSelectionListener(this);
 		
 		// Configure Legend label
 		legend.setPreferredSize(new Dimension(legendWidth, legendHeight));
@@ -211,7 +214,7 @@ public class TalkingPointsGUI implements ActionListener {
 		middlePane.add(bottomButton);
 	
 		centralPane.add(middlePane, MAINPANE);
-		
+				
 		// CONFIGURE MORE INFORMATION PANEL
 		// Set up More Information pane
 		JPanel moreInfo = new JPanel();
@@ -300,7 +303,15 @@ public class TalkingPointsGUI implements ActionListener {
 		locationListB.getTableHeader().setResizingAllowed(false);
 		locationListB.getTableHeader().setReorderingAllowed(false);
 		locationListB.getTableHeader().setVisible(false); 
-	
+		
+		// Configure back button
+		JButton goBack = new JButton(back);
+		goBack.setActionCommand("back");
+		goBack.setContentAreaFilled(false);
+		goBack.setForeground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
+		goBack.setBorder(BorderFactory.createEmptyBorder());
+		goBack.addActionListener(this);
+		
 		// Add components to More Info pane
 		moreInfo.setLayout(new GridBagLayout());
 		moreInfo.setBackground(new Color(BG_COLOR_R,BG_COLOR_G,BG_COLOR_B));
@@ -339,13 +350,18 @@ public class TalkingPointsGUI implements ActionListener {
 		c.gridx = 6;
 		c.gridy = 1;
 		c.gridwidth = 2;
-		c.gridheight = 4;
+		c.gridheight = 3;
 		c.fill = GridBagConstraints.BOTH;
-		//c.anchor = GridBagConstraints.LAST_LINE_END;
 		moreInfo.add(locationListB, c);
-		
+		c = new GridBagConstraints();
+		c.gridx = 7;
+		c.gridy = 4;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		c.anchor = GridBagConstraints.LAST_LINE_END;
+		moreInfo.add(goBack, c);
 		centralPane.add(moreInfo, MOREINFO);
-		
+	
 		// Add components to main content pane
 		mainContentPane.add(topButtons, BorderLayout.PAGE_START);
 		mainContentPane.add(centralPane, BorderLayout.CENTER);
@@ -369,79 +385,91 @@ public class TalkingPointsGUI implements ActionListener {
 	
 	// Listener for the table model that is assigned to the main pane table
 	// This is used to detect when the button in column 0 is "edited", ie clicked.
-	class mainModelListener implements TableModelListener {
-		
-		public void tableChanged(TableModelEvent e) {
+	public void tableChanged(TableModelEvent e) {
 			
-			if(e.getColumn() == 123) {
-				int row = e.getFirstRow();
-				locListModel model = (locListModel)locationList.getModel();
+		if(e.getColumn() == 123) {
+			System.out.println("Source: " + e.getSource());
+			int row = e.getFirstRow();
+			locListModel model = (locListModel)locationList.getModel();
 				if(model.getValueAt(row, 1) != null) {
-	//				locationName.setText((String)model.getValueAt(row, 1));
-					CardLayout cl = (CardLayout)centralPane.getLayout();
-					cl.show(centralPane, MOREINFO);
-				}
-			
+	//			locationName.setText((String)model.getValueAt(row, 1));
+				CardLayout cl = (CardLayout)centralPane.getLayout();
+				cl.show(centralPane, MOREINFO);
 			}
+			
 		}
-		
 	}
-	
+		
+		
 	/* Listener for user selection of a table cell
 	   For some reason, getFirstIndex() and getLastIndex() are inconsistent in the values they return when selecting rows,
 	   so we need to find the row selected by converting the output of getSource() to a string, and then
 	   the character after the first '{' to int, before subtracting the unicode integer value of '0'.  */
-	class cellListener implements ListSelectionListener {
+	public void valueChanged(ListSelectionEvent e) {
+		locListModel model = (locListModel)locationList.getModel();
 		
-		public void valueChanged(ListSelectionEvent e) {
-			locListModel model = (locListModel)locationList.getModel();
-			
-			if(!(e.getValueIsAdjusting())) {
-				String eventString = e.getSource().toString();
-				int index = eventString.lastIndexOf('{');
-				index++;
-				if(eventString.charAt(index) == '}')
-					return;
-				int row = (int)eventString.charAt(index) - (int)'0';
-				System.out.println("Row " + row + " selected. " + e.getSource());
-				if(model.getValueAt(row, 1) != null) {
-					cachedData = new POIdata((String)model.getValueAt(row, 1), 
-							(String)model.getValueAt(row,2),
-							(String)model.getValueAt(row,3),
-							(String)model.getValueAt(row,4),
-							(String)model.getValueAt(row,5),
-							(String)model.getValueAt(row,6),
-							(String)model.getValueAt(row,7),
-							(String)model.getValueAt(row,8),
-							(String)model.getValueAt(row,9));
-					locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
-							+ cachedData.description() + "]</font></b></html>");
-					StringBuffer sb = new StringBuffer();
-					String s = createString(cachedData);
-					coreInfo.setText(s);
-					CardLayout cl = (CardLayout)centralPane.getLayout();
-					cl.show(centralPane, MOREINFO);
-					locationList.clearSelection();
-				}
-				
+		if(!(e.getValueIsAdjusting())) {
+			String eventString = e.getSource().toString();
+			int index = eventString.lastIndexOf('{');
+			index++;
+			if(eventString.charAt(index) == '}')
+				return;
+			int row = (int)eventString.charAt(index) - (int)'0';
+			System.out.println("Row " + row + " selected. " + e.getSource());
+			if(model.getValueAt(row, 1) != null) {
+				cachedData = new POIdata((String)model.getValueAt(row, 1), 
+						(String)model.getValueAt(row,2),
+						(String)model.getValueAt(row,3),
+						(String)model.getValueAt(row,4),
+						(String)model.getValueAt(row,5),
+						(String)model.getValueAt(row,6),
+						(String)model.getValueAt(row,7),
+						(String)model.getValueAt(row,8),
+						(String)model.getValueAt(row,9));
+				locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
+						+ cachedData.description() + "]</font></b></html>");
+				StringBuffer sb = new StringBuffer();
+				String s = createString(cachedData);
+				coreInfo.setText(s);
+				CardLayout cl = (CardLayout)centralPane.getLayout();
+				cl.show(centralPane, MOREINFO);
+				model.tableState = MOREINFO;
+				history.push(MAINPANE);
+				locationList.clearSelection();
 			}
+				
+		}
 			
-		}
-		
 	}
+		
 	
-	// Listener for the Talking Points logo button (may expand to cover other types of buttons if needed)
-	// Unlike the other listeners, this is not its own object, but part of TalkingPointsGUI.
+	
+	// Listener for TalkingPointsGUI buttons
 	public void actionPerformed(ActionEvent e) {
+		
 		if(e.getActionCommand() == "home")  {
-		CardLayout cl = (CardLayout)centralPane.getLayout();
-		cl.show(centralPane, MAINPANE);
+			CardLayout cl = (CardLayout)centralPane.getLayout();
+			cl.show(centralPane, MAINPANE);
+			locListModel model = (locListModel)locationList.getModel();
+			model.tableState = MAINPANE;
+			}	
+		
+		if(e.getActionCommand() == "back") {
+			if(!(history.empty())) {
+				String s = new String(history.pop());
+				CardLayout cl = (CardLayout)centralPane.getLayout();
+				cl.show(centralPane, s);
+				locListModel model = (locListModel)locationList.getModel();
+				model.tableState = s;
+			}
 		}
+				
+		
 	}
 	
 	/**
 	 * @param args is unused
-	 */   
+	 */   /*
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
@@ -453,7 +481,7 @@ public class TalkingPointsGUI implements ActionListener {
 		ourGUI.addItem(new POIdata("Michigan Theater", "Movie Theater", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
 		ourGUI.addItem(new POIdata("The Backroom", "Pizzeria", "stuff", "empty", "words", "bleh", "duder", "blah", "schmelding"));
 		ourGUI.addItem(new POIdata("Dawn Treader", "Bookstore", "stuff", "empty", "48104", "1234 Cross Ave", "MI", "http://www.google.com", "Ann Arbor"));
-	}  
+	}  */
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -461,9 +489,12 @@ public class TalkingPointsGUI implements ActionListener {
 	 */
 	class locListModel extends AbstractTableModel {
 			
-		locListModel(ImageIcon icon) {
+		locListModel(ImageIcon seen_t, ImageIcon notseen_t, ImageIcon bulletpoint_t) {
 			data = new POIdata[10];
-			ourIcon = icon;
+			seen = seen_t;
+			notseen = notseen_t;
+			bulletpoint = bulletpoint_t;
+			tableState = new String(MAINPANE);
 		}
 		
 		// Required method getRowCount()
@@ -482,6 +513,7 @@ public class TalkingPointsGUI implements ActionListener {
 				return true;
 			else
 				return false;
+	
 		}
 		
 		public String getColumnName(int col) {
@@ -497,6 +529,7 @@ public class TalkingPointsGUI implements ActionListener {
 			
 		// Required method getValueAt()
 		// TODO: Alter to filter out hidden locations
+		// TODO: Alter to allow returning of extended location data (possibly return whole POIdata object if certain column is requested)
 		public Object getValueAt(int row, int column) {
 			
 			if(data[row] == null)
@@ -504,7 +537,10 @@ public class TalkingPointsGUI implements ActionListener {
 			
 			switch(column) {
 			case(0):
-				return ourIcon;
+				if(tableState.compareTo(MAINPANE) == 0)
+					return seen;
+				else
+					return bulletpoint;
 			case(1):
 				return data[row].name();
 			case(2):
@@ -533,7 +569,7 @@ public class TalkingPointsGUI implements ActionListener {
 		public void Push(POIdata p) {
 			System.out.println("Trying push onto location queue.");
 			
-			for(int i = 4 ; i > 0 ; i--) {
+			for(int i = 9 ; i > 0 ; i--) {
 				if(data[i-1] != null)
 					data[i] = data[i-1];
 				else
@@ -547,7 +583,10 @@ public class TalkingPointsGUI implements ActionListener {
 		
 		// variable definitions
 		private POIdata[] data;
-		private ImageIcon ourIcon;
+		private ImageIcon bulletpoint;
+		private ImageIcon seen;
+		private ImageIcon notseen;
+		public String tableState;
 	} 
 	
 	// Custom renderer for the button fields that will appear in the tables
@@ -564,7 +603,7 @@ public class TalkingPointsGUI implements ActionListener {
 		
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, 
 				boolean hasFocus, int row, int column) {
-											
+								
 			if(value != null) {
 				if(value.getClass().getName() == "javax.swing.ImageIcon") {
 					setIcon((ImageIcon)value);
@@ -599,7 +638,7 @@ public class TalkingPointsGUI implements ActionListener {
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 			isPushed = true;
 			locListModel model = (locListModel)table.getModel();
-			
+			System.out.println(value);
 			model.fireTableChanged(new TableModelEvent(model, row, row, 123));
 			return button;
 		}
@@ -657,12 +696,8 @@ public class TalkingPointsGUI implements ActionListener {
 	private JLabel tableTitle;
 	private JLabel locationTitle;
 	private JEditorPane coreInfo;
+	private Stack<String> history;
 	// A copy of the POIdata currently being viewed
 	private POIdata cachedData;
-	// Images for locationlist table
-	ImageIcon forward;
-	ImageIcon seen;
-	ImageIcon notseen;
-	ImageIcon forwardsm;
-	ImageIcon bulletpoint;
+	
 }
