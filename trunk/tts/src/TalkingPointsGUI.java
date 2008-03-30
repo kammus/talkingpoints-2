@@ -57,6 +57,13 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	static final int VIEWALL_Y = 45;
 	static final String MAINPANE = "Front pane of TPGUI";
 	static final String MOREINFO = "More information pane of TPGUI";
+	static final String MENU = "POI's menu";
+	static final String HOURS = "POI's hours";
+	static final String HISTORY = "POI's history";
+	static final String ACCESSIBILITY = "POI's accessibility";
+	static final String SPECIALS = "POI's specials";
+	static final String COMMENTS = "POI's comments";
+	
 	
 	// Default constructor
 	TalkingPointsGUI()  {
@@ -96,7 +103,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		centralPane = new JPanel(new CardLayout());
 		locationTitle = new JLabel("Empty");
 		coreInfo = new JEditorPane("text/html", "blahblahblah");
-		history = new Stack<String>();
+		viewingHistory = new Stack<String>();
 		
 		// Pre-calculate our desired component sizes to save time/computation
 		int seenWidth = seen.getIconWidth() ;
@@ -236,26 +243,31 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		coreInfo.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		coreInfo.setEditable(false);
 			
+		// Configure radio buttons for more info menu
+		menu = new JRadioButton("Menu", forwardsm);
+		hours = new JRadioButton("Hours", forwardsm);
+		history = new JRadioButton("History", forwardsm);
+		comments = new JRadioButton("Comments", forwardsm);
+		specials = new JRadioButton("Contact", forwardsm);
+		accessibility = new JRadioButton("Accessibility", forwardsm);
+		menu.setActionCommand("menu");
+		hours.setActionCommand("hours");
+		history.setActionCommand("history");
+		comments.setActionCommand("comments");
+		specials.setActionCommand("specials");
+		accessibility.setActionCommand("accessibility");
+		
 		// Configure panel of radio buttons
-		JPanel moreInfoMenu = new JPanel();
+		moreInfoMenu = new JPanel();
 		moreInfoMenu.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
-		JRadioButton menu = new JRadioButton("Menu", forwardsm);
-		JRadioButton hours = new JRadioButton("Hours", forwardsm);
-		JRadioButton history = new JRadioButton("History", forwardsm);
-		JRadioButton comments = new JRadioButton("Comments", forwardsm);
-		JRadioButton contact = new JRadioButton("Contact", forwardsm);
-		JRadioButton accessibility = new JRadioButton("Accessibility", forwardsm);
 		moreInfoMenu.setLayout(new BoxLayout(moreInfoMenu, BoxLayout.Y_AXIS));
 		moreInfoMenu.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		moreInfoMenu.setBackground(new Color(237,241,238));
-	//	moreInfoMenu.setMaximumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
-	//	moreInfoMenu.setMinimumSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
-	//	moreInfoMenu.setPreferredSize(new Dimension((int)Math.ceil(windowWidth * 0.20), (int)Math.ceil(windowHeight * 0.40)));
 		moreInfoMenu.add(menu);
 		moreInfoMenu.add(hours);
 		moreInfoMenu.add(history);
 		moreInfoMenu.add(accessibility);
-		moreInfoMenu.add(contact);
+		moreInfoMenu.add(specials);
 		moreInfoMenu.add(comments);
 		
 		// Configure recentlypassed label
@@ -417,26 +429,17 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			int row = (int)eventString.charAt(index) - (int)'0';
 			System.out.println("Row " + row + " selected. " + e.getSource());
 			if(model.getValueAt(row, 1) != null) {
-			//	cachedData = new POIdata((String)model.getValueAt(row, 1), 
-				//		(String)model.getValueAt(row,2),
-					//	(String)model.getValueAt(row,3),
-						//(String)model.getValueAt(row,4),
-						//(String)model.getValueAt(row,5),
-						//(String)model.getValueAt(row,6),
-						//(String)model.getValueAt(row,7),
-						//(String)model.getValueAt(row,8),
-						//(String)model.getValueAt(row,9));
+				cachedData = (POIdata)model.getValueAt(row, 3);
 				locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
 						+ cachedData.description() + "]</font></b></html>");
-				StringBuffer sb = new StringBuffer();
 				String s = createString(cachedData);
 				coreInfo.setText(s);
 				CardLayout cl = (CardLayout)centralPane.getLayout();
 				cl.show(centralPane, MOREINFO);
 				model.tableState = MOREINFO;
-				history.push(MAINPANE);
+				viewingHistory.push(MAINPANE);
 				locationList.clearSelection();
-			}
+			}	
 				
 		}
 			
@@ -447,41 +450,41 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Listener for TalkingPointsGUI buttons
 	public void actionPerformed(ActionEvent e) {
 		
+		locListModel model = (locListModel)locationList.getModel();
+		
 		if(e.getActionCommand() == "home")  {
 			CardLayout cl = (CardLayout)centralPane.getLayout();
 			cl.show(centralPane, MAINPANE);
-			locListModel model = (locListModel)locationList.getModel();
+			
 			model.tableState = MAINPANE;
+			viewingHistory.clear();
 			}	
 		
 		if(e.getActionCommand() == "back") {
-			if(!(history.empty())) {
-				String s = new String(history.pop());
+			if(!(viewingHistory.empty())) {
+				String s = new String(viewingHistory.pop());
 				CardLayout cl = (CardLayout)centralPane.getLayout();
 				cl.show(centralPane, s);
-				locListModel model = (locListModel)locationList.getModel();
 				model.tableState = s;
 			}
 		}
-				
-		
+		if(e.getActionCommand() == "menu")  {
+			
+		}
+
 	}
 	
 	/**
 	 * @param args is unused
-	 */   /*
+	 */   
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
-		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Middle Earth", "Kitsch Store", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Pinball Pete's", "Video Arcade", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Good Time Charley's", "Restaurant", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Scorekeeper's", "Bar", "stuff", "empty", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Michigan Theater", "Movie Theater", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("The Backroom", "Pizzeria", "stuff", "empty", "words", "bleh", "duder", "blah", "schmelding"));
-		ourGUI.addItem(new POIdata("Dawn Treader", "Bookstore", "stuff", "empty", "48104", "1234 Cross Ave", "MI", "http://www.google.com", "Ann Arbor"));
-	}  */
+		String [] s = {"etc", "etc", "etc", "etc", "etc", "etc", "etc"};
+		
+		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", s));
+
+	} 
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -510,9 +513,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// Cells in column 0 must be "editable" in order to be clickable; other cells are not
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			if(columnIndex == 0)
-				return true;
-			else
-				return false;
+				if(tableState.compareTo(MAINPANE) == 0)
+					return true;
+		
+			return false;
 	
 		}
 		
@@ -528,8 +532,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		}
 			
 		// Required method getValueAt()
+		// If column is 3, returns entire POIdata object.
 		// TODO: Alter to filter out hidden locations
-		// TODO: Alter to allow returning of extended location data (possibly return whole POIdata object if certain column is requested)
 		public Object getValueAt(int row, int column) {
 			
 			if(data[row] == null)
@@ -546,19 +550,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			case(2):
 				return data[row].location_type();
 			case(3):
-				return data[row].description();
-			case(4):
-				return data[row].country();
-			case(5):
-				return data[row].postalCode();
-			case(6):
-				return data[row].street();
-			case(7):
-				return data[row].state();
-			case(8):
-				return data[row].url();
-			case(9):
-				return data[row].city();
+				return data[row];
 			default:
 				return null;     }
 		
@@ -696,7 +688,14 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	private JLabel tableTitle;
 	private JLabel locationTitle;
 	private JEditorPane coreInfo;
-	private Stack<String> history;
+	private Stack<String> viewingHistory;
+	private JPanel moreInfoMenu;
+	private JRadioButton menu;
+	private JRadioButton hours;
+	private JRadioButton history;
+	private JRadioButton comments;
+	private JRadioButton specials;
+	private JRadioButton accessibility;
 	// A copy of the POIdata currently being viewed
 	private POIdata cachedData;
 	
