@@ -21,10 +21,13 @@ class POIdata {
         String url;
         String state;
         String city;
+        String comments;
+        String[] hours = new String[7];
         POIdata(){
+        	
         }
         
-        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t)// String phone_t,
+        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String[] hour_t)
         {
                 name = name_t;
                 type = type_t;
@@ -32,11 +35,17 @@ class POIdata {
                 country = country_t;
                 postalCode = postalCode_t;
                 street = street_t;
-                //phone = phone_t;
+                phone = phone_t;
                 url = url_t;
                 state = state_t;
-                city = city_t;                
+                city = city_t;
+                hours = hour_t;
         }
+        
+        public String comments() {
+        	return comments;
+        }
+        
         
         public String name(){
                 return (name);
@@ -108,7 +117,8 @@ public class ClientDataModel{
                  doc.getDocumentElement().normalize();
                  
                  //NodeList tpidText = getElement(doc, "tpid", 0); //XML changed
-                 NodeList nameText, typeText, descriptionText, countryText, postalCodeText, streetText, phoneText, urlText, stateText, cityText;
+                 NodeList nameText, typeText, descriptionText, countryText, postalCodeText;
+                 NodeList streetText, phoneText, urlText, stateText, cityText, hoursText;
                  nameText = getElement(doc, "name", 0);
                  typeText = getElement(doc, "location_type", 0); //XML changed
                  descriptionText = getElement(doc, "description", 0);
@@ -119,7 +129,9 @@ public class ClientDataModel{
                  countryText = getElement(doc, "country",0);
                  urlText = getElement(doc, "url",0);
                  phoneText = getElement(doc, "phone",0);
-                  
+                // hoursText = getElement(doc,"hours",0);
+                 
+                 String[] hours = new String[7];
                  
                  name = ((Node)nameText.item(0)).getNodeValue();
                  type = ((Node)typeText.item(0)).getNodeValue(); //type is not included in XML now.
@@ -128,11 +140,14 @@ public class ClientDataModel{
                  postalCode =((Node)postalCodeText.item(0)).getNodeValue();
                  street = ((Node)streetText.item(0)).getNodeValue();
                  state = ((Node)stateText.item(0)).getNodeValue();
-                 //phone = ((Node)phoneText.item(0)).getNodeValue();
+                 phone = ((Node)phoneText.item(0)).getNodeValue();
                  url = ((Node)urlText.item(0)).getNodeValue();
                  city = ((Node)cityText.item(0)).getNodeValue();
-                 
-                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city); //object creation
+                 /*for(int x=0; x<7; ++x)
+                 {
+                	 hours[x] = ((Node)cityText.item(x)).getNodeValue();
+                 }*/
+                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours); //object creation
                  objectNotify(data);
                  boolean blind = true;
                  if (blind == true)
