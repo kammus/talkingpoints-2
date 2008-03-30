@@ -19,3 +19,4 @@ public <specials> = (Specials);
 public <previous> = (Previous)(Location);
 public <nextloc> = (Next)(Location);
 public <home> = (Home);
+public <description> = (Description);

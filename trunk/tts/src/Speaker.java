@@ -78,7 +78,8 @@ public class Speaker {
 	{
 		currentLocation = incoming;
 		locationCache.add(incoming);
-		
+		if (locationCache.size() == 11)
+			locationCache.pop();
 	}
 	
 	public void listener()
