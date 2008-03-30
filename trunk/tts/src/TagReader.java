@@ -1,20 +1,20 @@
 import java.io.IOException;
 import java.util.Vector;
-/*
+
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
-*/
+//import javax.bluetooth.*;
 
-public class TagReader{// implements DiscoveryListener{
+public class TagReader implements DiscoveryListener{
 	
 	private ClientMessageHandler clientMessageHandler = null;
 	private static Object lock=new Object();
 	private static Vector vecDevices=new Vector();
-	private static String macAddress[];
+	private static String macAddress;
 
 	// fakeMacAdress list
 	String fakeMacAddress[] = new String [] { "1234567890ab" , "0123456789cd", "1234567890ef"};
@@ -45,7 +45,8 @@ public class TagReader{// implements DiscoveryListener{
 			e.printStackTrace();
 		}
 	}
-/*
+
+	
 	// bluetoothSearch function
 	public static void bluetoothSearch() throws IOException{
 	
@@ -109,5 +110,5 @@ public class TagReader{// implements DiscoveryListener{
 		break;
 			}
 	}//end method
-*/
+
 }
