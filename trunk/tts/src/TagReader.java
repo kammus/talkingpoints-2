@@ -48,7 +48,7 @@ public class TagReader implements DiscoveryListener{
 
 	
 	// bluetoothSearch function
-	public static void bluetoothSearch() throws IOException{
+	public void bluetoothSearch() throws IOException{
 	
 		TagReader tagReader = new TagReader();
 		LocalDevice localDevice = LocalDevice.getLocalDevice();
@@ -75,6 +75,7 @@ public class TagReader implements DiscoveryListener{
 		{
 			System.out.println("Bluetooth Devices: ");
 			macAddress = vecDevices.elementAt(0).toString(); // get string macAddress
+			notifyMacAddressWasRead(macAddress);
 			System.out.println(macAddress); // print macAddress
 		}
 	}
