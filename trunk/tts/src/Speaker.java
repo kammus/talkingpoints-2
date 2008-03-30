@@ -166,11 +166,14 @@ public class Speaker {
 				else{
 					toSpeak = currentLocation.comments();
 					dbVoice.speak(toSpeak);
-					
-					
+					listener();
 				}
-				
-				
+			}
+			else if(result.toLowerCase().compareTo("description") == 0)
+			{
+				toSpeak = currentLocation.description();
+				dbVoice.speak(toSpeak);
+				listener();
 			}
 			else if(result.toLowerCase().compareTo("home") == 0)
 			{
@@ -193,7 +196,7 @@ public class Speaker {
 			else if (result.toLowerCase().compareTo("more") == 0)
 			{
 				menuStatus = MORE_INFO;
-				toSpeak = "To Listen to comments, say Comments. To Listen to Specials, say Specials. To listen to the Menu, say Menu.";
+				toSpeak = "To hear the comments, say Comments. To hear hours, say Hours. To hear a short description, say Description.";
 				System.out.println("toSpeak: " + toSpeak);
 				dbVoice.speak(toSpeak);
 				listener();
@@ -212,11 +215,20 @@ public class Speaker {
 		
 			break;
 		case HOME:
-			//menuStatus = ;
+			if (result.toLowerCase().compareTo("previous") == 0)
+			{
+				 /* go to previous location, if available */ 
+			}
+			else if(result.toLowerCase().compareTo("next") == 0)
+			{
+				/*go to next location, if available */
+			}
+			
 			break;
 		case COMMENTS:
 			if (result.toLowerCase().compareTo("repeat") == 0)
 			{
+				dbVoice.speak(toSpeak);
 			}
 			break;
 		}
