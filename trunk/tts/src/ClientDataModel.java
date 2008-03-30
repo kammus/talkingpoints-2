@@ -21,8 +21,14 @@ class POIdata {
         String url;
         String state;
         String city;
+        /* All null for the moment */
         String comments;
         String[] hours = new String[7];
+        String menu;
+        String specials;
+        String accessibility;
+        String history;
+        
         POIdata(){
         	
         }
@@ -42,10 +48,29 @@ class POIdata {
                 hours = hour_t;
         }
         
+        public String[] hours_array()
+        {
+        	return hours;
+        }
+        
+        public String getMenu()
+        {
+        	return menu;
+        }
+        
+        public String getAccess()
+        {
+        	return accessibility;
+        }
+        
+        public String getSpecials()
+        {
+        	return specials;
+        }
+        
         public String comments() {
         	return comments;
         }
-        
         
         public String name(){
                 return (name);

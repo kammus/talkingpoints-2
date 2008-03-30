@@ -13,7 +13,7 @@ public class TagReader implements DiscoveryListener{
 	
 	private ClientMessageHandler clientMessageHandler = null;
 	private static Object lock=new Object();
-	private static Vector vecDevices=new Vector();
+	private static Vector<RemoteDevice> vecDevices=new Vector<RemoteDevice>();
 	private static String macAddress;
 
 	// fakeMacAdress list
@@ -25,7 +25,7 @@ public class TagReader implements DiscoveryListener{
 	private TagReader() {
 		
 	}
-	
+
 	// constructor with ClientMessageHandler
 	public TagReader(ClientMessageHandler cmh) {
 		clientMessageHandler = cmh;
