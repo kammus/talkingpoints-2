@@ -417,15 +417,15 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			int row = (int)eventString.charAt(index) - (int)'0';
 			System.out.println("Row " + row + " selected. " + e.getSource());
 			if(model.getValueAt(row, 1) != null) {
-				cachedData = new POIdata((String)model.getValueAt(row, 1), 
-						(String)model.getValueAt(row,2),
-						(String)model.getValueAt(row,3),
-						(String)model.getValueAt(row,4),
-						(String)model.getValueAt(row,5),
-						(String)model.getValueAt(row,6),
-						(String)model.getValueAt(row,7),
-						(String)model.getValueAt(row,8),
-						(String)model.getValueAt(row,9));
+			//	cachedData = new POIdata((String)model.getValueAt(row, 1), 
+				//		(String)model.getValueAt(row,2),
+					//	(String)model.getValueAt(row,3),
+						//(String)model.getValueAt(row,4),
+						//(String)model.getValueAt(row,5),
+						//(String)model.getValueAt(row,6),
+						//(String)model.getValueAt(row,7),
+						//(String)model.getValueAt(row,8),
+						//(String)model.getValueAt(row,9));
 				locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
 						+ cachedData.description() + "]</font></b></html>");
 				StringBuffer sb = new StringBuffer();
