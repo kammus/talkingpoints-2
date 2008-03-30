@@ -17,7 +17,9 @@ public class ClientMessageHandler {
 		URL url = new URL("http://grocs.dmc.dc.umich.edu:3000/locations/show_by_bluetooth_mac/");
 		
 		StringBuffer urlSB = new StringBuffer(url.toString());
-		urlSB.append(macAddress);
+		String fakeMacAddress = "1234567890ab";
+		//urlSB.append(macAddress);
+		urlSB.append(fakeMacAddress);
 		
 		URL nurl = new URL(urlSB.toString());
 			
