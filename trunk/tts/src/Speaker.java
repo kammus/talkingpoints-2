@@ -82,7 +82,29 @@ public class Speaker {
 	}
 	
 	public void listener()
-	{
+	{ 
+		if (microphone.isRecording())
+		{
+		/*	while(microphone.hasMoreData())
+			{
+				System.out.println("still has data");
+				try {
+				microphone.getData();
+				microphone.stopRecording();
+				}
+				catch (Exception e)
+				{
+					System.out.println("Error getting data");
+				}
+				
+			} 
+			System.out.println("about to freeze");
+			microphone.stopRecording();
+			microphone.startRecording();
+			while (!microphone.isRecording())
+			{} */
+		}
+		
 		while(true)
 		{
 			Result result = recognizer.recognize();
@@ -134,7 +156,25 @@ public class Speaker {
 			else if(result.toLowerCase().compareTo("comments") == 0)
 			{
 				menuStatus = COMMENTS; 
-			
+				
+				if (currentLocation.comments() !=  null)
+				{
+					String error = "I'm sorry, there are no comments available for " + currentLocation.name + ". Please pick a different command."; 
+					dbVoice.speak(error);
+					listener();
+				}
+				else{
+					toSpeak = currentLocation.comments();
+					dbVoice.speak(toSpeak);
+					
+					
+				}
+				
+				
+			}
+			else if(result.toLowerCase().compareTo("home") == 0)
+			{
+				menuStatus = HOME;
 			}
 			else
 			{
@@ -158,7 +198,7 @@ public class Speaker {
 				dbVoice.speak(toSpeak);
 				listener();
 			}
-			else if(result.toLowerCase().compareTo("back") == 0)
+			else if(result.toLowerCase().compareTo("back") == 0 || result.toLowerCase().compareTo("home") == 0)
 			{
 				menuStatus = HOME;
 			}
@@ -175,7 +215,9 @@ public class Speaker {
 			//menuStatus = ;
 			break;
 		case COMMENTS:
-			//menuStatus = ;
+			if (result.toLowerCase().compareTo("repeat") == 0)
+			{
+			}
 			break;
 		}
 		

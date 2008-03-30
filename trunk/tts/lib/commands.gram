@@ -1,7 +1,7 @@
 #JSGF V1.0;
 
 /**
- * JSGF Grammar for Hello World example
+ * JSGF Grammar for Talking Points
  */
 
 grammar commands;
@@ -17,3 +17,4 @@ public <comments> = (Comments);
 public <specials> = (Specials);
 public <previous> = (Previous)(Location);
 public <nextloc> = (Next)(Location);
+public <home> = (Home);
