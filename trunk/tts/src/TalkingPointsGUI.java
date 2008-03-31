@@ -24,12 +24,15 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.Color;
@@ -41,7 +44,8 @@ import java.awt.Insets;
 import java.lang.StringBuffer;
 import java.util.Stack;
 
-public class TalkingPointsGUI implements ActionListener, TableModelListener, ListSelectionListener {
+public class TalkingPointsGUI implements ActionListener, TableModelListener, ListSelectionListener,
+							   PropertyChangeListener   {
 	
 	// Constants
 	static final int BG_COLOR_R = 241;
@@ -94,7 +98,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		locationListB = new JTable(5, 3);
 		ourModel = new locListModel(seen, notseen, bulletpoint);
 		frontScroll = new JScrollPane(locationList);
-		infoScroll = new JScrollPane(locationListB);
 		logoButton = new JButton(createImageIcon("images/logo.jpg", "TalkingPoints Logo"));
 		viewAll = new JButton("View All");
 		legend = new JLabel(createImageIcon("images/legend.png", "Legend for this page's icons."),
@@ -120,7 +123,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		int windowWidth = legend.getIcon().getIconWidth() + logoButton.getIcon().getIconWidth() + TOP_SPACER_X + COMP_SPACER_X + COMP_SPACER_X;
 		int tallest = (legendHeight > logoHeight) ? legendHeight : logoHeight;
 		int windowHeight = COMP_SPACER_Y + tallest + COMP_SPACER_Y + tableHeight + (COMP_SPACER_Y / 2) 
-		+ VIEWALL_Y + COMP_SPACER_Y + 50;
+		+ VIEWALL_Y + COMP_SPACER_Y + 60;
 		
 		int infoFieldsWidth = windowWidth - seen.getIconWidth() - (COMP_SPACER_X * 2);
 		
@@ -221,7 +224,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		middlePane.add(bottomButton);
 	
 		centralPane.add(middlePane, MAINPANE);
-				
+		
 		// CONFIGURE MORE INFORMATION PANEL
 		// Set up More Information pane
 		JPanel moreInfo = new JPanel();
@@ -242,7 +245,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		coreInfo.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
 		coreInfo.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		coreInfo.setEditable(false);
-			
+		coreInfo.setMargin(new Insets(5, 5, 5, 5));
+		infoScroll = new JScrollPane(coreInfo);
+		infoScroll.setColumnHeader(null);
+		
 		// Configure radio buttons for more info menu
 		menu = new JRadioButton("Menu", forwardsm);
 		hours = new JRadioButton("Hours", forwardsm);
@@ -256,6 +262,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		comments.setActionCommand("comments");
 		specials.setActionCommand("specials");
 		accessibility.setActionCommand("accessibility");
+		menu.addActionListener(this);
+		hours.addActionListener(this);
+		history.addActionListener(this);
+		comments.addActionListener(this);
+		specials.addActionListener(this);
+		accessibility.addActionListener(this);
 		
 		// Configure panel of radio buttons
 		moreInfoMenu = new JPanel();
@@ -332,30 +344,41 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 0;
 		c.gridwidth = 6;
 		c.gridheight = 1;
-		c.fill = GridBagConstraints.BOTH;
+		c.weightx = 0.65;
+		c.weighty = 0.65;
+		c.insets = new Insets(0, COMP_SPACER_X, 0, COMP_SPACER_X);
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
-	//	c.insets = new Insets(0, 0, COMP_SPACER_Y, 0);
 		moreInfo.add(title, c);
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;
 		c.gridwidth = 2;
 		c.gridheight = 4;
-	//	c.insets = new Insets(COMP_SPACER_Y, 0, 0, COMP_SPACER_X);
+		c.weightx = 1;
+		c.weighty = 0.75;
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(COMP_SPACER_Y, COMP_SPACER_X, COMP_SPACER_Y, COMP_SPACER_X);
 		moreInfo.add(moreInfoMenu, c);
 		c = new GridBagConstraints();
 		c.gridx = 2;
 		c.gridy = 1;
 		c.gridwidth = 4;
 		c.gridheight = 5;
+		c.weightx = 0.75;
+		c.weighty = 0.75;
+		c.insets = new Insets(0, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		c.fill = GridBagConstraints.BOTH;
-		moreInfo.add(coreInfo, c);
+		moreInfo.add(infoScroll, c);
 		c = new GridBagConstraints();
 		c.gridx = 6;
 		c.gridy = 0;
 		c.gridwidth = 2;
 		c.gridheight = 1;
-		c.fill = GridBagConstraints.NONE;
+		c.weightx = 0.15;
+		c.weighty = 0.15;
+		c.insets = new Insets(0, 0, 0, COMP_SPACER_X);
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.FIRST_LINE_END;
 		moreInfo.add(recentlyPassedPanel, c);
 		c = new GridBagConstraints();
@@ -363,7 +386,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 1;
 		c.gridwidth = 2;
 		c.gridheight = 3;
+		c.weightx = 0.75;
+		c.weighty = 0.75;
 		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(0, 0, 0, COMP_SPACER_X);
 		moreInfo.add(locationListB, c);
 		c = new GridBagConstraints();
 		c.gridx = 7;
@@ -371,9 +397,18 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		c.anchor = GridBagConstraints.LAST_LINE_END;
+		c.weightx = 0.75;
+		c.weighty = 0.75;
+		c.insets = new Insets(0, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		moreInfo.add(goBack, c);
 		centralPane.add(moreInfo, MOREINFO);
 	
+		// Register listener for central pane property change events
+		centralPane.addPropertyChangeListener(this);
+		
+		// Set GUI's state to MAINPANE
+		currentState = MAINPANE;
+		
 		// Add components to main content pane
 		mainContentPane.add(topButtons, BorderLayout.PAGE_START);
 		mainContentPane.add(centralPane, BorderLayout.CENTER);
@@ -395,6 +430,76 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		}
 	}
 	
+	// Property change listener for central pane of GUI
+	// Checks currentState and configures the central pane accordingly
+	// All state switching is handled in this method.
+	public void propertyChange(PropertyChangeEvent e) {
+		String newstate = e.getPropertyName();
+		System.out.println("Propertychange event received:" + newstate);
+		
+		CardLayout cl = (CardLayout)centralPane.getLayout();
+		locListModel model = (locListModel)locationList.getModel();
+		String s;
+		
+		// Changing to Main Pane
+		if(newstate.compareTo(MAINPANE) == 0) {
+			cl.show(centralPane, MAINPANE);
+			model.tableState = MAINPANE;
+			currentState = MAINPANE;
+		}
+		// Changing to More Info pane
+		else if(newstate.compareTo(MOREINFO) == 0) {
+			locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
+						+ cachedData.description() + "]</font></b></html>");
+				s = createCoreInfoString(cachedData);
+				configureMenuPanel();
+				coreInfo.setText(s);
+				cl.show(centralPane, MOREINFO);
+				model.tableState = MOREINFO;
+				currentState = newstate;
+		}
+		// Switch central info pane to Menu info for current POI
+		else if(newstate.compareTo(MENU) == 0) {
+			s = createMenuString(cachedData);
+			coreInfo.setText(s);
+			model.tableState = MENU;
+			currentState = MENU;
+		}
+		else if(newstate.compareTo(HOURS) == 0) {
+			s = createHoursString(cachedData);
+			coreInfo.setText(s);
+			model.tableState = HOURS;
+			currentState = HOURS;
+		}
+	else if(newstate.compareTo(HISTORY) == 0) {
+			s = createHistoryString(cachedData);
+			coreInfo.setText(s);
+			model.tableState = HISTORY;
+			currentState = HISTORY;
+		} 
+		else if(newstate.compareTo(ACCESSIBILITY) == 0) {
+			s = createAccessString(cachedData);
+			coreInfo.setText(s);
+			model.tableState = ACCESSIBILITY;
+			currentState = ACCESSIBILITY;
+		} 
+		else if(newstate.compareTo(SPECIALS) == 0) {
+			s = createSpecialsString(cachedData);
+			coreInfo.setText(s);
+			model.tableState = SPECIALS;
+			currentState = SPECIALS;
+		} 
+		else if(newstate.compareTo(COMMENTS) == 0) {
+			s = createCommentsString(cachedData);
+			coreInfo.setText(s);
+			model.tableState = COMMENTS;
+			currentState = COMMENTS;
+		} 
+		else
+			System.out.println("Property change message contained an invalid state:" + newstate);
+		
+	}
+	
 	// Listener for the table model that is assigned to the main pane table
 	// This is used to detect when the button in column 0 is "edited", ie clicked.
 	public void tableChanged(TableModelEvent e) {
@@ -413,7 +518,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	}
 		
 		
-	/* Listener for user selection of a table cell
+	/* Listener for user selection of a table cell.  Always sends user to More Information screen.
 	   For some reason, getFirstIndex() and getLastIndex() are inconsistent in the values they return when selecting rows,
 	   so we need to find the row selected by converting the output of getSource() to a string, and then
 	   the character after the first '{' to int, before subtracting the unicode integer value of '0'.  */
@@ -427,64 +532,90 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			if(eventString.charAt(index) == '}')
 				return;
 			int row = (int)eventString.charAt(index) - (int)'0';
-			System.out.println("Row " + row + " selected. " + e.getSource());
+			System.out.println("Row " + row + " selected. ");
 			if(model.getValueAt(row, 1) != null) {
 				cachedData = (POIdata)model.getValueAt(row, 3);
-				locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
-						+ cachedData.description() + "]</font></b></html>");
-				String s = createString(cachedData);
-				coreInfo.setText(s);
-				CardLayout cl = (CardLayout)centralPane.getLayout();
-				cl.show(centralPane, MOREINFO);
-				model.tableState = MOREINFO;
-				viewingHistory.push(MAINPANE);
+				viewingHistory.push(currentState);
 				locationList.clearSelection();
+				centralPane.firePropertyChange(MOREINFO, true, false);
 			}	
 				
 		}
 			
 	}
 		
-	
-	
 	// Listener for TalkingPointsGUI buttons
 	public void actionPerformed(ActionEvent e) {
 		
 		locListModel model = (locListModel)locationList.getModel();
+		StringBuffer sb = new StringBuffer();
 		
 		if(e.getActionCommand() == "home")  {
-			CardLayout cl = (CardLayout)centralPane.getLayout();
-			cl.show(centralPane, MAINPANE);
-			
-			model.tableState = MAINPANE;
 			viewingHistory.clear();
+			centralPane.firePropertyChange(MAINPANE, true, false);
 			}	
 		
 		if(e.getActionCommand() == "back") {
 			if(!(viewingHistory.empty())) {
 				String s = new String(viewingHistory.pop());
-				CardLayout cl = (CardLayout)centralPane.getLayout();
-				cl.show(centralPane, s);
-				model.tableState = s;
+				centralPane.firePropertyChange(s, true, false);
 			}
 		}
 		if(e.getActionCommand() == "menu")  {
-			
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(MENU, true, false);
 		}
-
+		if(e.getActionCommand() == "hours")  {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(HOURS, true, false);
+		}
+		if(e.getActionCommand() == "history")  {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(HISTORY, true, false);
+		}
+		if(e.getActionCommand() == "accessibility")  {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(ACCESSIBILITY, true, false);
+		}
+		if(e.getActionCommand() == "specials")  {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(SPECIALS, true, false);
+		}
+		if(e.getActionCommand() == "comments")  {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(COMMENTS, true, false);
+		}
+		
+	}
+	
+	// Configures menu panel for More Information screens
+	private void configureMenuPanel() {
+		moreInfoMenu.removeAll();
+		if(cachedData.getMenu() != null)
+			moreInfoMenu.add(menu);
+		if(cachedData.hours_array() != null) 
+			moreInfoMenu.add(hours);
+	//	if(cachedData.getHistory()) != null
+		 // moreInfoMenu.add(history);
+		if(cachedData.getAccess() != null)
+			moreInfoMenu.add(accessibility);
+		if(cachedData.getSpecials() != null)
+			moreInfoMenu.add(specials);
+		if(cachedData.comments() != null)
+			moreInfoMenu.add(comments);
 	}
 	
 	/**
 	 * @param args is unused
-	 */   
+	 */   /*
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
-		String [] s = {"etc", "etc", "etc", "etc", "etc", "etc", "etc"};
+		String [] s = {"1-3 MWF", "2-5 Sat", "3-5 Sun", " ", " ", " ", " "};
 		
 		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", s));
 
-	} 
+	} */
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -658,7 +789,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	}
 		
 	// Fills a stringbuffer with the necessary text for the Core Info pane, then returns it as a string.
-	public String createString(POIdata p) {
+	private String createCoreInfoString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<font size = 5>&nbsp;Core Information</font><hr><pre>");
 		sb.append(" Name:          " + p.name() + " <br>");
@@ -672,6 +803,69 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		String s = new String(sb);
 		return s;
 	}
+	
+	// Stringbuffer-filling methods for each of the possible More Info menu items.
+	// This is ugly, but it gets the job done (presumably).  May want to streamline later.
+	// They all assume that <br>'s are placed in the proper places in the source strings to keep the horizontal
+	// scroll bar from appearing.
+	
+	// Fills a stringbuffer with the necessary text for a Menu pane about our current POI, then returns it as a string.
+	private String createMenuString(POIdata p) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<font size = 5>&nbsp;Menu</font><hr><pre>");
+		sb.append("&nbsp;" + p.getMenu() + "</pre>");
+		return(new String(sb));
+		
+	} 
+	
+	// Fills a stringbuffer with the necessary text for a Hours pane about our current POI, then returns it as a string.
+	// If hours_array is ever changed to have more or less entries, we need to alter the for loop.
+	private String createHoursString(POIdata p) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<font size = 5>&nbsp;Hours</font><hr><pre>");
+		String [] s = p.hours_array();
+		for(int i = 0 ; i < 7 ; i++)
+			sb.append("&nbsp;" + s[i] + "<br>");
+		sb.append("</pre>");
+		return(new String(sb));
+		
+	} 
+	
+	// Fills a stringbuffer with the necessary text for a History pane about our current POI, then returns it as a string.
+	// TODO: Change p.getMenu() to whatever returns the History string when it gets implemented.
+	private String createHistoryString(POIdata p) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<font size = 5>&nbsp;History</font><hr><pre>");
+		sb.append("&nbsp;" + p.getMenu() + "</pre>");
+		return(new String(sb));
+	}
+ 	
+	// Fills a stringbuffer with the necessary text for a Accessibility pane about our current POI, then returns it as a string.
+	private String createAccessString(POIdata p) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<font size = 5>&nbsp;Accessibility Information</font><hr><pre>");
+		sb.append("&nbsp;" + p.getAccess() + "</pre>");
+		return(new String(sb));
+		
+	} 
+	
+	// Fills a stringbuffer with the necessary text for a Specials pane about our current POI, then returns it as a string.
+	private String createSpecialsString(POIdata p) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<font size = 5>&nbsp;Specials</font><hr><pre>");
+		sb.append("&nbsp;" + p.getSpecials() + "</pre>");
+		return(new String(sb));
+		
+	} 
+	
+	// Fills a stringbuffer with the necessary text for a Comments pane about our current POI, then returns it as a string.
+	private String createCommentsString(POIdata p) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<font size = 5>&nbsp;User Comments</font><hr><pre>");
+		sb.append("&nbsp;" + p.comments() + "</pre>");
+		return(new String(sb));
+		
+	} 
 	
 	// Variable definitions
 	private locListModel ourModel;
@@ -698,5 +892,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	private JRadioButton accessibility;
 	// A copy of the POIdata currently being viewed
 	private POIdata cachedData;
+	// String that describes GUI's current state
+	private String currentState;
 	
 }
