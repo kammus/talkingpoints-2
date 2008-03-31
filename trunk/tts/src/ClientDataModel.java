@@ -11,23 +11,23 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 class POIdata {
-        String name;
-        String type;
-        String description;
-        String country;
-        String postalCode;
-        String street;
-        String phone;
-        String url;
-        String state;
-        String city;
+        private String name;
+        private String type;
+        private String description;
+        private String country;
+        private String postalCode;
+        private String street;
+        private String phone;
+        private String url;
+        private String state;
+        private String city;
         /* All null for the moment */
-        String comments;
-        String[] hours = new String[7];
-        String menu;
-        String specials;
-        String accessibility;
-        String history;
+        private String comments;
+        private String[] hours = new String[7];
+        private String menu;
+        private String specials;
+        private String accessibility;
+        private String history;
         
         POIdata(){
         	
@@ -46,6 +46,10 @@ class POIdata {
                 state = state_t;
                 city = city_t;
                 hours = hour_t;
+          //      accessibility = "asd";
+           //     specials = "asdsad";
+            //    comments = "Sdasd";
+             //   menu = "ASdasdsaasf asjldkal ";
         }
         
         public String[] hours_array()
