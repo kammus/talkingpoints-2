@@ -67,7 +67,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	static final String ACCESSIBILITY = "POI's accessibility";
 	static final String SPECIALS = "POI's specials";
 	static final String COMMENTS = "POI's comments";
-	
+	static final String VIEWALL = "View all pane";
 	
 	// Default constructor
 	TalkingPointsGUI()  {
@@ -191,6 +191,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		viewAll.setPreferredSize(new Dimension(VIEWALL_X, VIEWALL_Y));		
 		viewAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		viewAll.setAlignmentY(Component.CENTER_ALIGNMENT);
+		viewAll.setActionCommand("viewall");
+		viewAll.addActionListener(this);
 		
 		// Set up horizontal layer at top of window
 		JPanel topButtons = new JPanel();
@@ -445,6 +447,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		if(newstate.compareTo(MAINPANE) == 0) {
 			cl.show(centralPane, MAINPANE);
 			model.tableState = MAINPANE;
+			tableTitle.setText("<html><font size = 4><u>Detected Points of Interest</font></u></html>");
 			currentState = MAINPANE;
 		}
 		// Changing to More Info pane
@@ -495,6 +498,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			model.tableState = COMMENTS;
 			currentState = COMMENTS;
 		} 
+		else if(newstate.compareTo(VIEWALL) == 0) {
+			model.tableState = VIEWALL;
+			currentState = VIEWALL;
+			tableTitle.setText("<html><font size = 4><u>Points of Interest</u></font></html>");
+			model.fireTableDataChanged();
+		}
 		else
 			System.out.println("Property change message contained an invalid state:" + newstate);
 		
@@ -504,17 +513,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// This is used to detect when the button in column 0 is "edited", ie clicked.
 	public void tableChanged(TableModelEvent e) {
 			
-		if(e.getColumn() == 123) {
-			System.out.println("Source: " + e.getSource());
-			int row = e.getFirstRow();
-			locListModel model = (locListModel)locationList.getModel();
-				if(model.getValueAt(row, 1) != null) {
-	//			locationName.setText((String)model.getValueAt(row, 1));
-				CardLayout cl = (CardLayout)centralPane.getLayout();
-				cl.show(centralPane, MOREINFO);
-			}
-			
-		}
+		
+
 	}
 		
 		
@@ -585,6 +585,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			viewingHistory.push(currentState);
 			centralPane.firePropertyChange(COMMENTS, true, false);
 		}
+		if(e.getActionCommand() == "viewall") {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(VIEWALL, true, false);
+		}
 		
 	}
 	
@@ -607,7 +611,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	
 	/**
 	 * @param args is unused
-	 */   /*
+	 */   
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
@@ -615,7 +619,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", s));
 
-	} */
+	} 
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -629,6 +633,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			notseen = notseen_t;
 			bulletpoint = bulletpoint_t;
 			tableState = new String(MAINPANE);
+			hidden = new boolean[10];
 		}
 		
 		// Required method getRowCount()
@@ -666,11 +671,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// If column is 3, returns entire POIdata object.
 		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
+			int i = 0;
 			
 			if(data[row] == null)
 				return null;
 			
-			switch(column) {
+				switch(column) {
 			case(0):
 				if(tableState.compareTo(MAINPANE) == 0)
 					return seen;
@@ -693,19 +699,24 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			System.out.println("Trying push onto location queue.");
 			
 			for(int i = 9 ; i > 0 ; i--) {
-				if(data[i-1] != null)
+				if(data[i-1] != null) {
 					data[i] = data[i-1];
+					hidden[i] = hidden[i-1];
+				}	
 				else
 					System.out.println("object #" + i + " is unallocated.");
 			}
 		/* does this work instead of creating a new POIdata object every time*/ 
-		data[0] = p;
+			data[0] = p;
+			hidden[0] = false;
+			fireTableDataChanged();
 		//data[0] = new POIdata(p.name(), p.location_type(), p.description()); ;
 		}
 		
 		
 		// variable definitions
 		private POIdata[] data;
+		private boolean[] hidden;
 		private ImageIcon bulletpoint;
 		private ImageIcon seen;
 		private ImageIcon notseen;
@@ -761,7 +772,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 			isPushed = true;
 			locListModel model = (locListModel)table.getModel();
-			System.out.println(value);
+			
 			model.fireTableChanged(new TableModelEvent(model, row, row, 123));
 			return button;
 		}
