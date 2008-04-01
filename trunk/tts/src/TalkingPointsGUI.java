@@ -239,17 +239,21 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		title.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		title.add(locationTitle, BorderLayout.PAGE_START);
 		title.setAlignmentX(Component.LEFT_ALIGNMENT);
-//		title.setPreferredSize(new Dimension(400, 35));
-//		title.setMinimumSize(new Dimension(400, 35));
-//		title.setMaximumSize(new Dimension(400, 35));
+		title.setPreferredSize(new Dimension(315, 40));
+		title.setMinimumSize(new Dimension(315, 40));
 		
 		// Configure Core Information text pane
 		coreInfo.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
 		coreInfo.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		coreInfo.setEditable(false);
 		coreInfo.setMargin(new Insets(5, 5, 5, 5));
+		HTMLEditorKit editor = new HTMLEditorKit();
+		
+		coreInfo.setEditorKit(editor);
 		infoScroll = new JScrollPane(coreInfo);
 		infoScroll.setColumnHeader(null);
+		infoScroll.setMinimumSize(new Dimension(320, 185));
+		infoScroll.setPreferredSize(new Dimension(320, 185));
 		
 		// Configure radio buttons for more info menu
 		menu = new JRadioButton("Menu", forwardsm);
@@ -277,6 +281,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		moreInfoMenu.setLayout(new BoxLayout(moreInfoMenu, BoxLayout.Y_AXIS));
 		moreInfoMenu.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		moreInfoMenu.setBackground(new Color(237,241,238));
+		moreInfoMenu.setMinimumSize(new Dimension(110, 190));
+		moreInfoMenu.setPreferredSize(new Dimension(110,190));
 		moreInfoMenu.add(menu);
 		moreInfoMenu.add(hours);
 		moreInfoMenu.add(history);
@@ -299,9 +305,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		recentlyPassedPanel.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		recentlyPassedPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		recentlyPassedPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-		recentlyPassedPanel.setPreferredSize(new Dimension(125, 50));
-		recentlyPassedPanel.setMinimumSize(new Dimension(150, 50));
-		recentlyPassedPanel.setMaximumSize(new Dimension(150, 50));
+		recentlyPassedPanel.setPreferredSize(new Dimension(135, 50));
+		recentlyPassedPanel.setMinimumSize(new Dimension(135, 50));
 		recentlyPassedPanel.add(recentlyPassed);
 		
 		// Configure location list table B
@@ -326,6 +331,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		locationListB.setFillsViewportHeight(true);
 		locationListB.setShowHorizontalLines(false);
 		locationListB.setShowVerticalLines(false);
+		locationListB.setPreferredSize(new Dimension(135,140));
+		locationListB.setMinimumSize(new Dimension(135,140));
 		locationListB.getTableHeader().setResizingAllowed(false);
 		locationListB.getTableHeader().setReorderingAllowed(false);
 		locationListB.getTableHeader().setVisible(false); 
@@ -346,8 +353,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 0;
 		c.gridwidth = 6;
 		c.gridheight = 1;
-		c.weightx = 0.65;
-		c.weighty = 0.65;
+	//	c.weightx = 0.65;
+	//	c.weighty = 0.65;
 		c.insets = new Insets(0, COMP_SPACER_X, 0, COMP_SPACER_X);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -357,8 +364,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 1;
 		c.gridwidth = 2;
 		c.gridheight = 4;
-		c.weightx = 1;
-		c.weighty = 0.75;
+	//	c.weightx = 0.75;
+	//	c.weighty = 0.75;
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(COMP_SPACER_Y, COMP_SPACER_X, COMP_SPACER_Y, COMP_SPACER_X);
 		moreInfo.add(moreInfoMenu, c);
@@ -367,29 +374,29 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 1;
 		c.gridwidth = 4;
 		c.gridheight = 5;
-		c.weightx = 0.75;
-		c.weighty = 0.75;
-		c.insets = new Insets(0, 0, COMP_SPACER_Y, COMP_SPACER_X);
+	//	c.weightx = 0.75;
+	//	c.weighty = 0.75;
+		c.insets = new Insets(COMP_SPACER_Y, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		c.fill = GridBagConstraints.BOTH;
 		moreInfo.add(infoScroll, c);
 		c = new GridBagConstraints();
 		c.gridx = 6;
 		c.gridy = 0;
 		c.gridwidth = 2;
-		c.gridheight = 1;
-		c.weightx = 0.15;
-		c.weighty = 0.15;
-		c.insets = new Insets(0, 0, 0, COMP_SPACER_X);
+		c.gridheight = 2;
+	//	c.weightx = 0.15;
+	//	c.weighty = 0.15;
+		c.insets = new Insets(0, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.FIRST_LINE_END;
 		moreInfo.add(recentlyPassedPanel, c);
 		c = new GridBagConstraints();
 		c.gridx = 6;
-		c.gridy = 1;
+		c.gridy = 2;
 		c.gridwidth = 2;
-		c.gridheight = 3;
-		c.weightx = 0.75;
-		c.weighty = 0.75;
+		c.gridheight = 2;
+	//	c.weightx = 0.75;
+	//	c.weighty = 0.75;
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(0, 0, 0, COMP_SPACER_X);
 		moreInfo.add(locationListB, c);
@@ -399,8 +406,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		c.anchor = GridBagConstraints.LAST_LINE_END;
-		c.weightx = 0.75;
-		c.weighty = 0.75;
+	//	c.weightx = 0.75;
+	//	c.weighty = 0.75;
 		c.insets = new Insets(0, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		moreInfo.add(goBack, c);
 		centralPane.add(moreInfo, MOREINFO);
@@ -512,11 +519,25 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Listener for the table model that is assigned to the main pane table
 	// This is used to detect when the button in column 0 is "edited", ie clicked.
 	public void tableChanged(TableModelEvent e) {
-			
+		/*
+			int row = e.getFirstRow();
 		
-
+			if(e.getColumn() == 123)  {
+				locListModel model = (locListModel)e.getSource();
+				model.toggleHidden(row);
+				// Search forward in list for next unhidden entry
+				for(int i = row ; i <= 9 ; i++) {
+					if(!(model.getHidden(i))) {
+						updateMappings(i, model);
+						return
+					}
+						
+				}
+			}
+*/
 	}
 		
+//	private void updateMappings(int )
 		
 	/* Listener for user selection of a table cell.  Always sends user to More Information screen.
 	   For some reason, getFirstIndex() and getLastIndex() are inconsistent in the values they return when selecting rows,
@@ -546,9 +567,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 	// Listener for TalkingPointsGUI buttons
 	public void actionPerformed(ActionEvent e) {
-		
-		locListModel model = (locListModel)locationList.getModel();
-		StringBuffer sb = new StringBuffer();
 		
 		if(e.getActionCommand() == "home")  {
 			viewingHistory.clear();
@@ -618,7 +636,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		String [] s = {"1-3 MWF", "2-5 Sat", "3-5 Sun", " ", " ", " ", " "};
 		
 		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", s));
-
+		ourGUI.addItem(new POIdata("Stucchi's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", s));
 	} 
 
 	/* Custom table model for locationList.
@@ -634,6 +652,9 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			bulletpoint = bulletpoint_t;
 			tableState = new String(MAINPANE);
 			hidden = new boolean[10];
+			mappings = new int[5];
+			for(int i = 0 ; i <= 4 ; i++)
+				mappings[i] = i;
 		}
 		
 		// Required method getRowCount()
@@ -671,7 +692,9 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// If column is 3, returns entire POIdata object.
 		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
-			int i = 0;
+			
+			// Get mapping of this row
+			int map = mappings[row];
 			
 			if(data[row] == null)
 				return null;
@@ -713,10 +736,22 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		//data[0] = new POIdata(p.name(), p.location_type(), p.description()); ;
 		}
 		
+	/*	public void toggleHidden(int row) {
+			hidden[row] = !(hidden[row]);
+		}
+		
+		public boolean getHidden(int row) {
+			return hidden[row];
+		}
+		
+		public void setMapping(int row, int mapto) {
+			mappings[row] = mapto;
+		} */
 		
 		// variable definitions
 		private POIdata[] data;
 		private boolean[] hidden;
+		private int[] mappings;
 		private ImageIcon bulletpoint;
 		private ImageIcon seen;
 		private ImageIcon notseen;
