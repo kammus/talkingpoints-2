@@ -13,8 +13,10 @@ public class TagReader implements DiscoveryListener{
 	
 	private ClientMessageHandler clientMessageHandler = null;
 	private static Object lock=new Object();
+	
 	private static Vector<RemoteDevice> vecDevices=new Vector<RemoteDevice>();
 	private static String macAddress;
+	
 
 	// fakeMacAdress list
 	String fakeMacAddress[] = new String [] { "1234567890ab" , "0123456789cd", "1234567890ef"};
