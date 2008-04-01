@@ -648,8 +648,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		String [] s = {"1-3 MWF", "2-5 Sat", "3-5 Sun", " ", " ", " ", " "};
 		
-		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", s));
-		ourGUI.addItem(new POIdata("Stucchi's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", s));
+		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","junk"));
+		ourGUI.addItem(new POIdata("Stucchi's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
 	} 
 
 	/* Custom table model for locationList.
@@ -881,9 +881,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	private String createHoursString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<font size = 5>&nbsp;Hours</font><hr><pre>");
-		String [] s = p.hours_array();
-		for(int i = 0 ; i < 7 ; i++)
-			sb.append("&nbsp;" + s[i] + "<br>");
+		String s = p.hours_array();
+		sb.append(s + "<br>");
 		sb.append("</pre>");
 		return(new String(sb));
 		
