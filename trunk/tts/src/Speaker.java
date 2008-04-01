@@ -8,7 +8,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import java.net.URL;
 import java.io.*;
 import java.util.*;
-
+import java.util.concurrent.*;
 /*
  * Perhaps have some graphical output for the moment 
  * 
@@ -82,52 +82,46 @@ public class Speaker {
 			locationCache.pop();
 	}
 	
+	/* Have a listener thread 
+	 tell listener thread to get objects at the appropriate time
+	 have handler get result at appropriate time. 
+	 */
+	
 	public void listener()
 	{ 
-		if (microphone.isRecording())
-		{
-		/*	while(microphone.hasMoreData())
-			{
-				System.out.println("still has data");
-				try {
-				microphone.getData();
-				microphone.stopRecording();
-				}
-				catch (Exception e)
-				{
-					System.out.println("Error getting data");
-				}
-				
-			} 
-			System.out.println("about to freeze");
-			microphone.stopRecording();
-			microphone.startRecording();
-			while (!microphone.isRecording())
-			{} */
-		}
-		
+	
 		while(true)
-		{
+		{	
+			System.out.println("Starting recording");
+			microphone.startRecording();
+			System.out.println("Recording Started");
 			Result result = recognizer.recognize();
+			System.out.println("Trying to stop recording");
+			microphone.stopRecording();
+			System.out.println("Recording stopped");
 			if (result != null) 
 		    {
 				String resultText = result.getBestFinalResultNoFiller();
-				System.out.println("You said: " + resultText + "\n");
+				result = null;
+				System.out.println("You said: " + resultText);
 				resultHandler(resultText);
-				break;
 			} 
 		    else 
 		    {
-				String error = "I can't hear or understaid what you said.";
+				String error = "I can't hear or understand what you said.";
 				dbVoice.speak(error);
 				dbVoice.speak(toSpeak);
-				break;
 			}
+			microphone.clear();
 		}
 	}
 	
+	/* create a dialog with the user 
+	 * 
+	 * 
+	 * 
+	 */
 	
-	/* create a dialog with the user */ 
 	public void createDialog()
 	{
 		menuStatus = ENCOUNTER; 
@@ -136,10 +130,11 @@ public class Speaker {
 		dbVoice.speak(toSpeak);
 		if (!(microphone.isRecording()))
 			microphone.startRecording();
+		/* perhaps do something gunky here */
 		listener();
 	}
 	
-	public void resultHandler(String result)
+	public boolean resultHandler(String result)
 	{
 		switch(menuStatus)
 		{
@@ -147,7 +142,7 @@ public class Speaker {
 			if (result.toLowerCase().compareTo("repeat") == 0)
 			{
 				dbVoice.speak(toSpeak);
-				listener(); 
+				return true; 
 			}
 			else if(result.toLowerCase().compareTo("back") == 0)
 			{
@@ -157,37 +152,38 @@ public class Speaker {
 			else if(result.toLowerCase().compareTo("comments") == 0)
 			{
 				menuStatus = COMMENTS; 
-				
-				if (currentLocation.comments() !=  null)
+				if (currentLocation.comments() ==  null)
 				{
-					String error = "I'm sorry, there are no comments available for " + currentLocation.name + ". Please pick a different command."; 
+					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
 					dbVoice.speak(error);
-					listener();
+					return true;
 				}
 				else{
 					toSpeak = currentLocation.comments();
+					System.out.println("toSpeak: " + toSpeak);
 					dbVoice.speak(toSpeak);
-					listener();
+					
+					return true;
 				}
 			}
 			else if(result.toLowerCase().compareTo("description") == 0)
 			{
 				toSpeak = currentLocation.description();
 				dbVoice.speak(toSpeak);
-				listener();
+				return true;
 			}
 			else if(result.toLowerCase().compareTo("home") == 0)
 			{
 				menuStatus = HOME;
+				System.out.println("Welcome home");
+				return true;
 			}
 			else
 			{
 				String error  = "I'm sorry that command is not available at this menu. Please try again.";
 				dbVoice.speak(error);
-				listener();
+				return true;
 			}	
-			
-			
 			break;
 		case ENCOUNTER:
 			if (result.toLowerCase().compareTo("repeat") == 0)
@@ -200,20 +196,19 @@ public class Speaker {
 				toSpeak = "To hear the comments, say Comments. To hear hours, say Hours. To hear a short description, say Description.";
 				System.out.println("toSpeak: " + toSpeak);
 				dbVoice.speak(toSpeak);
-				listener();
+				return true;
 			}
 			else if(result.toLowerCase().compareTo("back") == 0 || result.toLowerCase().compareTo("home") == 0)
 			{
 				menuStatus = HOME;
+				return true;
 			}
 			else
 			{
 				String error  = "I'm sorry that command is not available at this menu. Please try again.";
 				dbVoice.speak(error);
-				listener();
+				return true;
 			}
-			
-		
 			break;
 		case HOME:
 			if (result.toLowerCase().compareTo("previous") == 0)
@@ -233,8 +228,7 @@ public class Speaker {
 			}
 			break;
 		}
-		
-		
+		return true;
 	}
 	
 	/* Eventually will return some type of object */

@@ -11,29 +11,29 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 class POIdata {
-        private String name;
-        private String type;
-        private String description;
-        private String country;
-        private String postalCode;
-        private String street;
-        private String phone;
-        private String url;
-        private String state;
-        private String city;
+        String name;
+        String type;
+        String description;
+        String country;
+        String postalCode;
+        String street;
+        String phone;
+        String url;
+        String state;
+        String city;
         /* All null for the moment */
-        private String comments;
-        private String[] hours = new String[7];
-        private String menu;
-        private String specials;
-        private String accessibility;
-        private String history;
+        String comments;
+        String hours;
+        String menu;
+        String specials;
+        String accessibility;
+        String history;
         
         POIdata(){
         	
         }
         
-        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String[] hour_t)
+        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String hour_t)
         {
                 name = name_t;
                 type = type_t;
@@ -46,13 +46,9 @@ class POIdata {
                 state = state_t;
                 city = city_t;
                 hours = hour_t;
-          //      accessibility = "asd";
-           //     specials = "asdsad";
-            //    comments = "Sdasd";
-             //   menu = "ASdasdsaasf asjldkal ";
         }
         
-        public String[] hours_array()
+        public String hours_array()
         {
         	return hours;
         }
@@ -128,7 +124,14 @@ public class ClientDataModel{
             //given an XML document and a tag, return an Element at a given index
             NodeList rows = doc.getDocumentElement().getElementsByTagName(tagName);
             Element ele = (Element)rows.item(index);
+            try {
             return ele.getChildNodes();
+            }
+            catch (Exception e)
+            {
+              System.out.println("Location does not have " + tagName + "!");
+              return null;
+            }
             
           }
            
@@ -143,9 +146,7 @@ public class ClientDataModel{
                  
                  Document doc = docBuilder.parse(in);
                  
-                 doc.getDocumentElement().normalize();
-                 
-                 //NodeList tpidText = getElement(doc, "tpid", 0); //XML changed
+                 doc.getDocumentElement();//.normalize();
                  NodeList nameText, typeText, descriptionText, countryText, postalCodeText;
                  NodeList streetText, phoneText, urlText, stateText, cityText, hoursText;
                  nameText = getElement(doc, "name", 0);
@@ -158,9 +159,30 @@ public class ClientDataModel{
                  countryText = getElement(doc, "country",0);
                  urlText = getElement(doc, "url",0);
                  phoneText = getElement(doc, "phone",0);
-                // hoursText = getElement(doc,"hours",0);
+                
+                 hoursText = getElement(doc,"hours",0);
                  
-                 String[] hours = new String[7];
+                 NodeList additionalInfoText = getElement(doc,"additional_information",0);
+                 System.out.println(doc.getTextContent());
+                 System.out.println("Size of info: " + additionalInfoText.getLength());
+                 NodeList additionalChild = additionalInfoText.item(0).getChildNodes();
+                 for (int x =0; x < additionalInfoText.getLength(); ++x)
+                 {
+                	 
+                	System.out.println(((Node)additionalInfoText.item(x))); 
+                 }
+                 System.out.println();
+                 for (int x =0; x < additionalChild.getLength(); ++x)
+                 {
+                	 
+                	System.out.println(((Node)additionalChild.item(x))); 
+                 }
+                 System.out.println();
+                 
+                 if (hoursText == null)
+                	 System.out.println("Additional info not found");
+                
+                 String hours;
                  
                  name = ((Node)nameText.item(0)).getNodeValue();
                  type = ((Node)typeText.item(0)).getNodeValue(); //type is not included in XML now.
@@ -172,10 +194,14 @@ public class ClientDataModel{
                  phone = ((Node)phoneText.item(0)).getNodeValue();
                  url = ((Node)urlText.item(0)).getNodeValue();
                  city = ((Node)cityText.item(0)).getNodeValue();
-                 /*for(int x=0; x<7; ++x)
+                 hours = "";
+                 System.out.println("length: " + hoursText.getLength());
+                 for (int x =0; x< hoursText.getLength(); ++x)
                  {
-                	 hours[x] = ((Node)cityText.item(x)).getNodeValue();
-                 }*/
+                
+                	 hours = ((Node)hoursText.item(x)).getNodeValue();
+                	 System.out.println("Hours is " + hours);
+                 }
                  data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours); //object creation
                  objectNotify(data);
                  boolean blind = true;
