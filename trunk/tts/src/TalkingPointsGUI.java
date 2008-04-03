@@ -59,6 +59,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	static final int TOP_SPACER_X = 50;
 	static final int VIEWALL_X = 80;
 	static final int VIEWALL_Y = 45;
+	static final int MOREINFO_CHAR_WIDTH = 55;
 	static final String MAINPANE = "Front pane of TPGUI";
 	static final String MOREINFO = "More information pane of TPGUI";
 	static final String MENU = "POI's menu";
@@ -341,9 +342,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		locationListB.getTableHeader().setReorderingAllowed(false);
 		locationListB.getTableHeader().setVisible(false); 
 		
+		ListSelectionModel selectionModelB = locationListB.getSelectionModel();
+		selectionModelB.addListSelectionListener(this);
+		
 		// Configure back button
 		JButton goBack = new JButton(back);
-		goBack.setActionCommand("back");
+		goBack.setActionCommand("home");
 		goBack.setContentAreaFilled(false);
 		goBack.setForeground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
 		goBack.setBorder(BorderFactory.createEmptyBorder());
@@ -357,8 +361,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 0;
 		c.gridwidth = 6;
 		c.gridheight = 1;
-	//	c.weightx = 0.65;
-	//	c.weighty = 0.65;
 		c.insets = new Insets(0, COMP_SPACER_X, 0, COMP_SPACER_X);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -368,8 +370,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 1;
 		c.gridwidth = 2;
 		c.gridheight = 4;
-	//	c.weightx = 0.75;
-	//	c.weighty = 0.75;
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(COMP_SPACER_Y, COMP_SPACER_X, COMP_SPACER_Y, COMP_SPACER_X);
 		moreInfo.add(moreInfoMenu, c);
@@ -378,8 +378,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 1;
 		c.gridwidth = 4;
 		c.gridheight = 5;
-	//	c.weightx = 0.75;
-	//	c.weighty = 0.75;
 		c.insets = new Insets(COMP_SPACER_Y, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		c.fill = GridBagConstraints.BOTH;
 		moreInfo.add(infoScroll, c);
@@ -388,8 +386,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 0;
 		c.gridwidth = 2;
 		c.gridheight = 2;
-	//	c.weightx = 0.15;
-	//	c.weighty = 0.15;
 		c.insets = new Insets(0, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.FIRST_LINE_END;
@@ -399,8 +395,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridy = 2;
 		c.gridwidth = 2;
 		c.gridheight = 2;
-	//	c.weightx = 0.75;
-	//	c.weighty = 0.75;
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(0, 0, 0, COMP_SPACER_X);
 		moreInfo.add(locationListB, c);
@@ -410,8 +404,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		c.gridwidth = 1;
 		c.gridheight = 1;
 		c.anchor = GridBagConstraints.LAST_LINE_END;
-	//	c.weightx = 0.75;
-	//	c.weighty = 0.75;
 		c.insets = new Insets(0, 0, COMP_SPACER_Y, COMP_SPACER_X);
 		moreInfo.add(goBack, c);
 		centralPane.add(moreInfo, MOREINFO);
@@ -448,13 +440,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// All state switching is handled in this method.
 	public void propertyChange(PropertyChangeEvent e) {
 		String newstate = e.getPropertyName();
-		System.out.println("Propertychange event received:" + newstate);
 		
 		CardLayout cl = (CardLayout)centralPane.getLayout();
 		locListModel model = (locListModel)locationList.getModel();
 		String s;
 		
-		// Changing to Main Pane
+			// Changing to Main Pane
 		if(newstate.compareTo(MAINPANE) == 0) {
 			cl.show(centralPane, MAINPANE);
 			model.tableState = MAINPANE;
@@ -475,6 +466,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 				model.tableState = MOREINFO;
 				currentState = newstate;
 		}
+		if(currentState.compareTo(newstate) == 0)
+			return;
 		// Switch central info pane to Menu info for current POI
 		else if(newstate.compareTo(MENU) == 0) {
 			s = createMenuString(cachedData);
@@ -544,7 +537,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 */
 	}
 		
-//	private void updateMappings(int )
 		
 	/* Listener for user selection of a table cell.  Always sends user to More Information screen.
 	   For some reason, getFirstIndex() and getLastIndex() are inconsistent in the values they return when selecting rows,
@@ -580,12 +572,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			centralPane.firePropertyChange(MAINPANE, true, false);
 			}	
 		
-		if(e.getActionCommand() == "back") {
-			if(!(viewingHistory.empty())) {
-				String s = new String(viewingHistory.pop());
-				centralPane.firePropertyChange(s, true, false);
-			}
-		}
+	//	if(e.getActionCommand() == "back") {
+	//		if(!(viewingHistory.empty())) {
+	//			String s = new String(viewingHistory.pop());
+	//			centralPane.firePropertyChange(s, true, false);
+	//		}
+	//	}
 		if(e.getActionCommand() == "lochome") {
 			viewingHistory.push(currentState);
 			centralPane.firePropertyChange(MOREINFO, true, false);
@@ -630,8 +622,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			moreInfoMenu.add(menu);
 		if(cachedData.hours_array() != null) 
 			moreInfoMenu.add(hours);
-	//	if(cachedData.getHistory()) != null
-		 // moreInfoMenu.add(history);
+		if(cachedData.getHistory() != null)
+		    moreInfoMenu.add(history);
 		if(cachedData.getAccess() != null)
 			moreInfoMenu.add(accessibility);
 		if(cachedData.getSpecials() != null)
@@ -642,15 +634,15 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	
 	/**
 	 * @param args is unused
-	 */   
+	 */  /* 
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
 		String [] s = {"1-3 MWF", "2-5 Sat", "3-5 Sun", " ", " ", " ", " "};
 		
-		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","junk"));
+		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog."));
 		ourGUI.addItem(new POIdata("Stucchi's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
-	} 
+	} */
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -870,8 +862,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Menu pane about our current POI, then returns it as a string.
 	private String createMenuString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<font size = 5>&nbsp;Menu</font><hr><pre>");
-		sb.append("&nbsp;" + p.getMenu() + "</pre>");
+		sb = copyStringWithWordWrap(p.getMenu(), sb);
+	//	sb.append("&nbsp;" + p.getMenu() + "</pre>");
+		sb.insert(0, "<font size = 5>&nbsp;Menu</font><hr><pre>");
+		sb.append("</pre>");
 		return(new String(sb));
 		
 	} 
@@ -889,19 +883,22 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	} 
 	
 	// Fills a stringbuffer with the necessary text for a History pane about our current POI, then returns it as a string.
-	// TODO: Change p.getMenu() to whatever returns the History string when it gets implemented.
 	private String createHistoryString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<font size = 5>&nbsp;History</font><hr><pre>");
-		sb.append("&nbsp;" + p.getMenu() + "</pre>");
+	//	sb.append("&nbsp;" + p.getHistory() + "</pre>");
+		sb = copyStringWithWordWrap(p.getHistory(), sb);
+		sb.insert(0, "<font size = 5>&nbsp;History</font><hr><pre>");
+		sb.append("</pre>");
 		return(new String(sb));
 	}
  	
 	// Fills a stringbuffer with the necessary text for a Accessibility pane about our current POI, then returns it as a string.
 	private String createAccessString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<font size = 5>&nbsp;Accessibility Information</font><hr><pre>");
-		sb.append("&nbsp;" + p.getAccess() + "</pre>");
+		sb = copyStringWithWordWrap(p.getAccess(), sb);
+		sb.insert(0, "<font size = 5>&nbsp;Accessibility Information</font><hr><pre>");
+		sb.append("</pre>");
+	//	sb.append("&nbsp;" + p.getAccess() + "</pre>");
 		return(new String(sb));
 		
 	} 
@@ -909,8 +906,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Specials pane about our current POI, then returns it as a string.
 	private String createSpecialsString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<font size = 5>&nbsp;Specials</font><hr><pre>");
-		sb.append("&nbsp;" + p.getSpecials() + "</pre>");
+		sb = copyStringWithWordWrap(p.getSpecials(), sb);
+		sb.append("</pre>");
+		sb.insert(0, "<font size = 5>&nbsp;Specials</font><hr><pre>");
+	//	sb.append("&nbsp;" + p.getSpecials() + "</pre>");
 		return(new String(sb));
 		
 	} 
@@ -918,11 +917,61 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Comments pane about our current POI, then returns it as a string.
 	private String createCommentsString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<font size = 5>&nbsp;User Comments</font><hr><pre>");
-		sb.append("&nbsp;" + p.comments() + "</pre>");
+		sb = copyStringWithWordWrap(p.comments(), sb);
+		sb.insert(0, "<font size = 5>&nbsp;User Comments</font><hr><pre>");
+		sb.append("</pre>");
+	//	sb.append("&nbsp;" + p.comments() + "</pre>");
 		return(new String(sb));
 		
 	} 
+	
+	// Copies a string to a stringbuffer character by character, adding <br> tags where needed.
+	private StringBuffer copyStringWithWordWrap(String source, StringBuffer dest) {
+		
+		int lastlinepos = 0;
+		int charscopied = 0;
+		int breakspaceinserted = 0;
+		
+		for(int i = 0 ; i < source.length(); i++) {
+			if(charscopied == MOREINFO_CHAR_WIDTH) {
+				System.out.println("Hit EOL at " + source.charAt(i));
+				int j = i;
+				while(source.charAt(j) != ' ') {
+					j--;
+					if(j == lastlinepos) 
+						break;
+				} 
+				System.out.println("Rewound to " +  source.charAt(j) + source.charAt(j+1));
+				if((j != lastlinepos) && (i != j)) {
+					dest.delete(j + breakspaceinserted, i + breakspaceinserted );
+					lastlinepos = j;
+					i = j;
+				}
+				else if(j == lastlinepos) {
+					dest.append(source.charAt(i));
+					lastlinepos = i;
+				}
+				else if(i == j)
+					breakspaceinserted--;
+				
+				dest.append("<br>");
+				breakspaceinserted += 4;
+				charscopied = 0;
+			}
+			else {
+				if(!((charscopied == 0) && (source.charAt(i) == ' '))) {
+					dest.append(source.charAt(i));
+					charscopied++; 
+				}
+				else 
+					breakspaceinserted--;
+				
+				
+				//System.out.println(dest.toString());
+			}
+		}
+		return dest;
+	}
 	
 	// Variable definitions
 	private locListModel ourModel;
