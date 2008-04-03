@@ -17,9 +17,9 @@ public class ClientMessageHandler {
 		URL url = new URL("http://grocs.dmc.dc.umich.edu:3000/locations/show_by_bluetooth_mac/");
 		
 		StringBuffer urlSB = new StringBuffer(url.toString());
-		String fakeMacAddress = "1234567890ab";
-		//urlSB.append(macAddress);
-		urlSB.append(fakeMacAddress);
+		//String fakeMacAddress = "1234567890ab";
+		urlSB.append(macAddress);
+		//urlSB.append(fakeMacAddress);
 		
 		URL nurl = new URL(urlSB.toString());
 			
@@ -34,6 +34,7 @@ public class ClientMessageHandler {
 		InputStream in = conn.getInputStream(); // Inputstream for xml data
 	
 		System.out.println("MacAddress was read: " + macAddress);
+		
 		clientDataModel.parseXML(in);
 		
 		conn.disconnect();
