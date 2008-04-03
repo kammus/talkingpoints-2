@@ -151,7 +151,6 @@ public class Speaker {
 			}
 			else if(result.toLowerCase().compareTo("comments") == 0)
 			{
-				menuStatus = COMMENTS; 
 				if (currentLocation.comments() ==  null)
 				{
 					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
@@ -159,10 +158,10 @@ public class Speaker {
 					return true;
 				}
 				else{
+					menuStatus = COMMENTS;
 					toSpeak = currentLocation.comments();
 					System.out.println("toSpeak: " + toSpeak);
-					dbVoice.speak(toSpeak);
-					
+					dbVoice.speak(toSpeak);		
 					return true;
 				}
 			}
@@ -176,6 +175,37 @@ public class Speaker {
 			{
 				menuStatus = HOME;
 				System.out.println("Welcome home");
+				return true;
+			}
+			else if (result.toLowerCase().compareTo("history") == 0)
+			{
+				toSpeak = currentLocation.getHistory();
+				dbVoice.speak(toSpeak);
+				return true;
+			}
+			else if(result.toLowerCase().compareTo("menu") == 0)
+			{
+				toSpeak = currentLocation.getMenu();
+				dbVoice.speak(toSpeak);
+				return true;
+			}
+			else if(result.toLowerCase().compareTo("specials") == 0)
+			{
+				toSpeak = currentLocation.getSpecials();
+				dbVoice.speak(toSpeak);
+				return true;
+			}
+			else if(result.toLowerCase().compareTo("hours") == 0)
+			{
+				toSpeak = currentLocation.hours_array();
+				dbVoice.speak(toSpeak);
+				return true;
+				
+			}
+			else if( result.toLowerCase().compareTo("access") == 0)
+			{
+				toSpeak = currentLocation.getAccess();
+				dbVoice.speak(toSpeak);
 				return true;
 			}
 			else
@@ -193,7 +223,31 @@ public class Speaker {
 			else if (result.toLowerCase().compareTo("more") == 0)
 			{
 				menuStatus = MORE_INFO;
-				toSpeak = "To hear the comments, say Comments. To hear hours, say Hours. To hear a short description, say Description.";
+				toSpeak = "";
+				if (currentLocation.comments() != null)
+				{
+					toSpeak += " To hear the comments, say Comments.";
+				}
+				if (currentLocation.getHistory() != null)
+				{
+					toSpeak += " To hear the history of this location, say History.";
+				}
+				if (currentLocation.getAccess() != null)
+				{
+					toSpeak += " To hear accessibility information, say Access.";
+				}
+				if (currentLocation.getMenu() != null)
+				{
+					toSpeak += " To hear the menu, say Menu.";
+				}
+				if (currentLocation.getSpecials() != null)
+				{
+					toSpeak += " To hear the specials, say Specials.";
+				}
+				if (currentLocation.description() != null)
+				{
+					toSpeak += "To hear a short description, description.";
+				}
 				System.out.println("toSpeak: " + toSpeak);
 				dbVoice.speak(toSpeak);
 				return true;
@@ -201,6 +255,7 @@ public class Speaker {
 			else if(result.toLowerCase().compareTo("back") == 0 || result.toLowerCase().compareTo("home") == 0)
 			{
 				menuStatus = HOME;
+				System.out.println("Welcome Home");
 				return true;
 			}
 			else

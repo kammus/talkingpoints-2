@@ -10,6 +10,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+class POIentry {
+	private String value;
+	private String type;
+}
+
+
 class POIdata {
 	
 	private String name;
@@ -130,12 +136,19 @@ public class ClientDataModel{
         boolean matched = false;
         private POIdata data;
         TalkingPointsGUI ourGUI = new TalkingPointsGUI();
-        Speaker locationSpeaker = new Speaker();
+        Speaker locationSpeaker= new Speaker();
         private static NodeList getElement(Document doc , String tagName , int index ){
             //given an XML document and a tag, return an Element at a given index
             NodeList rows = doc.getDocumentElement().getElementsByTagName(tagName);
             Element ele = (Element)rows.item(index);
+            //System.out.println(ele);
+            if (ele.getChildNodes().getLength() == 0)
+            {
+            	System.out.println("Returning null for " + tagName);
+            	return null;
+            }
             try {
+            
             return ele.getChildNodes();
             }
             catch (Exception e)
@@ -147,7 +160,8 @@ public class ClientDataModel{
           }
            
         public void parseXML(InputStream in) {
-            String name, type, description, country, postalCode, street, phone, url, state, city;
+            String name = null, type = null, description= null, country= null, postalCode= null;
+            String street= null, phone= null, url= null, state= null, city= null;
         	 try{
         		 // now I am using DOM document for XML parser, but another type 
         		 //SAX is more efficient in terms of 
@@ -157,7 +171,14 @@ public class ClientDataModel{
                  
                  Document doc = docBuilder.parse(in);
                  
-                 doc.getDocumentElement();//.normalize();
+                 doc.getDocumentElement().normalize();
+                 NodeList locationText = getElement(doc,"location_type",0);
+                 String location = locationText.item(0).getNodeValue();
+                 if (location.compareTo("ERROR") == 0)
+                 {
+                	 System.out.println("THIS IS NOT A VALID TALKING POINT");
+                	 return;
+                 }
                  NodeList nameText, typeText, descriptionText, countryText, postalCodeText;
                  NodeList streetText, phoneText, urlText, stateText, cityText, hoursText;
           
@@ -172,43 +193,68 @@ public class ClientDataModel{
                  urlText = getElement(doc, "url",0);
                  phoneText = getElement(doc, "phone",0);
                  hoursText = getElement(doc,"hours",0);
-                 NodeList accessText, specialsText, menuText, historyText;
+                 NodeList accessText, specialsText, menuText, historyText, commentText;
                  accessText = getElement(doc,"accessibility",0);
                  specialsText = getElement(doc,"specials",0);
                  menuText = getElement(doc,"menu",0);
                  historyText = getElement(doc,"history",0);
+                 commentText = getElement(doc,"comment",0);
+                // NodeList addInfo = doc.getElementsByTagName("additional_information");
+                 //Element e = doc.getElementById("additional_information");
+                 NodeList addInfo = doc.getElementsByTagName("additional_information");
+                 
+                 String[] username = new String[addInfo.getLength()]; //string array initialization
+                 System.out.println(addInfo.getLength());
+                 
+                 for (int x=0; x < addInfo.getLength(); x++)
+                 {
+                          NodeList usernameText = getElement(doc, "username", x); 
+                          username[x] = ((Node)usernameText.item(0)).getNodeValue();
+                          System.out.println(username[x]);
+                 }
+                 
+                 if (addInfo == null)
+                	 System.out.println("null information");
+              
                  if (hoursText == null)
                 	 System.out.println("Additional info not found");
                 
-                 String hours, access, specials, menu, history;
+                 String hours= null, access= null, specials= null, menu= null, history= null;
                  
-                 name = ((Node)nameText.item(0)).getNodeValue();
-                 type = ((Node)typeText.item(0)).getNodeValue(); //type is not included in XML now.
-                 description = ((Node)descriptionText.item(0)).getNodeValue();
-                 country = ((Node)countryText.item(0)).getNodeValue();
-                 postalCode =((Node)postalCodeText.item(0)).getNodeValue();
-                 street = ((Node)streetText.item(0)).getNodeValue();
-                 state = ((Node)stateText.item(0)).getNodeValue();
-                 phone = ((Node)phoneText.item(0)).getNodeValue();
-                 url = ((Node)urlText.item(0)).getNodeValue();
-                 city = ((Node)cityText.item(0)).getNodeValue();
-                 hours = ((Node)hoursText.item(0)).getNodeValue();
-                 access = ((Node)accessText.item(0)).getNodeValue();
-                 specials = ((Node)specialsText.item(0)).getNodeValue();
-                 menu = ((Node)menuText.item(0)).getNodeValue();
-                 history = ((Node)historyText.item(0)).getNodeValue();
+             name = extractString(nameText);
+             type = extractString(typeText);
+             description = extractString(descriptionText);
+             country = extractString(countryText);
+             street = extractString(streetText);
+             postalCode = extractString(postalCodeText);
+             street = extractString(streetText);
+             state = extractString(stateText);
+             phone = extractString(phoneText);
+             url = extractString(urlText);
+             city = extractString(cityText);
+             hours = extractString(hoursText);
+             access = extractString(accessText);
+             specials = extractString(specialsText);
+             menu = extractString(menuText);
+             history = extractString(historyText);
+             
+       
+         
+                 
                  data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history); //object creation
                  objectNotify(data);
                  boolean blind = true;
-                 if (blind == true)
-                 {
+                 //System.exit(1);
+                 //if (blind == true)
+                 //{
                  	locationSpeaker.addPOI(data);
-                 	locationSpeaker.createDialog(); 
-                 }
-                 else 
-                 {	
                  	ourGUI.addItem(data);
-                 }
+                 	locationSpeaker.createDialog(); 
+                 //}
+                 //else 
+                 //{	
+                 	
+                 //}
                  
                                  
                  }catch (SAXParseException err) {
@@ -220,6 +266,19 @@ public class ClientDataModel{
                  }catch (Throwable t) {
                          t.printStackTrace ();
                  }	
+        }
+        public String extractString(NodeList textList)
+        {
+        	//System.out.println(textList.toString());
+        	String textValue;
+        	if (textList != null)
+        	{
+        		textValue = ((Node)textList.item(0)).getNodeValue();
+        		return textValue;
+        	}
+        	else
+        	  return null;
+        	
         }
         
         public ClientDataModel() {

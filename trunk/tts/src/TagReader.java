@@ -51,14 +51,12 @@ public class TagReader implements DiscoveryListener{
 	
 	// bluetoothSearch function
 	public void bluetoothSearch() throws IOException{
-	
-		TagReader tagReader = new TagReader();
 		LocalDevice localDevice = LocalDevice.getLocalDevice();
 		
 		DiscoveryAgent agent = localDevice.getDiscoveryAgent();
 	
 		System.out.println("Starting device inquiry...");
-		agent.startInquiry(DiscoveryAgent.GIAC, tagReader);
+		agent.startInquiry(DiscoveryAgent.GIAC, this);
 		try {
 			synchronized(lock)
 			{
@@ -68,7 +66,7 @@ public class TagReader implements DiscoveryListener{
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+		/*
 		int deviceCount = vecDevices.size();
 		if(deviceCount <= 0){
 			System.out.println("No Devices Found .");
@@ -80,13 +78,17 @@ public class TagReader implements DiscoveryListener{
 			notifyMacAddressWasRead(macAddress);
 			System.out.println(macAddress); // print macAddress
 		}
+		*/
 	}
 	
 	
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-		//System.out.println("Device discovered: "+btDevice.getBluetoothAddress());
+		System.out.println("Device discovered: "+btDevice.getBluetoothAddress());
+		macAddress = btDevice.getBluetoothAddress();
 		if(!vecDevices.contains(btDevice)){
 			vecDevices.addElement(btDevice);
+			notifyMacAddressWasRead(macAddress);
+
 		}
 	}
 	public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
