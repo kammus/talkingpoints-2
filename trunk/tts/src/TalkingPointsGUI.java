@@ -79,7 +79,11 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// adds an item to the list.  If the list is already full, 
 	// the oldest item is thrown out.
 	public void addItem(POIdata p) {
-		ourModel.Push(p);
+		POIdata lastread = (POIdata)ourModel.getValueAt(0, 3);
+		if(lastread != p)
+			ourModel.Push(p);
+		else
+			System.out.println("Duplicate name found: " + p.name() + " is same as " + lastread.name());
 	}
 	
 	// Does what it says; initialize the GUI and its components
@@ -698,6 +702,9 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
 			
+			if((row == 0) && (column == 1) && (data[0] == null))
+				return(new String("No locations have been detected."));
+			
 			// Get mapping of this row
 			int map = mappings[row];
 			
@@ -725,7 +732,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// current last element on the list is thrown away.
 		public void Push(POIdata p) {
 			System.out.println("Trying push onto location queue.");
-			
+		
 			for(int i = 9 ; i > 0 ; i--) {
 				if(data[i-1] != null) {
 					data[i] = data[i-1];
