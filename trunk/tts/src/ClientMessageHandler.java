@@ -6,10 +6,10 @@ import java.net.URL;
 
 public class ClientMessageHandler {
 	 
-	ClientDataModel clientDataModel = new ClientDataModel();  //changing 
+	ClientDataModel clientDataModel;
 		
-	public ClientMessageHandler(){
-		
+	public ClientMessageHandler(int option){
+		 clientDataModel = new ClientDataModel(option);  //changing 
 	}
 	
 	public void tagWasRead(String macAddress) throws Exception{
