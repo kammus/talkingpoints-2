@@ -262,7 +262,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		hours = new JRadioButton("Hours", forwardsm);
 		history = new JRadioButton("History", forwardsm);
 		comments = new JRadioButton("Comments", forwardsm);
-		specials = new JRadioButton("Contact", forwardsm);
+		specials = new JRadioButton("Specials", forwardsm);
 		accessibility = new JRadioButton("Accessibility", forwardsm);
 		core.setActionCommand("lochome");
 		menu.setActionCommand("menu");
@@ -512,7 +512,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			model.fireTableDataChanged();
 		}
 		else
-			System.out.println("Property change message contained an invalid state:" + newstate);
+			System.out.println("Property change message contained an unhandled state:" + newstate);
 		
 	}
 	
