@@ -122,16 +122,19 @@ public class Speaker {
 	 * 
 	 */
 	
-	public void createDialog()
+	public void createDialog(boolean listen)
 	{
 		menuStatus = ENCOUNTER; 
 		toSpeak = "The name is " + currentLocation.name() + " and it is of type " + currentLocation.location_type() + ".  To Hear more, say More.";
 		System.out.println("toSpeak: " + toSpeak);
 		dbVoice.speak(toSpeak);
-		if (!(microphone.isRecording()))
-			microphone.startRecording();
-		/* perhaps do something gunky here */
-		listener();
+		if (listen)
+		{
+			listener();
+		}
+	
+		
+			
 	}
 	
 	public boolean resultHandler(String result)
@@ -147,7 +150,7 @@ public class Speaker {
 			else if(result.toLowerCase().compareTo("back") == 0)
 			{
 				menuStatus = ENCOUNTER;
-				createDialog();
+				createDialog(false);
 			}
 			else if(result.toLowerCase().compareTo("comments") == 0)
 			{
@@ -255,7 +258,7 @@ public class Speaker {
 		case ENCOUNTER:
 			if (result.toLowerCase().compareTo("repeat") == 0)
 			{
-				createDialog();
+				createDialog(false);
 			}
 			else if (result.toLowerCase().compareTo("more") == 0)
 			{
