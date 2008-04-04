@@ -455,7 +455,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// Changing to More Info pane
 		else if(newstate.compareTo(MOREINFO) == 0) {
 			locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
-						+ cachedData.description() + "]</font></b></html>");
+						+ cachedData.location_type() + "]</font></b></html>");
 				s = createCoreInfoString(cachedData);
 				String prevstate = viewingHistory.peek();
 				System.out.println(prevstate);
@@ -883,8 +883,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		sb.append(" Phone:         " + phone + " <br>");
 		sb.append(" URL:           <a href=" + url + ">" + url + "</a> </pre>");
 		
-		String s = new String(sb);
-		return s;
+		return new String(sb);
+		
 	}
 	
 	// Stringbuffer-filling methods for each of the possible More Info menu items.
@@ -895,7 +895,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Menu pane about our current POI, then returns it as a string.
 	private String createMenuString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb = copyStringWithWordWrap(p.getMenu(), sb);
+		copyStringWithWordWrap(p.getMenu(), sb);
 	//	sb.append("&nbsp;" + p.getMenu() + "</pre>");
 		sb.insert(0, "<font size = 5>&nbsp;Menu</font><hr><pre>");
 		sb.append("</pre>");
@@ -919,7 +919,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	private String createHistoryString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
 	//	sb.append("&nbsp;" + p.getHistory() + "</pre>");
-		sb = copyStringWithWordWrap(p.getHistory(), sb);
+		copyStringWithWordWrap(p.getHistory(), sb);
 		sb.insert(0, "<font size = 5>&nbsp;History</font><hr><pre>");
 		sb.append("</pre>");
 		return(new String(sb));
@@ -928,7 +928,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Accessibility pane about our current POI, then returns it as a string.
 	private String createAccessString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb = copyStringWithWordWrap(p.getAccess(), sb);
+		copyStringWithWordWrap(p.getAccess(), sb);
 		sb.insert(0, "<font size = 5>&nbsp;Accessibility Information</font><hr><pre>");
 		sb.append("</pre>");
 	//	sb.append("&nbsp;" + p.getAccess() + "</pre>");
@@ -939,7 +939,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Specials pane about our current POI, then returns it as a string.
 	private String createSpecialsString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb = copyStringWithWordWrap(p.getSpecials(), sb);
+		copyStringWithWordWrap(p.getSpecials(), sb);
 		sb.append("</pre>");
 		sb.insert(0, "<font size = 5>&nbsp;Specials</font><hr><pre>");
 	//	sb.append("&nbsp;" + p.getSpecials() + "</pre>");
@@ -950,7 +950,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Comments pane about our current POI, then returns it as a string.
 	private String createCommentsString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		sb = copyStringWithWordWrap(p.comments(), sb);
+		copyStringWithWordWrap(p.comments(), sb);
 		sb.insert(0, "<font size = 5>&nbsp;User Comments</font><hr><pre>");
 		sb.append("</pre>");
 	//	sb.append("&nbsp;" + p.comments() + "</pre>");
@@ -959,7 +959,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	} 
 	
 	// Copies a string to a stringbuffer character by character, adding <br> tags where needed.
-	private StringBuffer copyStringWithWordWrap(String source, StringBuffer dest) {
+	private void copyStringWithWordWrap(String source, StringBuffer dest) {
 		
 		int lastlinepos = 0;
 		int charscopied = 0;
@@ -967,14 +967,14 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		for(int i = 0 ; i < source.length(); i++) {
 			if(charscopied == MOREINFO_CHAR_WIDTH) {
-		//		System.out.println("Hit EOL at " + source.charAt(i));
+				//System.out.println("Hit EOL at " + source.charAt(i));
 				int j = i;
 				while(source.charAt(j) != ' ') {
 					j--;
 					if(j == lastlinepos) 
 						break;
 				} 
-		//		System.out.println("Rewound to " +  source.charAt(j) + source.charAt(j+1));
+				//System.out.println("Rewound to " +  source.charAt(j) + source.charAt(j+1));
 				if((j != lastlinepos) && (i != j)) {
 					dest.delete(j + breakspaceinserted, i + breakspaceinserted );
 					lastlinepos = j;
@@ -1003,7 +1003,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 				//System.out.println(dest.toString());
 			}
 		}
-		return dest;
+	
 	}
 	
 	// Variable definitions
