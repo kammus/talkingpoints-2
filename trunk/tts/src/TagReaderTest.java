@@ -20,7 +20,7 @@ public class TagReaderTest {
 		}
 		final TagReader tagReader = new TagReader(clientMessageHandler);
 		try{
-			tagReader.bluetoothSearch();				// search Bluetooth MacAddress
+			tagReader.initBluetoothSearch();				// search Bluetooth MacAddress
 			
 		}catch(IOException e){
 			System.out.println("This device is not Bluetooth Capable! Exiting now.");
