@@ -249,7 +249,7 @@ public class ClientDataModel{
                  //{
                  	locationSpeaker.addPOI(data);
                  	ourGUI.addItem(data);
-                 	locationSpeaker.createDialog(); 
+                 	locationSpeaker.createDialog(true); 
                  //}
                  //else 
                  //{	
