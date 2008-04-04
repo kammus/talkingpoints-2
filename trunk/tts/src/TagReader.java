@@ -59,7 +59,6 @@ public class TagReader implements DiscoveryListener{
 	
 		System.out.println("Starting device inquiry...");
 		agent.startInquiry(DiscoveryAgent.GIAC, this);
-		//agent.
 		
 		try {
 			synchronized(lock)
@@ -70,18 +69,21 @@ public class TagReader implements DiscoveryListener{
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+		/*
 		int deviceCount = vecDevices.size();
 		if(deviceCount <= 0){
 			System.out.println("No Devices Found .");
 		}
 		else
 		{
-			System.out.println("Bluetooth Devices: ");
+			//System.out.println("Bluetooth Devices: ");
 			macAddress = vecDevices.elementAt(1).toString(); // get string macAddress
 			notifyMacAddressWasRead(macAddress);
 			//System.out.println(macAddress); // print macAddress
 		}
+		//initBluetoothSearch();
+		 * 
+		 */
 		
 	}
 	
@@ -89,17 +91,13 @@ public class TagReader implements DiscoveryListener{
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
 
 		System.out.println("Device discovered: "+btDevice.getBluetoothAddress());
-		//macAddress = btDevice.getBluetoothAddress();
+		//macAddress = btDevice.getBluetoothAddress()
 
-		if(!vecDevices.contains(btDevice)){
-			vecDevices.addElement(btDevice);
-
-			//macAddress = btDevice.getBluetoothAddress(); // get string macAddress
-			//notifyMacAddressWasRead(macAddress);
+			macAddress = btDevice.getBluetoothAddress(); // get string macAddress
+			notifyMacAddressWasRead(macAddress);
 
 			//notifyMacAddressWasRead(macAddress);
 
-		}
 	}
 	public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
 	}
@@ -108,7 +106,7 @@ public class TagReader implements DiscoveryListener{
 	}
 	
 	public void inquiryCompleted(int discType) {
-	System.out.println("qwer");
+	System.out.println("this inquiry is completed.");
 	
 		synchronized(lock){
 			lock.notify(); //if inquiry is completed, notify to the object
