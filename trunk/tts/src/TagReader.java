@@ -42,6 +42,8 @@ public class TagReader implements DiscoveryListener{
 	
 	private void notifyMacAddressWasRead(String MacAddress) {
 		try{
+			System.out.println(MacAddress);
+			
 		clientMessageHandler.tagWasRead(MacAddress);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -50,13 +52,15 @@ public class TagReader implements DiscoveryListener{
 
 	
 	// bluetoothSearch function
-	public void bluetoothSearch() throws IOException{
+	public void initBluetoothSearch() throws IOException{
 		LocalDevice localDevice = LocalDevice.getLocalDevice();
 		
 		DiscoveryAgent agent = localDevice.getDiscoveryAgent();
 	
 		System.out.println("Starting device inquiry...");
 		agent.startInquiry(DiscoveryAgent.GIAC, this);
+		//agent.
+		
 		try {
 			synchronized(lock)
 			{
@@ -66,7 +70,7 @@ public class TagReader implements DiscoveryListener{
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		/*
+		
 		int deviceCount = vecDevices.size();
 		if(deviceCount <= 0){
 			System.out.println("No Devices Found .");
@@ -74,20 +78,26 @@ public class TagReader implements DiscoveryListener{
 		else
 		{
 			System.out.println("Bluetooth Devices: ");
-			macAddress = vecDevices.elementAt(0).toString(); // get string macAddress
+			macAddress = vecDevices.elementAt(1).toString(); // get string macAddress
 			notifyMacAddressWasRead(macAddress);
-			System.out.println(macAddress); // print macAddress
+			//System.out.println(macAddress); // print macAddress
 		}
-		*/
+		
 	}
 	
 	
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+
 		System.out.println("Device discovered: "+btDevice.getBluetoothAddress());
-		macAddress = btDevice.getBluetoothAddress();
+		//macAddress = btDevice.getBluetoothAddress();
+
 		if(!vecDevices.contains(btDevice)){
 			vecDevices.addElement(btDevice);
-			notifyMacAddressWasRead(macAddress);
+
+			//macAddress = btDevice.getBluetoothAddress(); // get string macAddress
+			//notifyMacAddressWasRead(macAddress);
+
+			//notifyMacAddressWasRead(macAddress);
 
 		}
 	}
@@ -98,9 +108,12 @@ public class TagReader implements DiscoveryListener{
 	}
 	
 	public void inquiryCompleted(int discType) {
+	System.out.println("qwer");
+	
 		synchronized(lock){
 			lock.notify(); //if inquiry is completed, notify to the object
 		}
+		
 		switch (discType) {
 		case DiscoveryListener.INQUIRY_COMPLETED :
 			break;
