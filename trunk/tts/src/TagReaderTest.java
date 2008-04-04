@@ -5,25 +5,26 @@ public class TagReaderTest {
 
 	// Please note: this will never die. You'll have to kill it manually.
 	public static void main (String args[]){
-		ClientMessageHandler clientMessageHandler = new ClientMessageHandler(); // also loading xml file
-		final TagReader tagReader = new TagReader(clientMessageHandler);
-		//tagReader.generateFakeEvent(); // for MacAddress test
-		final java.util.Timer timer = new java.util.Timer();
-		java.util.TimerTask timerTask = new java.util.TimerTask()
+		ClientMessageHandler clientMessageHandler;
+		if (args[0] == "1")
 		{
-		public void run() {
-
-				try{
-					tagReader.initBluetoothSearch();				// search Bluetooth MacAddress
-					
-				}catch(IOException e){
-				System.out.println("This device is not Bluetooth Capable! Exiting now.");
-				}	
-		
-		
-		// will fire a new TimerTask every 10 sec, each of which will generate a fake tag event
+			clientMessageHandler = new ClientMessageHandler(1);
 		}
-		};
-		timer.scheduleAtFixedRate(timerTask, 0, 10000);
-	}	
+		else if (args[0] == "2")
+		{
+			clientMessageHandler = new ClientMessageHandler(2);	
+		}
+		else  //if args[0] is three
+		{
+			clientMessageHandler = new ClientMessageHandler(3);	
+		}
+		final TagReader tagReader = new TagReader(clientMessageHandler);
+		try{
+			tagReader.bluetoothSearch();				// search Bluetooth MacAddress
+			
+		}catch(IOException e){
+			System.out.println("This device is not Bluetooth Capable! Exiting now.");
+		}	
+	}
 }
+	

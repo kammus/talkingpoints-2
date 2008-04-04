@@ -42,8 +42,6 @@ public class TagReader implements DiscoveryListener{
 	
 	private void notifyMacAddressWasRead(String MacAddress) {
 		try{
-			System.out.println(MacAddress);
-			
 		clientMessageHandler.tagWasRead(MacAddress);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -52,14 +50,13 @@ public class TagReader implements DiscoveryListener{
 
 	
 	// bluetoothSearch function
-	public void initBluetoothSearch() throws IOException{
+	public void bluetoothSearch() throws IOException{
 		LocalDevice localDevice = LocalDevice.getLocalDevice();
 		
 		DiscoveryAgent agent = localDevice.getDiscoveryAgent();
 	
 		System.out.println("Starting device inquiry...");
 		agent.startInquiry(DiscoveryAgent.GIAC, this);
-		
 		try {
 			synchronized(lock)
 			{
@@ -76,28 +73,23 @@ public class TagReader implements DiscoveryListener{
 		}
 		else
 		{
-			//System.out.println("Bluetooth Devices: ");
-			macAddress = vecDevices.elementAt(1).toString(); // get string macAddress
+			System.out.println("Bluetooth Devices: ");
+			macAddress = vecDevices.elementAt(0).toString(); // get string macAddress
 			notifyMacAddressWasRead(macAddress);
-			//System.out.println(macAddress); // print macAddress
+			System.out.println(macAddress); // print macAddress
 		}
-		//initBluetoothSearch();
-		 * 
-		 */
-		
+		*/
 	}
 	
 	
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-
 		System.out.println("Device discovered: "+btDevice.getBluetoothAddress());
-		//macAddress = btDevice.getBluetoothAddress()
-
-			macAddress = btDevice.getBluetoothAddress(); // get string macAddress
+		macAddress = btDevice.getBluetoothAddress();
+		if(!vecDevices.contains(btDevice)){
+			vecDevices.addElement(btDevice);
 			notifyMacAddressWasRead(macAddress);
 
-			//notifyMacAddressWasRead(macAddress);
-
+		}
 	}
 	public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
 	}
@@ -106,12 +98,9 @@ public class TagReader implements DiscoveryListener{
 	}
 	
 	public void inquiryCompleted(int discType) {
-	System.out.println("this inquiry is completed.");
-	
 		synchronized(lock){
 			lock.notify(); //if inquiry is completed, notify to the object
 		}
-		
 		switch (discType) {
 		case DiscoveryListener.INQUIRY_COMPLETED :
 			break;

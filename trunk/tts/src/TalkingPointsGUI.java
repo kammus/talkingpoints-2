@@ -79,11 +79,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// adds an item to the list.  If the list is already full, 
 	// the oldest item is thrown out.
 	public void addItem(POIdata p) {
-		POIdata lastread = (POIdata)ourModel.getValueAt(0, 3);
-		if(lastread != p)
-			ourModel.Push(p);
-		else
-			System.out.println("Duplicate name found: " + p.name() + " is same as " + lastread.name());
+		ourModel.Push(p);
 	}
 	
 	// Does what it says; initialize the GUI and its components
@@ -196,8 +192,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		viewAll.setPreferredSize(new Dimension(VIEWALL_X, VIEWALL_Y));		
 		viewAll.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		viewAll.setAlignmentY(Component.CENTER_ALIGNMENT);
-		//viewAll.setActionCommand("viewall");
-		//viewAll.addActionListener(this);
+		viewAll.setActionCommand("viewall");
+		viewAll.addActionListener(this);
 		
 		// Set up horizontal layer at top of window
 		JPanel topButtons = new JPanel();
@@ -266,7 +262,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		hours = new JRadioButton("Hours", forwardsm);
 		history = new JRadioButton("History", forwardsm);
 		comments = new JRadioButton("Comments", forwardsm);
-		specials = new JRadioButton("Specials", forwardsm);
+		specials = new JRadioButton("Contact", forwardsm);
 		accessibility = new JRadioButton("Accessibility", forwardsm);
 		core.setActionCommand("lochome");
 		menu.setActionCommand("menu");
@@ -459,7 +455,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// Changing to More Info pane
 		else if(newstate.compareTo(MOREINFO) == 0) {
 			locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
-						+ cachedData.location_type() + "]</font></b></html>");
+						+ cachedData.description() + "]</font></b></html>");
 				s = createCoreInfoString(cachedData);
 				String prevstate = viewingHistory.peek();
 				System.out.println(prevstate);
@@ -516,7 +512,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			model.fireTableDataChanged();
 		}
 		else
-			System.out.println("Property change message contained an unhandled state:" + newstate);
+			System.out.println("Property change message contained an invalid state:" + newstate);
 		
 	}
 	
@@ -638,15 +634,15 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	
 	/**
 	 * @param args is unused
-	 */  /*
+	 */  /* 
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
 		String [] s = {"1-3 MWF", "2-5 Sat", "3-5 Sun", " ", " ", " ", " "};
 		
-		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "Confectionry", "stuff", null, null, null, null, null, null, "1-3 MWF","junk","junk","feh","blah blah blah sdhfjdshf jsdhf werjh sdjfh wsrfjh werf wejrfhwef rjhsfs"));
+		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog."));
 		ourGUI.addItem(new POIdata("Stucchi's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
-	}  */
+	} */
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -702,9 +698,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
 			
-			if((row == 0) && (column == 1) && (data[0] == null))
-				return(new String("No locations have been detected."));
-			
 			// Get mapping of this row
 			int map = mappings[row];
 			
@@ -732,7 +725,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// current last element on the list is thrown away.
 		public void Push(POIdata p) {
 			System.out.println("Trying push onto location queue.");
-		
+			
 			for(int i = 9 ; i > 0 ; i--) {
 				if(data[i-1] != null) {
 					data[i] = data[i-1];
@@ -847,51 +840,18 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 	// Fills a stringbuffer with the necessary text for the Core Info pane, then returns it as a string.
 	private String createCoreInfoString(POIdata p) {
-		
-		String street, city, state, postalcode, phone, url;
-		
-		street = p.street();
-		city = p.city();
-		state = p.state();
-		postalcode = p.postalCode();
-		phone = p.phone();
-		url = p.url();
-		
-		if((street == null) && (city == null) && (state == null) && (postalcode == null)) {
-			street = "Not Available";
-			city = " ";
-			state = " ";
-			postalcode = " ";
-		}
-		else {
-			if(street == null)
-				street = " ";
-			if(city == null)
-				city = " ";
-			if(state == null)
-				state = " ";
-			if(postalcode == null)
-				postalcode = " ";
-		}
-		
-		if(phone == null)
-			phone = "Not available";
-		
-		if(url == null)
-			url = "Not available";
-			
 		StringBuffer sb = new StringBuffer();
 		sb.append("<font size = 5>&nbsp;Core Information</font><hr><pre>");
 		sb.append(" Name:          " + p.name() + " <br>");
 		sb.append(" Location Type: " + p.location_type() + " <br>");
 		sb.append(" Description:   " + p.description() + " <br>");
-		sb.append(" Address:       " + street + " <br>");
-		sb.append("                " + city + " " + state + " " + postalcode + " <br>");   
-		sb.append(" Phone:         " + phone + " <br>");
-		sb.append(" URL:           <a href=" + url + ">" + url + "</a> </pre>");
+		sb.append(" Address:       " + p.street() + " <br>");
+		sb.append("                " + p.city() + " " + p.state() + " " + p.postalCode() + " <br>");
+		sb.append(" Phone:         " + p.phone() + " <br>");
+		sb.append(" URL:           <a href=" + p.url() + ">" + p.url() + "</a> </pre>");
 		
-		return new String(sb);
-		
+		String s = new String(sb);
+		return s;
 	}
 	
 	// Stringbuffer-filling methods for each of the possible More Info menu items.
@@ -902,7 +862,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Menu pane about our current POI, then returns it as a string.
 	private String createMenuString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		copyStringWithWordWrap(p.getMenu(), sb);
+		sb = copyStringWithWordWrap(p.getMenu(), sb);
 	//	sb.append("&nbsp;" + p.getMenu() + "</pre>");
 		sb.insert(0, "<font size = 5>&nbsp;Menu</font><hr><pre>");
 		sb.append("</pre>");
@@ -926,7 +886,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	private String createHistoryString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
 	//	sb.append("&nbsp;" + p.getHistory() + "</pre>");
-		copyStringWithWordWrap(p.getHistory(), sb);
+		sb = copyStringWithWordWrap(p.getHistory(), sb);
 		sb.insert(0, "<font size = 5>&nbsp;History</font><hr><pre>");
 		sb.append("</pre>");
 		return(new String(sb));
@@ -935,7 +895,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Accessibility pane about our current POI, then returns it as a string.
 	private String createAccessString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		copyStringWithWordWrap(p.getAccess(), sb);
+		sb = copyStringWithWordWrap(p.getAccess(), sb);
 		sb.insert(0, "<font size = 5>&nbsp;Accessibility Information</font><hr><pre>");
 		sb.append("</pre>");
 	//	sb.append("&nbsp;" + p.getAccess() + "</pre>");
@@ -946,7 +906,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Specials pane about our current POI, then returns it as a string.
 	private String createSpecialsString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		copyStringWithWordWrap(p.getSpecials(), sb);
+		sb = copyStringWithWordWrap(p.getSpecials(), sb);
 		sb.append("</pre>");
 		sb.insert(0, "<font size = 5>&nbsp;Specials</font><hr><pre>");
 	//	sb.append("&nbsp;" + p.getSpecials() + "</pre>");
@@ -957,7 +917,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Fills a stringbuffer with the necessary text for a Comments pane about our current POI, then returns it as a string.
 	private String createCommentsString(POIdata p) {
 		StringBuffer sb = new StringBuffer();
-		copyStringWithWordWrap(p.comments(), sb);
+		sb = copyStringWithWordWrap(p.comments(), sb);
 		sb.insert(0, "<font size = 5>&nbsp;User Comments</font><hr><pre>");
 		sb.append("</pre>");
 	//	sb.append("&nbsp;" + p.comments() + "</pre>");
@@ -966,7 +926,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	} 
 	
 	// Copies a string to a stringbuffer character by character, adding <br> tags where needed.
-	private void copyStringWithWordWrap(String source, StringBuffer dest) {
+	private StringBuffer copyStringWithWordWrap(String source, StringBuffer dest) {
 		
 		int lastlinepos = 0;
 		int charscopied = 0;
@@ -974,14 +934,14 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		for(int i = 0 ; i < source.length(); i++) {
 			if(charscopied == MOREINFO_CHAR_WIDTH) {
-				//System.out.println("Hit EOL at " + source.charAt(i));
+				System.out.println("Hit EOL at " + source.charAt(i));
 				int j = i;
 				while(source.charAt(j) != ' ') {
 					j--;
 					if(j == lastlinepos) 
 						break;
 				} 
-				//System.out.println("Rewound to " +  source.charAt(j) + source.charAt(j+1));
+				System.out.println("Rewound to " +  source.charAt(j) + source.charAt(j+1));
 				if((j != lastlinepos) && (i != j)) {
 					dest.delete(j + breakspaceinserted, i + breakspaceinserted );
 					lastlinepos = j;
@@ -1010,7 +970,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 				//System.out.println(dest.toString());
 			}
 		}
-	
+		return dest;
 	}
 	
 	// Variable definitions

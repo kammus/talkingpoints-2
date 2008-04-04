@@ -2,6 +2,7 @@ import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.recognizer.Recognizer;
+import edu.cmu.sphinx.result.ResultListener;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException; 
@@ -16,11 +17,13 @@ import java.util.concurrent.*;
  */
 public class Speaker {
 	POIdata currentLocation;
+	POIdata previousLocation;
 	Voice dbVoice;
 	URL url;
 	ConfigurationManager manager;
 	Microphone microphone;
 	Recognizer recognizer;
+	
 	LinkedList<POIdata> locationCache;
     final static int ENCOUNTER = 0;
     final static int MORE_INFO = 1;
@@ -28,7 +31,7 @@ public class Speaker {
     final static int HOME = 3;
     int menuStatus;
     String toSpeak;
-    
+    boolean inSession;
 	public Speaker()
 	{
 		locationCache = new LinkedList<POIdata>();
@@ -76,7 +79,23 @@ public class Speaker {
 	}
 	public void addPOI(POIdata incoming)
 	{
+		try {
+			while (inSession)
+				this.wait();
+			} catch (Exception E) {
+			  System.out.println("Error waiting");
+			}
+		inSession = true;
 		currentLocation = incoming;
+		boolean test = locationCache.contains(incoming);
+		if (test)
+		{
+			System.out.println("Duplicate Object Dectected");
+			long start = System.currentTimeMillis();
+			long testTime = System.currentTimeMillis();
+			while (testTime <= start + 60000)
+				testTime = System.currentTimeMillis();
+		}
 		locationCache.add(incoming);
 		if (locationCache.size() == 11)
 			locationCache.pop();
@@ -86,6 +105,12 @@ public class Speaker {
 	 tell listener thread to get objects at the appropriate time
 	 have handler get result at appropriate time. 
 	 */
+	class RecognizerImplementer implements ResultListener {
+		public void newResult(Result result)
+		{
+			
+		}
+	}
 	
 	public void listener()
 	{ 
@@ -95,6 +120,7 @@ public class Speaker {
 			System.out.println("Starting recording");
 			microphone.startRecording();
 			System.out.println("Recording Started");
+			//recognizer.addResultListener();
 			Result result = recognizer.recognize();
 			System.out.println("Trying to stop recording");
 			microphone.stopRecording();
@@ -114,6 +140,8 @@ public class Speaker {
 			}
 			microphone.clear();
 		}
+		inSession = false;
+		this.notify();
 	}
 	
 	/* create a dialog with the user 
@@ -125,16 +153,13 @@ public class Speaker {
 	public void createDialog(boolean listen)
 	{
 		menuStatus = ENCOUNTER; 
-		toSpeak = "The name is " + currentLocation.name() + " and it is of type " + currentLocation.location_type() + ".  To Hear more, say More.";
+		toSpeak = currentLocation.name() + " " + currentLocation.location_type();
 		System.out.println("toSpeak: " + toSpeak);
 		dbVoice.speak(toSpeak);
 		if (listen)
 		{
 			listener();
-		}
-	
-		
-			
+		}		
 	}
 	
 	public boolean resultHandler(String result)
@@ -246,7 +271,7 @@ public class Speaker {
 			}
 			else if(result.toLowerCase().compareTo("home") == 0)
 			{
-				
+				return false;
 			}
 			else
 			{
@@ -264,33 +289,35 @@ public class Speaker {
 			{
 				menuStatus = MORE_INFO;
 				toSpeak = "";
-				toSpeak = currentLocation.description();
+				toSpeak = currentLocation.description() + ". You can say, ";
 				
 				if (currentLocation.comments() != null)
 				{
-					toSpeak += " To hear the comments, say Comments.";
+					toSpeak += " ,Comments";
 				}
 				if (currentLocation.getHistory() != null)
 				{
-					toSpeak += " To hear the history of this location, say History.";
+					toSpeak += " ,History";
 				}
 				if (currentLocation.getAccess() != null)
 				{
-					toSpeak += " To hear accessibility information, say Access.";
+					toSpeak += " ,Access";
 				}
 				if (currentLocation.getMenu() != null)
 				{
-					toSpeak += " To hear the menu, say Menu.";
+					toSpeak += " ,Menu";
 				}
 				if (currentLocation.getSpecials() != null)
 				{
-					toSpeak += " To hear the specials, say Specials.";
+					toSpeak += " ,Specials";
 				}
+				toSpeak += ".";
 				System.out.println("toSpeak: " + toSpeak);
 				dbVoice.speak(toSpeak);
 				return true;
 			}
-			else if(result.toLowerCase().compareTo("back") == 0 || result.toLowerCase().compareTo("home") == 0)
+			else if(result.toLowerCase().compareTo("back") == 0 || result.toLowerCase().compareTo("home") == 0 
+					|| result.toLowerCase().compareTo("skip") == 0 || result.toLowerCase().compareTo("stop") == 0)
 			{
 				menuStatus = HOME;
 				System.out.println("Welcome Home");

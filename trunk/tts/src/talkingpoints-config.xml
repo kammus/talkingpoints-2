@@ -99,7 +99,7 @@
     <component name="jsgfGrammar" type="edu.cmu.sphinx.jsapi.JSGFGrammar">
         <property name="dictionary" value="dictionary"/>
         <property name="grammarLocation" 
-             value="tts/lib/"/>
+             value="lib/"/>
         <property name="grammarName" value="commands"></property>
 	<property name="logMath" value="logMath"/>
     </component>

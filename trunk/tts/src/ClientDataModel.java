@@ -131,12 +131,47 @@ class POIdata {
         
 }
 
+class SpeechThread extends Thread
+{
+	POIdata data;	
+   Speaker speaker;
+   public SpeechThread (Speaker speak, POIdata incoming)
+   {
+	   data = incoming;
+	   speaker = speak;
+   }
+   public void run() {
+	   speaker.addPOI(data);
+	   speaker.createDialog(true);	   
+   }
+}
+
 public class ClientDataModel{
+		
         long tpid;
         boolean matched = false;
+        boolean blind;
+        boolean sighted;
         private POIdata data;
         TalkingPointsGUI ourGUI = new TalkingPointsGUI();
         Speaker locationSpeaker= new Speaker();
+        public ClientDataModel (int option)
+        {
+        	sighted = false;
+        	blind = false;
+        	if (option == 1)
+        		blind = true;
+        	else if (option == 2)
+        		sighted = true;
+        	else if (option == 3)
+        	{
+        		sighted = true;
+        		blind = true;
+        	}
+        		
+        		
+        		
+        }
         private static NodeList getElement(Document doc , String tagName , int index ){
             //given an XML document and a tag, return an Element at a given index
             NodeList rows = doc.getDocumentElement().getElementsByTagName(tagName);
@@ -243,20 +278,23 @@ public class ClientDataModel{
                  
                  data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history); //object creation
                  objectNotify(data);
-                 boolean blind = true;
-                 //System.exit(1);
-                 //if (blind == true)
-                 //{
-                 	locationSpeaker.addPOI(data);
-                 	ourGUI.addItem(data);
-                 	locationSpeaker.createDialog(true); 
-                 //}
-                 //else 
-                 //{	
-                 	
-                 //}
-                 
-                                 
+              
+                 if (blind)
+                 {
+                 	SpeechThread speakThread= new SpeechThread(locationSpeaker, data);
+                 	speakThread.run();
+                 }
+                 else if (sighted)
+                 {
+                	 ourGUI.addItem(data); 
+                 }
+                 else if (sighted && blind)  //its a PARADOX~
+                 {
+                	 ourGUI.addItem(data); 
+                	SpeechThread speakThread= new SpeechThread(locationSpeaker, data);
+                    speakThread.run();
+                 }
+                          
                  }catch (SAXParseException err) {
                          System.out.println ("** Parsing error" + ", line " +err.getLineNumber() + ", uri " + err.getSystemId());
                          System.out.println(" " + err.getMessage ());    
