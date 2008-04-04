@@ -69,7 +69,7 @@ public class TagReader implements DiscoveryListener{
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		/*
+		
 		int deviceCount = vecDevices.size();
 		if(deviceCount <= 0){
 			System.out.println("No Devices Found .");
@@ -81,9 +81,9 @@ public class TagReader implements DiscoveryListener{
 			notifyMacAddressWasRead(macAddress);
 			//System.out.println(macAddress); // print macAddress
 		}
-		//initBluetoothSearch();
-		 * 
-		 */
+		initBluetoothSearch();
+		 
+		 
 		
 	}
 	
