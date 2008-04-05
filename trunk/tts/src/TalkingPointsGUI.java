@@ -19,12 +19,9 @@ import javax.swing.Box;
 import javax.swing.JViewport;
 import javax.swing.ImageIcon;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.UIManager;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
@@ -42,6 +39,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.lang.StringBuffer;
+import java.util.Vector;
 import java.util.Stack;
 
 public class TalkingPointsGUI implements ActionListener, TableModelListener, ListSelectionListener,
@@ -79,8 +77,13 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// adds an item to the list.  If the list is already full, 
 	// the oldest item is thrown out.
 	public void addItem(POIdata p) {
-		ourModel.Push(p);
+		POIdata lastread = (POIdata)ourModel.getValueAt(0, 3);
+		if(lastread != p)
+			ourModel.Push(p);
+		else
+			System.out.println("Duplicate name found: " + p.name() + " is same as " + lastread.name());
 	}
+
 	
 	// Does what it says; initialize the GUI and its components
 	private void initGUI() {
@@ -248,9 +251,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		coreInfo.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
 		coreInfo.setEditable(false);
 		coreInfo.setMargin(new Insets(5, 5, 5, 5));
-		HTMLEditorKit editor = new HTMLEditorKit();
 		
-		coreInfo.setEditorKit(editor);
 		infoScroll = new JScrollPane(coreInfo);
 		infoScroll.setColumnHeader(null);
 		infoScroll.setMinimumSize(new Dimension(420, 230));
@@ -634,15 +635,19 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	
 	/**
 	 * @param args is unused
-	 */  /* 
+	 */  
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
 		String [] s = {"1-3 MWF", "2-5 Sat", "3-5 Sun", " ", " ", " ", " "};
 		
 		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog."));
-		ourGUI.addItem(new POIdata("Stucchi's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
-	} */
+		ourGUI.addItem(new POIdata("Alan Smithee's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog."));
+		ourGUI.addItem(new POIdata("Bob Schmelding's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
+		ourGUI.addItem(new POIdata("Shemp's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
+		ourGUI.addItem(new POIdata("Blip's Arkaid", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
+		ourGUI.addItem(new POIdata("Kwik-e-Mart", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
+	} 
 
 	/* Custom table model for locationList.
 	 * Implements the table data as a sort of ersatz-queue, 
@@ -651,7 +656,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	class locListModel extends AbstractTableModel {
 			
 		locListModel(ImageIcon seen_t, ImageIcon notseen_t, ImageIcon bulletpoint_t) {
-			data = new POIdata[10];
+			data = new Vector();
 			seen = seen_t;
 			notseen = notseen_t;
 			bulletpoint = bulletpoint_t;
@@ -698,10 +703,13 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
 			
+			if((row == 0) && (column == 1) && (data.isEmpty()))
+				return(new String("No locations have been detected."));
+			
 			// Get mapping of this row
 			int map = mappings[row];
 			
-			if(data[row] == null)
+			if((row+1) > data.size())
 				return null;
 			
 				switch(column) {
@@ -711,32 +719,27 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 				else
 					return bulletpoint;
 			case(1):
-				return data[row].name();
+				return data.get(row).name();
 			case(2):
-				return data[row].location_type();
+				return data.get(row).location_type();
 			case(3):
-				return data[row];
+				return data.get(row);
 			default:
 				return null;     }
 		
 		}
+
 		
 		// Push a new data entry onto the list.  The
 		// current last element on the list is thrown away.
 		public void Push(POIdata p) {
 			System.out.println("Trying push onto location queue.");
 			
-			for(int i = 9 ; i > 0 ; i--) {
-				if(data[i-1] != null) {
-					data[i] = data[i-1];
-					hidden[i] = hidden[i-1];
-				}	
-				else
-					System.out.println("object #" + i + " is unallocated.");
-			}
-		/* does this work instead of creating a new POIdata object every time*/ 
-			data[0] = p;
-			hidden[0] = false;
+			data.add(0, p);
+			
+			if(data.size() > 10)
+				data.removeElementAt(11);
+			
 			fireTableDataChanged();
 		}
 		
@@ -753,7 +756,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		} */
 		
 		// variable definitions
-		private POIdata[] data;
+		private Vector<POIdata> data;
 		private boolean[] hidden;
 		private int[] mappings;
 		private ImageIcon bulletpoint;
@@ -840,19 +843,53 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 	// Fills a stringbuffer with the necessary text for the Core Info pane, then returns it as a string.
 	private String createCoreInfoString(POIdata p) {
+		
+		String street, city, state, postalcode, phone, url;
+		
+		street = p.street();
+		city = p.city();
+		state = p.state();
+		postalcode = p.postalCode();
+		phone = p.phone();
+		url = p.url();
+		
+		if((street == null) && (city == null) && (state == null) && (postalcode == null)) {
+			street = "Not Available";
+			city = " ";
+			state = " ";
+			postalcode = " ";
+		}
+		else {
+			if(street == null)
+				street = " ";
+			if(city == null)
+				city = " ";
+			if(state == null)
+				state = " ";
+			if(postalcode == null)
+				postalcode = " ";
+		}
+		
+		if(phone == null)
+			phone = "Not available";
+		
+		if(url == null)
+			url = "Not available";
+			
 		StringBuffer sb = new StringBuffer();
 		sb.append("<font size = 5>&nbsp;Core Information</font><hr><pre>");
 		sb.append(" Name:          " + p.name() + " <br>");
 		sb.append(" Location Type: " + p.location_type() + " <br>");
 		sb.append(" Description:   " + p.description() + " <br>");
-		sb.append(" Address:       " + p.street() + " <br>");
-		sb.append("                " + p.city() + " " + p.state() + " " + p.postalCode() + " <br>");
-		sb.append(" Phone:         " + p.phone() + " <br>");
-		sb.append(" URL:           <a href=" + p.url() + ">" + p.url() + "</a> </pre>");
+		sb.append(" Address:       " + street + " <br>");
+		sb.append("                " + city + " " + state + " " + postalcode + " <br>");   
+		sb.append(" Phone:         " + phone + " <br>");
+		sb.append(" URL:           <a href=" + url + ">" + url + "</a> </pre>");
 		
-		String s = new String(sb);
-		return s;
+		return new String(sb);
+		
 	}
+
 	
 	// Stringbuffer-filling methods for each of the possible More Info menu items.
 	// This is ugly, but it gets the job done (presumably).  May want to streamline later.
