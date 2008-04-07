@@ -1,5 +1,5 @@
 import java.io.InputStream;
-
+import java.util.Hashtable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -35,7 +35,8 @@ class POIdata {
     private String specials;
     private String access;
     private String history;
-        	
+    private Hashtable<String, String> extraInfo;    
+    
     POIdata(){
     	
     }
@@ -129,6 +130,15 @@ class POIdata {
         	return (state);
         }
         
+        public void addHash (Hashtable<String, String> incoming)
+        {
+        	extraInfo = incoming;
+        }
+        public Hashtable<String, String> getHash()
+        {
+        	return extraInfo; 
+        }
+        
 }
 
 class SpeechThread extends Thread
@@ -175,13 +185,11 @@ public class ClientDataModel{
         private static NodeList getElement(Document doc , String tagName , int index ){
             //given an XML document and a tag, return an Element at a given index
             NodeList rows = doc.getDocumentElement().getElementsByTagName(tagName);
+            System.out.println(rows.getLength());
+  
             Element ele = (Element)rows.item(index);
             //System.out.println(ele);
-            if (ele.getChildNodes().getLength() == 0)
-            {
-            	System.out.println("Returning null for " + tagName);
-            	return null;
-            }
+            
             try {
             
             return ele.getChildNodes();
@@ -214,6 +222,9 @@ public class ClientDataModel{
                 	 System.out.println("THIS IS NOT A VALID TALKING POINT");
                 	 return;
                  }
+                 
+                 
+                 
                  NodeList nameText, typeText, descriptionText, countryText, postalCodeText;
                  NodeList streetText, phoneText, urlText, stateText, cityText, hoursText;
           
@@ -234,23 +245,19 @@ public class ClientDataModel{
                  menuText = getElement(doc,"menu",0);
                  historyText = getElement(doc,"history",0);
                  commentText = getElement(doc,"comment",0);
-                // NodeList addInfo = doc.getElementsByTagName("additional_information");
-                 //Element e = doc.getElementById("additional_information");
-                 NodeList addInfo = doc.getElementsByTagName("additional_information");
-                 
-                 String[] username = new String[addInfo.getLength()]; //string array initialization
-                 System.out.println(addInfo.getLength());
-                 
-                 for (int x=0; x < addInfo.getLength(); x++)
+                 NodeList hashKeys = doc.getElementsByTagName("section");
+                 System.out.println("length of hash keys: " + hashKeys.getLength());
+                 String array[] = new String [hashKeys.getLength()];
+                 System.out.println(hashKeys.toString());
+                 Hashtable<String, String> extraInfo = new Hashtable<String, String>();
+                 for (int x = 0; x < hashKeys.getLength(); ++x)
                  {
-                          NodeList usernameText = getElement(doc, "username", x); 
-                          username[x] = ((Node)usernameText.item(0)).getNodeValue();
-                          System.out.println(username[x]);
+                	 array[x] = hashKeys.item(x).getChildNodes().item(0).getNodeValue();
+                	 System.out.println("Xml file has: " + array[x]);
+                	 extraInfo.put(array[x], getElement(doc,array[x],0).item(0).getNodeValue());
                  }
                  
-                 if (addInfo == null)
-                	 System.out.println("null information");
-              
+                 System.out.println(extraInfo);
                  if (hoursText == null)
                 	 System.out.println("Additional info not found");
                 
@@ -277,6 +284,7 @@ public class ClientDataModel{
          
                  
                  data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history); //object creation
+                 data.addHash(extraInfo);
                  objectNotify(data);
               
                  if (blind)
@@ -311,9 +319,16 @@ public class ClientDataModel{
         	String textValue;
         	if (textList != null)
         	{
+        		try {
         		textValue = ((Node)textList.item(0)).getNodeValue();
         		return textValue;
+        		}
+        		catch(Exception e)
+        		{
+        			return null;
+        		}
         	}
+        		
         	else
         	  return null;
         	
