@@ -35,13 +35,14 @@ class POIdata {
     private String specials;
     private String access;
     private String history;
+    private String tpid;
     private Hashtable<String, String> extraInfo;    
     
     POIdata(){
     	
     }
         
-        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String hour_t, String access_t, String specials_t, String menu_t, String history_t)
+        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String hour_t, String access_t, String specials_t, String menu_t, String history_t, String tpid_t)
         {
                 name = name_t;
                 type = type_t;
@@ -58,6 +59,12 @@ class POIdata {
                 menu = menu_t;
                 access = access_t;
                 history = history_t;
+                tpid = tpid_t;
+        }
+        
+        public String getTpid()
+        {
+        	return tpid;
         }
         
         public String getHistory()
@@ -204,7 +211,7 @@ public class ClientDataModel{
            
         public void parseXML(InputStream in) {
             String name = null, type = null, description= null, country= null, postalCode= null;
-            String street= null, phone= null, url= null, state= null, city= null;
+            String street= null, phone= null, url= null, state= null, city= null, mac= null;
         	 try{
         		 // now I am using DOM document for XML parser, but another type 
         		 //SAX is more efficient in terms of 
@@ -226,7 +233,7 @@ public class ClientDataModel{
                  
                  
                  NodeList nameText, typeText, descriptionText, countryText, postalCodeText;
-                 NodeList streetText, phoneText, urlText, stateText, cityText, hoursText;
+                 NodeList streetText, phoneText, urlText, stateText, cityText, hoursText, macText;
           
                  nameText = getElement(doc, "name", 0);
                  typeText = getElement(doc, "location_type", 0); //XML changed
@@ -245,6 +252,7 @@ public class ClientDataModel{
                  menuText = getElement(doc,"menu",0);
                  historyText = getElement(doc,"history",0);
                  commentText = getElement(doc,"comment",0);
+                 macText = getElement(doc,"bluetoothMac",0);
                  NodeList hashKeys = doc.getElementsByTagName("section");
                  System.out.println("length of hash keys: " + hashKeys.getLength());
                  String array[] = new String [hashKeys.getLength()];
@@ -279,11 +287,11 @@ public class ClientDataModel{
              specials = extractString(specialsText);
              menu = extractString(menuText);
              history = extractString(historyText);
-             
+             mac = extractString(macText);
        
          
                  
-                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history); //object creation
+                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history, mac); //object creation
                  data.addHash(extraInfo);
                  objectNotify(data);
               
