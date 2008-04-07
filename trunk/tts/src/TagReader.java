@@ -19,7 +19,7 @@ public class TagReader implements DiscoveryListener{
 	
 
 	// fakeMacAdress list
-	String fakeMacAddress[] = new String [] { "1234567890ab" , "0123456789cd", "1234567890ef"};
+	String fakeMacAddress[] = new String [] { "001C623FA0B8" , "0123456789cd", "1234567890ef"};
 	//The Macaddress of Espresso Royale, TCF, Underground Printing in order
 	int currentIndex = 0;
 
