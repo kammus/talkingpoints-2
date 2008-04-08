@@ -478,7 +478,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// Changing to More Info pane
 		else if(newstate.compareTo(MOREINFO) == 0) {
 			locationTitle.setText("<html><font size = 5><b>" + cachedData.name() + "</font><font size = 5 color = #B04C1B> [" 
-						+ cachedData.description() + "]</font></b></html>");
+						+ cachedData.location_type() + "]</font></b></html>");
 				s = createCoreInfoString(cachedData);
 				String prevstate = viewingHistory.peek();
 				System.out.println("Previous state was: " +  prevstate);
@@ -695,7 +695,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	
 	/**
 	 * @param args is unused
-	 */  
+	 */  /*
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 		
@@ -707,7 +707,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		ourGUI.addItem(new POIdata("Shemp's", "Not Curly", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "014"));
 		ourGUI.addItem(new POIdata("Blip's Arkaid", "Arcade", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "015"));
 		ourGUI.addItem(new POIdata("Kwik-e-Mart", "Who needs it?", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "016"));
-	} 
+	} */
 
 	/* Custom table model for locationList.
 	 * Implements the data as a vector that is truncated if it exceeds 10 entries.
