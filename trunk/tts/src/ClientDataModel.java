@@ -186,7 +186,7 @@ public class ClientDataModel{
         		blind = true;
         	}
         		
-        		
+        	System.out.println("sighted: " + sighted + " blind: " + blind);
         		
         }
      
@@ -304,19 +304,19 @@ public class ClientDataModel{
                  data.addHash(extraInfo);
                  objectNotify(data);
                  
-                 if (blind)
+                 if (blind && !sighted)
                  {
                  	SpeechThread speakThread= new SpeechThread(locationSpeaker, data);
                  	speakThread.run();
                  }
-                 else if (sighted)
+                 else if (sighted && !blind)
                  {
                 	 ourGUI.addItem(data); 
                  }
                  else if (sighted && blind)  //its a PARADOX~
                  {
                 	 ourGUI.addItem(data); 
-                	SpeechThread speakThread= new SpeechThread(locationSpeaker, data);
+                	 SpeechThread speakThread= new SpeechThread(locationSpeaker, data);
                     speakThread.run();
                  }
                           
