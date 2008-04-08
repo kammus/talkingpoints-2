@@ -300,7 +300,7 @@ public class ClientDataModel{
 
                  String hours= null, access= null, specials= null, menu= null, history= null;
                  
-                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history, mac); //object creation
+                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history, tpid); //object creation
                  data.addHash(extraInfo);
                  objectNotify(data);
                  
