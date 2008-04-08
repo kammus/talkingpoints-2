@@ -10,11 +10,27 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-class POIentry {
-	private String value;
-	private String type;
+class POIcomment {
+	private String comment_id;
+	private String username;
+	private String user_id;
+	private String datetime;
+	private String text;
+	
+	//constructor to prevent normal constructing
+	private POIcomment(){
+		
+	}
+	
+	POIcomment(String comment_id_t, String username_t, String user_id_t, String datetime_t, String text_t)
+	{
+		comment_id = comment_id_t;
+		username = username_t;
+		user_id = user_id_t;
+		datetime = datetime_t;
+		text = text_t;
+	}
 }
-
 
 class POIdata {
 	
@@ -29,20 +45,21 @@ class POIdata {
     private String state;
     private String city;
     /* All null for the moment */
-    private String comments;
-    private String hours;
-    private String menu;
-    private String specials;
-    private String access;
-    private String history;
+    //private String comments;
+    //private String hours;
+    //private String menu;
+    //private String specials;
+    //private String access;
+    //private String history;
     private String tpid;
-    private Hashtable<String, String> extraInfo;    
-    
+    private Hashtable<String, String> extraInfo;
+    private Hashtable<String, Object> comment;
+        
     POIdata(){
     	
     }
         
-        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String hour_t, String access_t, String specials_t, String menu_t, String history_t, String tpid_t)
+        POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String tpid_t)
         {
                 name = name_t;
                 type = type_t;
@@ -54,11 +71,11 @@ class POIdata {
                 url = url_t;
                 state = state_t;
                 city = city_t;
-                hours = hour_t;
-                specials = specials_t;
-                menu = menu_t;
-                access = access_t;
-                history = history_t;
+                //hours = hour_t;
+                //specials = specials_t;
+                //menu = menu_t;
+                //access = access_t;
+                //history = history_t;
                 tpid = tpid_t;
         }
         
@@ -66,7 +83,7 @@ class POIdata {
         {
         	return tpid;
         }
-        
+        /*
         public String getHistory()
         {
         	return history;
@@ -96,7 +113,7 @@ class POIdata {
         public String comments() {
         	return comments;
         }
-        
+        */
         public String name(){
                 return (name);
         }
@@ -146,6 +163,15 @@ class POIdata {
         	return extraInfo; 
         }
         
+        public void addComment (Hashtable<String, Object> incoming)
+        {
+        	comment = incoming;
+        }
+  
+        public Hashtable<String, Object> getComment()
+        {
+        	return comment;
+        }
 }
 
 class SpeechThread extends Thread
@@ -170,6 +196,7 @@ public class ClientDataModel{
         boolean blind;
         boolean sighted;
         private POIdata data;
+        private POIcomment POIcomment;
         TalkingPointsGUI ourGUI = new TalkingPointsGUI();
         Speaker locationSpeaker= new Speaker();
         public ClientDataModel (int option)
@@ -286,22 +313,59 @@ public class ClientDataModel{
                  /*
                   * Fourth Part -> get dynamic additional information
                   * 
-                  * 'comments' part is not developed yet.
+                  * Using two hahstables
+                  * 1) extraInfo (every tag name, value for each tag) except comments in additional_information
+                  * 2) comments(comment_id, comment Object) comment Object includes every information for each comment
                   */
                  String array[] = new String [hashKeys.getLength()];
                  Hashtable<String, String> extraInfo = new Hashtable<String, String>();
+                 Hashtable<String, Object> comments = new Hashtable<String, Object>();
+                 
                  for (int x = 0; x < hashKeys.getLength(); ++x)
                  {
                 	 array[x] = hashKeys.item(x).getChildNodes().item(0).getNodeValue();
-                	 extraInfo.put(array[x], getString(doc,array[x],0));
+                	 if(array[x].compareTo("comments") == 0) //get comments
+                	 {
+                		NodeList commentsNodes = doc.getElementsByTagName("comment");
+                		for (int k=0; k<commentsNodes.getLength(); k++)
+                		{
+                			NodeList commentNodes = commentsNodes.item(k).getChildNodes();
+                		
+                			String comment_tag[] = new String[commentNodes.getLength()];
+                		
+                			for (int i=0; i<commentNodes.getLength(); i++)
+                			{
+                				if(commentNodes.item(i).getNodeType() == Node.ELEMENT_NODE)
+                				{
+                					Element element = (Element)commentNodes.item(i);
+                					System.out.println(element.getNodeName());
+                					try
+                					{
+                						comment_tag[i] = element.getChildNodes().item(0).getNodeValue().trim();
+                						System.out.println(i);
+                					}catch(Exception e)
+                					{
+                						comment_tag[i] = null;
+                					}
+                				}	
+                			}
+
+                			POIcomment = new POIcomment(comment_tag[1], comment_tag[3], comment_tag[5], comment_tag[7], comment_tag[9]);
+                			comments.put(comment_tag[1], POIcomment);
+                		}
+                	 }
+                	 else
+                	 {
+                		 extraInfo.put(array[x], getString(doc,array[x],0));
+                	 }
                  }
                  
-                 System.out.println(extraInfo);
+                 System.out.println(extraInfo); //test for extraInfo
+                 System.out.println(comments); //test for comments
 
-                 String hours= null, access= null, specials= null, menu= null, history= null;
-                 
-                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history, tpid); //object creation
+                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, mac); //object creation
                  data.addHash(extraInfo);
+                 data.addComment(comments);
                  objectNotify(data);
                  
                  if (blind && !sighted)
