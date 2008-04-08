@@ -58,15 +58,16 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	static final int VIEWALL_X = 80;
 	static final int VIEWALL_Y = 45;
 	static final int MOREINFO_CHAR_WIDTH = 55;
-	static final String MAINPANE = "Front pane of TPGUI";
-	static final String MOREINFO = "More information pane of TPGUI";
+	static final String MAINPANE = "Front";
+	static final String MOREINFO = "More information";
 	static final String MENU = "POI's menu";
 	static final String HOURS = "POI's hours";
 	static final String HISTORY = "POI's history";
 	static final String ACCESSIBILITY = "POI's accessibility";
 	static final String SPECIALS = "POI's specials";
 	static final String COMMENTS = "POI's comments";
-	static final String VIEWALL = "View all pane";
+	static final String VIEWALL = "View all";
+	static final String SHOWHIDDEN = "Show hidden";
 	
 	// Default constructor
 	TalkingPointsGUI()  {
@@ -78,8 +79,9 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// the oldest item is thrown out.
 	public void addItem(POIdata p) {
 		POIdata lastread = (POIdata)ourModel.getValueAt(0, 3);
+						
 		if(lastread != p)
-			ourModel.Push(p);
+			ourModel.addToTable(p);
 		else
 			System.out.println("Duplicate name found: " + p.name() + " is same as " + lastread.name());
 	}
@@ -104,9 +106,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		frontScroll = new JScrollPane(locationList);
 		logoButton = new JButton(createImageIcon("images/logo.jpg", "TalkingPoints Logo"));
 		viewAll = new JButton("View All");
+		goBackb = new JButton(back);
 		legend = new JLabel(createImageIcon("images/legend.png", "Legend for this page's icons."),
 				javax.swing.SwingConstants.CENTER);
-		tableTitle = new JLabel("<html><font size = 4><u>Detected Points of Interest</font></u></html>", javax.swing.SwingConstants.CENTER);
+		tableTitle = new JLabel("<html><font size = 4><u>Recently Detected Points of Interest</font></u></html>", javax.swing.SwingConstants.CENTER);
 		centralPane = new JPanel(new CardLayout());
 		locationTitle = new JLabel("Empty");
 		coreInfo = new JEditorPane("text/html", "blahblahblah");
@@ -141,23 +144,23 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// Configure table's scroll bar
 		frontScroll.setColumnHeader(new JViewport());
 		frontScroll.getColumnHeader().setVisible(false);
-		frontScroll.setPreferredSize(new Dimension((windowWidth - COMP_SPACER_X - COMP_SPACER_X), tableHeight));
-		frontScroll.setMinimumSize(new Dimension((windowWidth - COMP_SPACER_X - COMP_SPACER_X), tableHeight));
-		frontScroll.setMaximumSize(new Dimension((windowWidth - COMP_SPACER_X - COMP_SPACER_X), tableHeight));
+		frontScroll.setPreferredSize(new Dimension((windowWidth - COMP_SPACER_X - COMP_SPACER_X), tableHeight+20));
+		frontScroll.setMinimumSize(new Dimension((windowWidth - COMP_SPACER_X - COMP_SPACER_X), tableHeight+20));
+		frontScroll.setMaximumSize(new Dimension((windowWidth - COMP_SPACER_X - COMP_SPACER_X), tableHeight+20));
 		
 		// Configure location list table
 		ourModel.addTableModelListener(this);
 		locationList.setModel(ourModel);
 		locationList.getColumnModel().getColumn(0).setCellRenderer(new ButtonRenderer());
 		locationList.getColumnModel().getColumn(0).setCellEditor(new ButtonEditor(new JCheckBox()));
-		locationList.getColumnModel().getColumn(0).setPreferredWidth(seenWidth);
-		locationList.getColumnModel().getColumn(0).setMinWidth(seenWidth);
-		locationList.getColumnModel().getColumn(0).setMaxWidth(seenWidth);
+		locationList.getColumnModel().getColumn(0).setPreferredWidth(seenWidth+2);
+		locationList.getColumnModel().getColumn(0).setMinWidth(seenWidth+2);
+		locationList.getColumnModel().getColumn(0).setMaxWidth(seenWidth+2);
 		locationList.getColumnModel().getColumn(1).setPreferredWidth((int)Math.floor(infoFieldsWidth * 0.25));
 		locationList.getColumnModel().getColumn(1).setMinWidth((int)Math.floor(infoFieldsWidth * 0.25));
 		locationList.getColumnModel().getColumn(1).setMaxWidth((int)Math.floor(infoFieldsWidth * 0.25));
-		locationList.getColumnModel().getColumn(2).setPreferredWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
-		locationList.getColumnModel().getColumn(2).setMinWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 3);
+		locationList.getColumnModel().getColumn(2).setPreferredWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 5);
+		locationList.getColumnModel().getColumn(2).setMinWidth((int)Math.ceil(infoFieldsWidth * 0.75) - 5);
 		locationList.getColumnModel().getColumn(2).setMaxWidth(infoFieldsWidth * 2);
 		locationList.setBackground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
 		locationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -198,6 +201,14 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		viewAll.setActionCommand("viewall");
 		viewAll.addActionListener(this);
 		
+		// Configure back button for Show All and View Hidden screens
+		goBackb.setActionCommand("back");
+		goBackb.setContentAreaFilled(false);
+		goBackb.setForeground(new Color(COMP_BG_COLOR_R, COMP_BG_COLOR_G, COMP_BG_COLOR_B));
+		goBackb.setBorder(BorderFactory.createEmptyBorder());
+		goBackb.setVisible(false);
+		goBackb.addActionListener(this);
+		
 		// Set up horizontal layer at top of window
 		JPanel topButtons = new JPanel();
 		topButtons.setBackground(new Color(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B));
@@ -226,6 +237,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		bottomButton.setLayout(new BoxLayout(bottomButton, BoxLayout.LINE_AXIS));
 		bottomButton.add(Box.createGlue());
 		bottomButton.add(viewAll);
+		bottomButton.add(Box.createRigidArea(new Dimension(COMP_SPACER_X, COMP_SPACER_Y)));
+		bottomButton.add(goBackb);
 		bottomButton.add(Box.createRigidArea(new Dimension(COMP_SPACER_X, COMP_SPACER_Y))); 
 		middlePane.add(bottomButton);
 	
@@ -440,7 +453,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// Checks currentState and configures the central pane accordingly
 	// All state switching is handled in this method.
 	public void propertyChange(PropertyChangeEvent e) {
+	
 		String newstate = e.getPropertyName();
+		
+		ButtonEditor editor = (ButtonEditor)locationList.getCellEditor(0, 0);
 		
 		CardLayout cl = (CardLayout)centralPane.getLayout();
 		locListModel model = (locListModel)locationList.getModel();
@@ -450,8 +466,14 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		if(newstate.compareTo(MAINPANE) == 0) {
 			cl.show(centralPane, MAINPANE);
 			model.tableState = MAINPANE;
-			tableTitle.setText("<html><font size = 4><u>Detected Points of Interest</font></u></html>");
+			tableTitle.setText("<html><font size = 4><u>Recently Detected Points of Interest</font></u></html>");
 			currentState = MAINPANE;
+			viewAll.setVisible(true);
+			viewAll.setText("View All");
+			viewAll.setActionCommand("viewall");
+			viewAll.setPreferredSize(new Dimension(VIEWALL_X, VIEWALL_Y));
+			goBackb.setVisible(false);
+			model.fireTableDataChanged();
 		}
 		// Changing to More Info pane
 		else if(newstate.compareTo(MOREINFO) == 0) {
@@ -459,7 +481,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 						+ cachedData.description() + "]</font></b></html>");
 				s = createCoreInfoString(cachedData);
 				String prevstate = viewingHistory.peek();
-				System.out.println(prevstate);
+				System.out.println("Previous state was: " +  prevstate);
 				if(prevstate.compareTo(MAINPANE) == 0)
 					configureMenuPanel();
 				coreInfo.setText(s);
@@ -509,33 +531,66 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		else if(newstate.compareTo(VIEWALL) == 0) {
 			model.tableState = VIEWALL;
 			currentState = VIEWALL;
-			tableTitle.setText("<html><font size = 4><u>Points of Interest</u></font></html>");
+			tableTitle.setText("<html><font size = 4><u>All Locations</u></font></html>");
+			viewAll.setVisible(true);
+			viewAll.setText("Show Hidden Locations");
+			viewAll.setActionCommand("showhidden");
+			viewAll.setPreferredSize(new Dimension((int)Math.floor(VIEWALL_X * 2.5) , VIEWALL_Y));
+			goBackb.setVisible(true);
+			model.fireTableDataChanged();
+		}
+		else if(newstate.compareTo(SHOWHIDDEN) == 0) {
+			model.tableState = SHOWHIDDEN;
+			currentState = SHOWHIDDEN;
+			tableTitle.setText("<html><font size = 4><u>Hidden Points of Interest</u></font></html>");
+			viewAll.setVisible(false);
 			model.fireTableDataChanged();
 		}
 		else
-			System.out.println("Property change message contained an invalid state:" + newstate);
+			System.out.println("Property change message contained an unknown state:" + newstate);
 		
 	}
 	
 	// Listener for the table model that is assigned to the main pane table
 	// This is used to detect when the button in column 0 is "edited", ie clicked.
 	public void tableChanged(TableModelEvent e) {
-		/*
-			int row = e.getFirstRow();
 		
-			if(e.getColumn() == 123)  {
-				locListModel model = (locListModel)e.getSource();
-				model.toggleHidden(row);
-				// Search forward in list for next unhidden entry
-				for(int i = row ; i <= 9 ; i++) {
-					if(!(model.getHidden(i))) {
-						updateMappings(i, model);
-						return
-					}
-						
-				}
+		locListModel model;
+		if(e.getColumn() == 123) {
+			
+			if(currentState.compareTo(MAINPANE) == 0) {
+				System.out.println("Moving row " + e.getFirstRow() + " to hidden list.");
+				model = (locListModel)locationList.getModel();
+				model.moveToHidden(e.getFirstRow());
+				model.fireTableDataChanged();
+			
 			}
-*/
+			
+			if(currentState.compareTo(VIEWALL) == 0) {
+				model = (locListModel)locationList.getModel();
+				if(model.isHidden(e.getFirstRow())) {
+					System.out.println("Removing " + e.getFirstRow() + " from hidden list.");
+					model.removeFromHidden(e.getFirstRow());
+					model.fireTableDataChanged();
+				}
+				else {
+					System.out.println("Moving row " + e.getFirstRow() + " to hidden list.");
+					model.moveToHidden(e.getFirstRow());
+					model.fireTableDataChanged();
+				}
+					
+			}
+			
+			if(currentState.compareTo(SHOWHIDDEN) == 0) {
+				System.out.println("Removing row " + e.getFirstRow() + " from hidden list.");
+				model = (locListModel)locationList.getModel();
+				model.removeFromHidden(e.getFirstRow());
+				model.fireTableDataChanged();
+			}
+			
+		}
+		
+		
 	}
 		
 		
@@ -545,22 +600,25 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	   the character after the first '{' to int, before subtracting the unicode integer value of '0'.  */
 	public void valueChanged(ListSelectionEvent e) {
 		locListModel model = (locListModel)locationList.getModel();
-		
-		if(!(e.getValueIsAdjusting())) {
-			String eventString = e.getSource().toString();
-			int index = eventString.lastIndexOf('{');
-			index++;
-			if(eventString.charAt(index) == '}')
-				return;
-			int row = (int)eventString.charAt(index) - (int)'0';
-			System.out.println("Row " + row + " selected. ");
-			if(model.getValueAt(row, 1) != null) {
-				cachedData = (POIdata)model.getValueAt(row, 3);
-				viewingHistory.push(currentState);
-				locationList.clearSelection();
-				centralPane.firePropertyChange(MOREINFO, true, false);
-			}	
-				
+			
+		if(locationList.getSelectedColumn() != 0) {
+			if(!(e.getValueIsAdjusting())) {
+				if(currentState.compareTo(SHOWHIDDEN) != 0) {
+					String eventString = e.getSource().toString();
+					int index = eventString.lastIndexOf('{');
+					index++;
+					if(eventString.charAt(index) == '}')
+						return;
+					int row = (int)eventString.charAt(index) - (int)'0';
+					System.out.println("Row " + row + " selected. ");
+					if(model.getValueAt(row, 1) != null) {
+						cachedData = (POIdata)model.getValueAt(row, 3);
+						viewingHistory.push(currentState);
+						locationList.clearSelection();
+						centralPane.firePropertyChange(MOREINFO, true, false);
+					}	
+				}	
+			}
 		}
 			
 	}
@@ -572,13 +630,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			viewingHistory.clear();
 			centralPane.firePropertyChange(MAINPANE, true, false);
 			}	
-		
-	//	if(e.getActionCommand() == "back") {
-	//		if(!(viewingHistory.empty())) {
-	//			String s = new String(viewingHistory.pop());
-	//			centralPane.firePropertyChange(s, true, false);
-	//		}
-	//	}
+		if(e.getActionCommand() == "back") {
+			if(!(viewingHistory.empty())) {
+				String s = new String(viewingHistory.pop());
+				centralPane.firePropertyChange(s, true, false);
+			}
+		}
 		if(e.getActionCommand() == "lochome") {
 			viewingHistory.push(currentState);
 			centralPane.firePropertyChange(MOREINFO, true, false);
@@ -612,7 +669,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			viewingHistory.push(currentState);
 			centralPane.firePropertyChange(VIEWALL, true, false);
 		}
-		
+		if(e.getActionCommand() == "showhidden") {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(SHOWHIDDEN, true, false);
+		}
 	}
 	
 	// Configures menu panel for More Information screens
@@ -641,35 +701,42 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		String [] s = {"1-3 MWF", "2-5 Sat", "3-5 Sun", " ", " ", " ", " "};
 		
-		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog."));
-		ourGUI.addItem(new POIdata("Alan Smithee's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog."));
-		ourGUI.addItem(new POIdata("Bob Schmelding's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
-		ourGUI.addItem(new POIdata("Shemp's", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
-		ourGUI.addItem(new POIdata("Blip's Arkaid", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
-		ourGUI.addItem(new POIdata("Kwik-e-Mart", "Not Ben & Jerry's", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk"));
+		ourGUI.addItem(new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog.", "010"));
+		ourGUI.addItem(new POIdata("Alan Smithee's", "Pseudonym", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog.", "012"));
+		ourGUI.addItem(new POIdata("Bob Schmelding's", "Some guy", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "013"));
+		ourGUI.addItem(new POIdata("Shemp's", "Not Curly", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "014"));
+		ourGUI.addItem(new POIdata("Blip's Arkaid", "Arcade", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "015"));
+		ourGUI.addItem(new POIdata("Kwik-e-Mart", "Who needs it?", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "016"));
 	} 
 
 	/* Custom table model for locationList.
-	 * Implements the table data as a sort of ersatz-queue, 
-	 * where random access is possible.
+	 * Implements the data as a vector that is truncated if it exceeds 10 entries.
 	 */
 	class locListModel extends AbstractTableModel {
 			
 		locListModel(ImageIcon seen_t, ImageIcon notseen_t, ImageIcon bulletpoint_t) {
 			data = new Vector();
+			hidden = new Vector();
 			seen = seen_t;
 			notseen = notseen_t;
 			bulletpoint = bulletpoint_t;
 			tableState = new String(MAINPANE);
-			hidden = new boolean[10];
 			mappings = new int[5];
-			for(int i = 0 ; i <= 4 ; i++)
+		
+			for(int i = 0 ; i < 5 ; i++)
 				mappings[i] = i;
 		}
 		
 		// Required method getRowCount()
 		public int getRowCount() {
+			if(tableState.compareTo(VIEWALL) == 0)
+				return data.size();
+			
+			if(tableState.compareTo(SHOWHIDDEN) == 0)
+				return hidden.size();
+			
 			return 5;
+			
 		}
 		
 		// Required method getColumnCount()
@@ -680,7 +747,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// Cells in column 0 must be "editable" in order to be clickable; other cells are not
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			if(columnIndex == 0)
-				if(tableState.compareTo(MAINPANE) == 0)
+				if((tableState.compareTo(MAINPANE) == 0) || (tableState.compareTo(VIEWALL) == 0) || (tableState.compareTo(SHOWHIDDEN) == 0))
 					return true;
 		
 			return false;
@@ -700,69 +767,238 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			
 		// Required method getValueAt()
 		// If column is 3, returns entire POIdata object.
-		// TODO: Alter to filter out hidden locations
 		public Object getValueAt(int row, int column) {
+			
+			boolean mainpane = false;
+			boolean viewall = false;
+			boolean showhidden = false;
+	
+			if(tableState.compareTo(MAINPANE) == 0)
+				mainpane = true;
+			else if(tableState.compareTo(VIEWALL) == 0)
+				viewall = true;
+			else if(tableState.compareTo(SHOWHIDDEN) == 0)
+				showhidden = true;
 			
 			if((row == 0) && (column == 1) && (data.isEmpty()))
 				return(new String("No locations have been detected."));
 			
-			// Get mapping of this row
-			int map = mappings[row];
+			if(!viewall && !showhidden) {
+				if((row+1) > data.size())
+					return null;
+				
+				try {
+					data.get(mappings[row]);
+				}
+				catch(ArrayIndexOutOfBoundsException e) {
+					return null;
+				}
+			}
 			
-			if((row+1) > data.size())
-				return null;
+			switch(column) {
 			
-				switch(column) {
 			case(0):
-				if(tableState.compareTo(MAINPANE) == 0)
+				if(mainpane)
 					return seen;
-				else
-					return bulletpoint;
+				if(viewall) {
+					if(isHidden(row))
+						return notseen;
+					else
+						return seen;
+				}
+				if(showhidden)
+					return notseen;
+				
+				return bulletpoint;
+			
 			case(1):
-				return data.get(row).name();
+				if(viewall)
+					return data.get(row).name();
+				if(showhidden)
+					return hidden.get(row).name();
+				// If we're not on either of those pages, we need to use the mappings
+				return data.get(mappings[row]).name();
+				
 			case(2):
-				return data.get(row).location_type();
+				if(viewall)
+					return data.get(row).location_type();
+				if(showhidden)
+					return hidden.get(row).location_type();
+				// If we're not on either of those pages, we need to use the mappings
+				return data.get(mappings[row]).location_type();
+			
 			case(3):
-				return data.get(row);
+				if(viewall)
+					return data.get(row);
+				if(showhidden)
+					return hidden.get(row);
+				
+				return data.get(mappings[row]);
+			
 			default:
-				return null;     }
+				return null;     
+			}
 		
 		}
 
 		
-		// Push a new data entry onto the list.  The
-		// current last element on the list is thrown away.
-		public void Push(POIdata p) {
-			System.out.println("Trying push onto location queue.");
+		// Add a new POI data to the vector.  If
+		// the vector is larger than 10, the 11th item is thrown out.
+		public void addToTable(POIdata p) {
 			
 			data.add(0, p);
+			
+			
+			mappings[0] = 0;
+			// Starting at 1, update all mappings
+			int i;
+			int k = 1;
+			for(i = 1 ; i < 5 ; i++) {
+				while(isHidden(k))
+					k++;
+				mappings[i] = k++;
+			}
 			
 			if(data.size() > 10)
 				data.removeElementAt(11);
 			
 			fireTableDataChanged();
+						
 		}
 		
-	/*	public void toggleHidden(int row) {
-			hidden[row] = !(hidden[row]);
+		// Moves the given row of the table to the list of hidden POIs.
+		public void moveToHidden(int row) {
+			
+			POIdata p;
+			
+			try { 
+				if(tableState.compareTo(MAINPANE) == 0)	
+					p = data.elementAt(mappings[row]); 
+				else
+					p = data.elementAt(row);
+			}
+			catch(ArrayIndexOutOfBoundsException e) {
+				System.out.println("Attempted to move nonexistent table entry at row " + row);
+				return;
+			}
+			// To save memory, we'll make a new POIdata to put on the hidden list, with only the name, type,
+			// and TPID addresses as valid fields.
+			POIdata dummy = new POIdata(p.name(), p.location_type(), null, null, null, null, null, null, null, null, null, null, null, null, null, p.getTpid());
+			hidden.add(dummy);
+			
+			// Now we need to remap this row of the table, and update all the mappings below it.
+			int i;
+			if(row < 5) {  // If the row is higher than 4, there are no mappings to update.
+				for(i = mappings[row] ; i < 10 ; i++) 
+					if(!(isHidden(i)))
+						break;
+			
+				mappings[row] = i;
+				i = row+1;
+				int k;
+				// Update all mappings below the row we changed
+				while(i < 5) {
+					for(k = (mappings[i]+1) ; k < 10 ; k++)
+						if(!(isHidden(k)))
+							break;
+					mappings[i] = k;
+					i++;
+				}
+			}
+			System.out.println("[0]:" + mappings[0] + " [1]:" + mappings[1] + " [2]:" + mappings[2]);
+			System.out.println("[3]:" + mappings[3] + " [4]:" + mappings[4]);
+			
 		}
 		
-		public boolean getHidden(int row) {
-			return hidden[row];
+		// Removes the entry in data at the given index from the hidden list, then updates
+		// the row mappings.
+		public void removeFromHidden(int index) {
+			
+			int i;
+			
+			// If we're on a page other than the Show Hidden page, index is a position in the "data" vector,
+			// and we need to look up that position's tpid and find it in the hidden list.  Otherwise, we
+			// must be on the Show Hidden page, and index represents a position in the "hidden" vector.
+			if(tableState.compareTo(SHOWHIDDEN) != 0) {
+				String removetpid;
+				try {
+					removetpid = data.get(index).getTpid();
+				}
+				catch(ArrayIndexOutOfBoundsException e) {
+					System.out.println("Tried to remove an invalid index from hidden list: " + index);
+					return;
+				}
+			
+				int hiddensize = hidden.size();
+				if(hiddensize == 0) {
+					System.out.println("Error: hidden list is empty!");
+					return;
+				}
+			
+				
+				for(i = 0 ; i < hiddensize ; i++) 
+					if(removetpid.compareTo(hidden.get(i).getTpid()) == 0)
+						break;
+			
+				if(i == hiddensize) {
+					System.out.println("Couldn't find " + removetpid + " in hidden list.");
+					return;
+				}
+			
+				System.out.println("Found " + removetpid + " at entry " + i + " in hidden list.");
+			}
+			else
+				i = index;
+			
+			hidden.remove(i);
+			
+			int k = 0;
+			for(i = 0 ; i < 5 ; i++) {
+				while(isHidden(k)) 
+					k++;
+				mappings[i] = k++;
+			}
+			
+			System.out.println("[0]:" + mappings[0] + " [1]:" + mappings[1] + " [2]:" + mappings[2]);
+			System.out.println("[3]:" + mappings[3] + " [4]:" + mappings[4]);
 		}
 		
-		public void setMapping(int row, int mapto) {
-			mappings[row] = mapto;
-		} */
+		// Compares the given POIdata's TPID against the list of hidden locations' TPIDs, and returns true if it matches any of them
+		public boolean isHidden(int index) {
+			String tpid;
+			
+			try {
+				tpid = data.get(index).getTpid();
+			}
+			catch(ArrayIndexOutOfBoundsException e) {
+				return false;
+			}
+						
+			for(int i = 0 ; i < 10 ; i++) 
+			try{
+				if(tpid.compareTo(hidden.get(i).getTpid()) == 0) 
+					return true;
+			}
+			catch(ArrayIndexOutOfBoundsException e) {
+				return false;
+			}
+			System.out.println(index + " is hidden.");
+			return false;
+			
+		}
+		
 		
 		// variable definitions
 		private Vector<POIdata> data;
-		private boolean[] hidden;
-		private int[] mappings;
+		private Vector<POIdata> hidden;
 		private ImageIcon bulletpoint;
 		private ImageIcon seen;
 		private ImageIcon notseen;
 		public String tableState;
+		// Indicates the relationship between rows of the table and entries in the data Vector.
+		// ie, "mappings[0]" returns the index in Vector "data" that corresponds to the 0th row of the table.
+		// This will be used on every screen but "View All"
+		private int[] mappings;
 	} 
 	
 	// Custom renderer for the button fields that will appear in the tables
@@ -779,7 +1015,8 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, 
 				boolean hasFocus, int row, int column) {
-								
+			
+			
 			if(value != null) {
 				if(value.getClass().getName() == "javax.swing.ImageIcon") {
 					setIcon((ImageIcon)value);
@@ -812,10 +1049,14 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		}
 		
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+			
+		//	ListSelectionModel selectmodel = table.getSelectionModel();
+		//	selectmodel.clearSelection();
+			
 			isPushed = true;
 			locListModel model = (locListModel)table.getModel();
-			
 			model.fireTableChanged(new TableModelEvent(model, row, row, 123));
+			button.setIcon((ImageIcon)value);
 			return button;
 		}
 		
@@ -833,12 +1074,13 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		}
 		
 		protected void fireEditingStopped() {
+			System.out.println("Editing stopped.");
 			super.fireEditingStopped();
 		}
 		
 		// Variable declarations
 		protected JButton button;
-		private boolean isPushed;
+		public boolean isPushed;
 	}
 		
 	// Fills a stringbuffer with the necessary text for the Core Info pane, then returns it as a string.
@@ -1017,10 +1259,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	private JPanel centralPane;
 	private JScrollPane frontScroll;
 	private JScrollPane infoScroll;
+	private JScrollPane buttonScroll;
 	private JTable locationList;
 	private JTable locationListB;
 	private JButton logoButton;
 	private JButton viewAll;
+	private JButton goBackb;
 	private JLabel legend;
 	private JLabel tableTitle;
 	private JLabel locationTitle;
