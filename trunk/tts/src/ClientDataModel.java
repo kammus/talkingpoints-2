@@ -189,21 +189,21 @@ public class ClientDataModel{
         		
         		
         }
-        private static NodeList getElement(Document doc , String tagName , int index ){
-            //given an XML document and a tag, return an Element at a given index
-            NodeList rows = doc.getDocumentElement().getElementsByTagName(tagName);
-            System.out.println(rows.getLength());
-  
+     
+        //modified version start from here
+        private static String getString(Document doc , String tagName , int index ){
+            //given document, tagname, index, return node value(string)
+            NodeList rows = doc.getElementsByTagName(tagName);
             Element ele = (Element)rows.item(index);
-            //System.out.println(ele);
-            
+
             try {
-            
-            return ele.getChildNodes();
+            	String value = ele.getChildNodes().item(0).getNodeValue();
+            	System.out.println(value);
+            	return value;
             }
             catch (Exception e)
             {
-              System.out.println("Location does not have " + tagName + "!");
+              System.out.println("Location does not have " + tagName);
               return null;
             }
             
@@ -212,89 +212,98 @@ public class ClientDataModel{
         public void parseXML(InputStream in) {
             String name = null, type = null, description= null, country= null, postalCode= null;
             String street= null, phone= null, url= null, state= null, city= null, mac= null;
-        	 try{
-        		 // now I am using DOM document for XML parser, but another type 
-        		 //SAX is more efficient in terms of 
-        		 // It is just difficult to implement, so I'll modify later.
+            String tpid = null, wifiMac = null, rfid = null, latitude = null, longitude = null;
+        	 //modified version starts from here
+            try{
+            	// Please don't change from now on. If you want to change this parsing part, let me know.(Travis)
                  DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
                  DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
                  
                  Document doc = docBuilder.parse(in);
                  
                  doc.getDocumentElement().normalize();
-                 NodeList locationText = getElement(doc,"location_type",0);
-                 String location = locationText.item(0).getNodeValue();
-                 if (location.compareTo("ERROR") == 0)
+                 
+                 // location type checking
+//                 NodeList locationText = getElement(doc,"location_type",0);
+                 type = getString(doc, "location_type", 0);
+                 
+                 if (type.compareTo("ERROR") == 0)
                  {
                 	 System.out.println("THIS IS NOT A VALID TALKING POINT");
+                	 in.close();
                 	 return;
                  }
                  
+                 /*
+                  * Core information Parsing
+                  * First Part > always filled 
+                  * tpid
+                  * locaiton_type // is already parsed above
+                  * name
+                  * description
+                  */
+                
+                 tpid = getString(doc, "tpid", 0); //tpid
+                 name = getString(doc, "name", 0);
+                 description = getString(doc, "description",0);
                  
+                 /*
+                  * Second Part > flexible parts of the core information
+                  * If it doesn't exist, return null
+                  * 
+                  * bluetooth_mac
+                  * wifi_mac
+                  * rfid
+                  * latitude
+                  * longitude
+                  * street
+                  * city
+                  * state
+                  * postal_code
+                  * country
+                  * phone
+                  */
+                 mac = getString(doc, "bluetooth_mac",0);
+                 wifiMac = getString(doc, "wifi_mac",0);
+                 rfid = getString(doc, "rfid", 0);
+                 latitude = getString(doc, "latitude",0);
+                 longitude = getString(doc, "longitude", 0);
+                 street = getString(doc, "street", 0);
+                 city = getString(doc,"city",0);
+                 state = getString(doc, "state", 0);
+                 postalCode = getString(doc, "postal_code", 0);
+                 country = getString(doc, "country", 0);
+                 url = getString(doc, "url", 0);
+                 phone = getString(doc, "phone", 0);
                  
-                 NodeList nameText, typeText, descriptionText, countryText, postalCodeText;
-                 NodeList streetText, phoneText, urlText, stateText, cityText, hoursText, macText;
-          
-                 nameText = getElement(doc, "name", 0);
-                 typeText = getElement(doc, "location_type", 0); //XML changed
-                 descriptionText = getElement(doc, "description", 0);
-                 streetText = getElement(doc, "street",0);
-                 cityText = getElement(doc, "city",0);
-                 stateText = getElement(doc, "state",0);
-                 postalCodeText = getElement(doc,"postal_code",0);
-                 countryText = getElement(doc, "country",0);
-                 urlText = getElement(doc, "url",0);
-                 phoneText = getElement(doc, "phone",0);
-                 hoursText = getElement(doc,"hours",0);
-                 NodeList accessText, specialsText, menuText, historyText, commentText;
-                 accessText = getElement(doc,"accessibility",0);
-                 specialsText = getElement(doc,"specials",0);
-                 menuText = getElement(doc,"menu",0);
-                 historyText = getElement(doc,"history",0);
-                 commentText = getElement(doc,"comment",0);
-                 macText = getElement(doc,"bluetoothMac",0);
+                 /*
+                  * Third Part > parse section and get hashKeys
+                  */
+                 
                  NodeList hashKeys = doc.getElementsByTagName("section");
                  System.out.println("length of hash keys: " + hashKeys.getLength());
+                 
+                 /*
+                  * Fourth Part -> get dynamic additional information
+                  * 
+                  * 'comments' part is not developed yet.
+                  */
                  String array[] = new String [hashKeys.getLength()];
-                 System.out.println(hashKeys.toString());
                  Hashtable<String, String> extraInfo = new Hashtable<String, String>();
                  for (int x = 0; x < hashKeys.getLength(); ++x)
                  {
                 	 array[x] = hashKeys.item(x).getChildNodes().item(0).getNodeValue();
-                	 System.out.println("Xml file has: " + array[x]);
-                	 extraInfo.put(array[x], getElement(doc,array[x],0).item(0).getNodeValue());
+                	 extraInfo.put(array[x], getString(doc,array[x],0));
                  }
                  
                  System.out.println(extraInfo);
-                 if (hoursText == null)
-                	 System.out.println("Additional info not found");
-                
+
                  String hours= null, access= null, specials= null, menu= null, history= null;
-                 
-             name = extractString(nameText);
-             type = extractString(typeText);
-             description = extractString(descriptionText);
-             country = extractString(countryText);
-             street = extractString(streetText);
-             postalCode = extractString(postalCodeText);
-             street = extractString(streetText);
-             state = extractString(stateText);
-             phone = extractString(phoneText);
-             url = extractString(urlText);
-             city = extractString(cityText);
-             hours = extractString(hoursText);
-             access = extractString(accessText);
-             specials = extractString(specialsText);
-             menu = extractString(menuText);
-             history = extractString(historyText);
-             mac = extractString(macText);
-       
-         
                  
                  data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, hours, access, specials, menu, history, mac); //object creation
                  data.addHash(extraInfo);
                  objectNotify(data);
-              
+                 
                  if (blind)
                  {
                  	SpeechThread speakThread= new SpeechThread(locationSpeaker, data);
@@ -320,26 +329,6 @@ public class ClientDataModel{
                  }catch (Throwable t) {
                          t.printStackTrace ();
                  }	
-        }
-        public String extractString(NodeList textList)
-        {
-        	//System.out.println(textList.toString());
-        	String textValue;
-        	if (textList != null)
-        	{
-        		try {
-        		textValue = ((Node)textList.item(0)).getNodeValue();
-        		return textValue;
-        		}
-        		catch(Exception e)
-        		{
-        			return null;
-        		}
-        	}
-        		
-        	else
-        	  return null;
-        	
         }
         
         public ClientDataModel() {
