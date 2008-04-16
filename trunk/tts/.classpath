@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="lib/sphinx4.jar"/>
 	<classpathentry kind="lib" path="lib/bluecove-2.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Josh/Desktop/Talking Points/tts/tts/lib/jsapi.jar"/>
+	<classpathentry kind="lib" path="/svn/trunk/tts/lib/BareBonesBrowserLaunch.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

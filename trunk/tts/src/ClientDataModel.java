@@ -64,13 +64,6 @@ class POIdata {
     private String url;
     private String state;
     private String city;
-    /* All null for the moment */
-    //private String comments;
-    //private String hours;
-    //private String menu;
-    //private String specials;
-    //private String access;
-    //private String history;
     private String tpid;
     private Hashtable<String, String> extraInfo;
     private Hashtable<String, Object> comment;
@@ -78,7 +71,13 @@ class POIdata {
     POIdata(){
     	
     }
-        
+    public boolean equals(POIdata data)    
+    {
+    	if(data.tpid == this.tpid)
+    		return true;
+    	else
+    		return false;
+    }
         POIdata (String name_t, String type_t, String description_t, String country_t,String postalCode_t,String street_t,String state_t,String url_t,String city_t, String phone_t, String tpid_t)
         {
                 name = name_t;
@@ -91,11 +90,6 @@ class POIdata {
                 url = url_t;
                 state = state_t;
                 city = city_t;
-                //hours = hour_t;
-                //specials = specials_t;
-                //menu = menu_t;
-                //access = access_t;
-                //history = history_t;
                 tpid = tpid_t;
         }
         
@@ -106,32 +100,32 @@ class POIdata {
         
         public String getHistory()
         {
-        	return " ";
+        	return null;
         }
         
         
         public String hours_array()
         {
-        	return " ";
+        	return null;
         }
         
         public String getMenu()
         {
-        	return " ";
+        	return null;
         }
         
         public String getAccess()
         {
-        	return " ";
+        	return null;
         }
         
         public String getSpecials()
         {
-        	return " ";
+        	return null;
         }
         
         public String comments() {
-        	return " ";
+        	return null;
         }
         
         public String name(){
@@ -205,7 +199,7 @@ class SpeechThread extends Thread
    }
    public void run() {
 	   speaker.addPOI(data);
-	   speaker.createDialog(true);	   
+	   speaker.createDialog(true, Integer.valueOf(data.getTpid()));	   
    }
 }
 
@@ -217,18 +211,24 @@ public class ClientDataModel{
         boolean sighted;
         private POIdata data;
         private POIcomment POIcomment;
-        TalkingPointsGUI ourGUI = new TalkingPointsGUI();
-        Speaker locationSpeaker= new Speaker();
+        TalkingPointsGUI ourGUI;
+        Speaker locationSpeaker;
         public ClientDataModel (int option)
         {
         	sighted = false;
         	blind = false;
-        	if (option == 1)
+        	if (option == 1) {
         		blind = true;
-        	else if (option == 2)
+        		locationSpeaker = new Speaker();
+        	}
+        	else if (option == 2) {
+        		ourGUI = new TalkingPointsGUI();
         		sighted = true;
+        	}
         	else if (option == 3)
         	{
+        		locationSpeaker = new Speaker();
+        		ourGUI = new TalkingPointsGUI();
         		sighted = true;
         		blind = true;
         	}
@@ -383,7 +383,7 @@ public class ClientDataModel{
                  System.out.println(extraInfo); //test for extraInfo
                  System.out.println(comments); //test for comments
 
-                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, mac); //object creation
+                 data = new POIdata(name, type, description, country,postalCode,street,state, url,city, phone, tpid); //object creation
                  data.addHash(extraInfo);
                  data.addComment(comments);
                  objectNotify(data);
