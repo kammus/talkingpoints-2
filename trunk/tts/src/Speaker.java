@@ -2,36 +2,42 @@ import com.sun.speech.freetts.Voice;
 import com.sun.speech.freetts.VoiceManager;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.recognizer.Recognizer;
-import edu.cmu.sphinx.result.ResultListener;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
-import edu.cmu.sphinx.util.props.PropertyException; 
+import edu.cmu.sphinx.util.props.PropertyException;
+import edu.cmu.sphinx.jsapi.JSGFGrammar;
+import javax.speech.recognition.GrammarException;
+import javax.speech.recognition.Rule;
+import javax.speech.recognition.RuleGrammar;
+import javax.speech.recognition.RuleParse;
 import java.net.URL;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.*;
+
+
 /*
- * Perhaps have some graphical output for the moment 
- * 
- * 
+ * 	To do: 
+ * Explain to Pete problem with duplicates 
+ * Add Dynamic Grammar / Dynamic Grammar Recognition
  */
 public class Speaker {
-	POIdata currentLocation;
-	POIdata previousLocation;
-	Voice dbVoice;
-	URL url;
-	ConfigurationManager manager;
-	Microphone microphone;
-	Recognizer recognizer;
-	
-	LinkedList<POIdata> locationCache;
-    final static int ENCOUNTER = 0;
-    final static int MORE_INFO = 1;
-    final static int COMMENTS = 2;
-    final static int HOME = 3;
-    int menuStatus;
-    String toSpeak;
-    boolean inSession;
+	private JSGFGrammar jsgfGrammarManager;
+	private POIdata currentLocation;
+	private POIdata previousLocation;
+	private Voice dbVoice;
+	private URL url;
+	private ConfigurationManager manager;
+	private Microphone microphone;
+	private Recognizer recognizer;
+	private LinkedList<POIdata> locationCache;
+    private final static int ENCOUNTER = 0;
+    private final static int MORE_INFO = 1;
+    private final static int COMMENTS = 2;
+    private final static int HOME = 3;
+    private int menuStatus;
+    private String toSpeak;
+    private boolean inSession;
+    private boolean grammarCreated;
 	public Speaker()
 	{
 		locationCache = new LinkedList<POIdata>();
@@ -41,12 +47,10 @@ public class Speaker {
 	    dbVoice = voiceManager.getVoice(voiceName);
 	    /* some control over whether or not to speak here */ 
 	    toSpeak =  "Welcome to Talking Points." + 
-		" At any time, To go back to home, say HOME." + 
-"To stop listening, say STOP or SKIP. " + 
-"To repeat the previous sentence, say REPEAT. " +
-"To go back to the previous menu, say BACK. " + 
-"To skip the current item and go to the next one, say NEXT To pause, say PAUSE" + 
-"To contine, say CONTINUE"; 
+		"To stop any information about a talking point, say STOP or SKIP. " +
+		"To return to the previous menu, say BACK." +
+		"To hear again what was just said, say REPEAT.";
+		
 		System.out.println("Startup string: " + toSpeak);
 	
 	    /* Set up for recognizer */
@@ -54,8 +58,10 @@ public class Speaker {
         System.out.println("Loading...");
         try {
         	manager = new ConfigurationManager(url);
+     
 	    	recognizer = (Recognizer) manager.lookup("recognizer");
 	    	microphone = (Microphone) manager.lookup("microphone");
+	    	jsgfGrammarManager = (JSGFGrammar) manager.lookup("jsgfGrammar");
 	    	recognizer.allocate();
         }
         catch (IOException e)
@@ -75,19 +81,13 @@ public class Speaker {
         }
 	    System.out.println("Done loading!");
 	    dbVoice.allocate();
-	    //dbVoice.speak(welcomeString);
+	    inSession = false;
+	    dbVoice.speak(toSpeak);
 	}
 	public void addPOI(POIdata incoming)
 	{
-		try {
-			while (inSession)
-				this.wait();
-			} catch (Exception E) {
-			  System.out.println("Error waiting");
-			}
-		inSession = true;
-		currentLocation = incoming;
 		boolean test = locationCache.contains(incoming);
+		
 		if (test)
 		{
 			System.out.println("Duplicate Object Dectected");
@@ -96,19 +96,13 @@ public class Speaker {
 			while (testTime <= start + 60000)
 				testTime = System.currentTimeMillis();
 		}
-		locationCache.add(incoming);
+		else
+			locationCache.push(incoming);
+		
 		if (locationCache.size() == 11)
 			locationCache.pop();
-	}
-	
-	/* Have a listener thread 
-	 tell listener thread to get objects at the appropriate time
-	 have handler get result at appropriate time. 
-	 */
-	class RecognizerImplementer implements ResultListener {
-		public void newResult(Result result)
-		{
-			
+		if (!inSession) {
+		   grammarCreated = false;
 		}
 	}
 	
@@ -120,7 +114,6 @@ public class Speaker {
 			System.out.println("Starting recording");
 			microphone.startRecording();
 			System.out.println("Recording Started");
-			//recognizer.addResultListener();
 			Result result = recognizer.recognize();
 			System.out.println("Trying to stop recording");
 			microphone.stopRecording();
@@ -128,11 +121,21 @@ public class Speaker {
 			if (result != null) 
 		    {
 				String resultText = result.getBestFinalResultNoFiller();
-				result = null;
-				System.out.println("You said: " + resultText);
-				flag = resultHandler(resultText);
+		        RuleGrammar ruleGrammar = jsgfGrammarManager.getRuleGrammar();
+		        try {
+		        	RuleParse ruleParse = ruleGrammar.parse(resultText, null);
+		        	if (ruleParse != null) {
+		        		result = null;
+		        		System.out.println("You said: " + resultText);
+		        		flag = resultHandler(resultText);
+		        	}
+		        	else
+		        		System.out.println("Coult not recognize!");
+		        } catch(GrammarException e) {
+		        	System.out.println("Recognizer error!" + e.getMessage());
+		        }
 			} 
-		    else 
+		    else if (menuStatus != HOME) 
 		    {
 				String error = "I can't hear or understand what you said.";
 				dbVoice.speak(error);
@@ -144,24 +147,83 @@ public class Speaker {
 		this.notify();
 	}
 	
-	/* create a dialog with the user 
-	 * 
-	 * 
-	 * 
-	 */
+
 	
-	public void createDialog(boolean listen)
+	public void createDialog(boolean listen, Integer tpid)
 	{
-		menuStatus = ENCOUNTER; 
-		toSpeak = currentLocation.name() + " " + currentLocation.location_type();
-		System.out.println("toSpeak: " + toSpeak);
-		dbVoice.speak(toSpeak);
-		if (listen)
+		System.out.println("In create dialog");
+		synchronized(this) 
 		{
-			listener();
-		}		
+			 if (listen) 
+			 {
+				 try 
+				 {
+					 while (inSession)
+					 {
+						grammarCreated = false;
+						System.out.println("Sleeping");
+						this.wait();
+					 }	
+				 } 
+				 catch (Exception E) 
+				 {	 
+					 System.out.println("Error waiting");
+				 }		
+			}
+			inSession = true;
+			
+			if (!grammarCreated) {
+				int index = 0;
+				do {
+					currentLocation = locationCache.get(index);
+					++index;
+				}while(Integer.valueOf(currentLocation.getTpid()).compareTo(tpid) != 0);
+			   CreateGrammar();
+			}
+		
+			grammarCreated = true;
+			menuStatus = ENCOUNTER; 
+			toSpeak = currentLocation.name() + " " + currentLocation.location_type();
+			System.out.println("toSpeak: " + toSpeak);
+			dbVoice.speak(toSpeak);
+			if (listen)
+			{
+				listener();
+			}		
+		}
 	}
-	
+	public void CreateGrammar()
+	{
+		try {
+			jsgfGrammarManager.loadJSGF("commands");
+			RuleGrammar ruleGrammar = jsgfGrammarManager.getRuleGrammar();
+			Hashtable<String,String> moreInfo = currentLocation.getHash();
+			Enumeration<String> keys = moreInfo.keys();
+			String ruleName;
+			while (keys.hasMoreElements())
+			{
+				ruleName = keys.nextElement().toLowerCase();
+				System.out.println("Adding rule: " + ruleName + " which has the value " + ruleName);
+				Rule newRule = ruleGrammar.ruleForJSGF(ruleName);
+				ruleGrammar.setRule(ruleName, newRule, true);
+				ruleGrammar.setEnabled(ruleName, true);
+			}
+			if (currentLocation.getComment().size() > 0)
+			{
+				ruleName = "comments";
+				System.out.println("Adding comments to the grammar");
+				Rule newRule = ruleGrammar.ruleForJSGF(ruleName);
+				ruleGrammar.setRule(ruleName,newRule,true);
+				ruleGrammar.setEnabled(ruleName,true);
+			}
+			jsgfGrammarManager.commitChanges();
+		}catch (Exception e) {
+			System.out.println("Error building grammar: " + e.getMessage());
+			System.exit(1);
+		}
+		
+
+	}
 	public boolean resultHandler(String result)
 	{
 		switch(menuStatus)
@@ -175,143 +237,72 @@ public class Speaker {
 			else if(result.toLowerCase().compareTo("back") == 0)
 			{
 				menuStatus = ENCOUNTER;
-				createDialog(false);
+				createDialog(false, Integer.valueOf(0));
 			}
-			else if(result.toLowerCase().compareTo("comments") == 0)
-			{
-				if (currentLocation.comments() ==  null)
-				{
-					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
-					dbVoice.speak(error);
-					return true;
-				}
-				else{
-					menuStatus = COMMENTS;
-					toSpeak = currentLocation.comments();
-					System.out.println("toSpeak: " + toSpeak);
-					dbVoice.speak(toSpeak);		
-					return true;
-				}
-			}
-			else if(result.toLowerCase().compareTo("stop") == 0)
+			else if(result.toLowerCase().compareTo("stop") == 0 || result.toLowerCase().compareTo("skip") == 0)
 			{
 				menuStatus = HOME;
 				System.out.println("Welcome home");
 				return false;
 			}
-			else if (result.toLowerCase().compareTo("history") == 0)
-			{
-				if (currentLocation.getHistory() ==  null)
+			else {
+				System.out.println(result.toLowerCase());
+				Hashtable<String,String> table = currentLocation.getHash();
+				if (table.containsKey(result.toLowerCase()))
 				{
-					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
-					dbVoice.speak(error);
-					return true;
-				}
-				else{
-					toSpeak = currentLocation.getHistory();
+					System.out.println("Location has key!");
+					toSpeak = table.get(result.toLowerCase());
+					System.out.println("toSpeak: " + toSpeak);
 					dbVoice.speak(toSpeak);
-					return true;
 				}
-			}
-			else if(result.toLowerCase().compareTo("menu") == 0)
-			{
-				if (currentLocation.getMenu() ==  null)
+				else if (result.toLowerCase().compareTo("comments") == 0)
 				{
-					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
+					int end;
+					if (currentLocation.getComment().size() == 1)
+						end = 1;
+					else
+						end = 2;
+					Hashtable<String, Object> comments = currentLocation.getComment();
+					Enumeration<Object> individualComments = comments.elements();
+					for (int x = 0; x < end; ++x)
+					{
+						POIcomment comment = (POIcomment) individualComments.nextElement();
+						toSpeak = "User " + comment.getUsername() + " says " + comment.getCommentText();
+						System.out.println("toSpeak: " + toSpeak);
+						dbVoice.speak(toSpeak);
+					}
+				}
+				else {
+					String error = "I'm sorry, there is no " + result.toLowerCase() + "available for " + currentLocation.name();
 					dbVoice.speak(error);
-					return true;
 				}
-				else{
-					toSpeak = currentLocation.getMenu();
-					dbVoice.speak(toSpeak);
-					return true;
-				}
-			}
-			else if(result.toLowerCase().compareTo("specials") == 0)
-			{
-				if (currentLocation.getSpecials() ==  null)
-				{
-					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
-					dbVoice.speak(error);
-					return true;
-				}
-				else{
-				   toSpeak = currentLocation.getSpecials();
-				   dbVoice.speak(toSpeak);
-				   return true;
-				}
-			}
-			else if(result.toLowerCase().compareTo("hours") == 0)
-			{
-				if (currentLocation.comments() ==  null)
-				{
-					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
-					dbVoice.speak(error);
-					return true;
-				}
-				else{
-					toSpeak = currentLocation.hours_array();
-					dbVoice.speak(toSpeak);
-					return true;
-				}
-			}
-			else if( result.toLowerCase().compareTo("access") == 0)
-			{
-				if (currentLocation.comments() ==  null)
-				{
-					String error = "I'm sorry, there are no comments available for " + currentLocation.name() + ". Please pick a different command."; 
-					dbVoice.speak(error);
-					return true;
-				}
-				else{
-					toSpeak = currentLocation.getAccess();
-					dbVoice.speak(toSpeak);
-					return true;
-				}
-			}
-			else if(result.toLowerCase().compareTo("home") == 0)
-			{
-				return false;
-			}
-			else
-			{
-				String error  = "I'm sorry that command is not available at this menu. Please try again.";
-				dbVoice.speak(error);
 				return true;
-			}	
-			break;
+			}
 		case ENCOUNTER:
 			if (result.toLowerCase().compareTo("repeat") == 0)
 			{
-				createDialog(false);
+				createDialog(false, Integer.valueOf(0));
 			}
 			else if (result.toLowerCase().compareTo("more") == 0)
 			{
 				menuStatus = MORE_INFO;
 				toSpeak = "";
-				toSpeak = currentLocation.description() + ". You can say, ";
 				
-				if (currentLocation.comments() != null)
-				{
-					toSpeak += " ,Comments";
+				Hashtable<String,String> table = currentLocation.getHash();
+				Hashtable<String,Object> commentTable = currentLocation.getComment(); 
+				if (table.size() == 0)
+					toSpeak ="I'm sorry. This location has no extra info.";
+				else {
+					toSpeak = currentLocation.description() + ". You can say ";
+					Enumeration<String> keys = table.keys();
+					
+					while (keys.hasMoreElements())
+						toSpeak += (", " + keys.nextElement());
+					if (commentTable.size() != 0)
+						toSpeak += ", comments";
+					toSpeak += ".";
 				}
-				if (currentLocation.getHistory() != null)
-				{
-					toSpeak += " ,History";
-				}
-				if (currentLocation.getAccess() != null)
-				{
-					toSpeak += " ,Access";
-				}
-				if (currentLocation.getMenu() != null)
-				{
-					toSpeak += " ,Menu";
-				}
-				if (currentLocation.getSpecials() != null)
-				{
-					toSpeak += " ,Specials";
-				}
-				toSpeak += ".";
+				
 				System.out.println("toSpeak: " + toSpeak);
 				dbVoice.speak(toSpeak);
 				return true;
@@ -333,32 +324,16 @@ public class Speaker {
 		case HOME:
 			if (result.toLowerCase().compareTo("previous") == 0)
 			{
+				System.out.println("Previous recongized, not doing anything");
 				 /* go to previous location, if available */ 
 			}
 			else if(result.toLowerCase().compareTo("next") == 0)
 			{
+				System.out.println("Next recognized, not doing anything");
 				/*go to next location, if available */
 			}
-			
 			break;
-		/*case MORE_SUB_INFO:
-			if (result.toLowerCase().compareTo("repeat") == 0)
-			{
-				dbVoice.speak(toSpeak);
-			}
-			else if (result.toLowerCase().compareTo("home") == 0)
-			{
-				ConstructComments();
-			}
-			break; */
 		}
 		return true;
-	}
-	
-	/* Eventually will return some type of object */
-	public Object getDialogResult()
-	{
-		Object empty = new Object();
-		return empty;
 	}
 }
