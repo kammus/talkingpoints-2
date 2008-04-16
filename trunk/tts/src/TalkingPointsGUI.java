@@ -80,8 +80,10 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		locListModel model = (locListModel)locationList.getModel();
 		if(model.isInTable(p.getTpid()))
 			System.out.println(p.name() + " already exists in table.  Throwing it out.");
-		else
+		else 
 			ourModel.addToTable(p);
+	
+			
 	}
 
 	
@@ -862,9 +864,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		// Test to see if a given TPID is already represented in the table.
 		public boolean isInTable(String tpid) {
 			Enumeration<POIdata> e = data.elements();
-			while(e.hasMoreElements()) 
-				if(e.nextElement().getTpid() == tpid)
+			while(e.hasMoreElements()) {
+				POIdata p = e.nextElement();
+				if(p.getTpid().compareTo(tpid) == 0)
 					return true;
+			}
+				
 			
 			return false;
 		}
@@ -1175,7 +1180,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			finalstring.append("&nbsp;<u>User ID</u>: " + p.getUserID() + "<br>");
 			sb = copyStringWithWordWrap(p.getUsername(), sb, 7);
 			finalstring.append("&nbsp;<u>User name</u>: " + sb + "<br>");
-			finalstring.append("&nbsp;<u>Posted at</u>: " + p.getTimestamp() + "<br>");
+			finalstring.append("&nbsp;<u>Posted</u>: " + p.getTimestamp() + "<br>");
 			sb = new StringBuffer();
 			sb = copyStringWithWordWrap(p.getCommentText(), sb, 0);
 			finalstring.append("&nbsp;<u>Comment</u>:<br>&nbsp;" + sb + "<br><br>");
