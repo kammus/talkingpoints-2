@@ -632,7 +632,6 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			viewingHistory.push(currentState);
 			centralPane.firePropertyChange(MOREINFO, true, false);
 		}
-	
 		if(e.getActionCommand() == "comments")  {
 			viewingHistory.push(currentState);
 			centralPane.firePropertyChange(COMMENTS, true, false);
@@ -641,10 +640,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 			viewingHistory.push(currentState);
 			centralPane.firePropertyChange(VIEWALL, true, false);
 		}
+		if(e.getActionCommand() == "showhidden") {
+			viewingHistory.push(currentState);
+			centralPane.firePropertyChange(SHOWHIDDEN, true, false);
+		}
 		if(e.getActionCommand() == "contribute") {
-			
-			BareBonesBrowserLaunch.openURL(new String("http://grocs.dmc.dc.umich.edu:3000/locations/edit/1"));
-		
+			BareBonesBrowserLaunch.openURL(new String("http://grocs.dmc.dc.umich.edu:3000/locations/edit/" + cachedData.getTpid()));
 		}
 		
 		
@@ -691,16 +692,14 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	
 	/**
 	 * @param args is unused
-	 */  
-/*	public static void main(String[] args) throws InterruptedException {
+	 */  /*
+	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 			
 		POIdata p = new POIdata("Stucchi's", "Ice Cream Parlour", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "010");
 		
 		Hashtable <String,String> hash = new Hashtable<String,String>();
 		
-		hash.put("Fighter", "Terry Bogard");
-		hash.put("Specials", "Power Geezer, Ovahhead Geezer, Bustah Wolf");
 		hash.put("Etc", "LAFFO!!!!");
 		hash.put("More", "Things!");
 		hash.put("David Byrne", "Guitarist");
@@ -726,7 +725,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	//	ourGUI.addItem(new POIdata("Shemp's", "Not Curly", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "014"));
 	//	ourGUI.addItem(new POIdata("Blip's Arkaid", "Arcade", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "015"));
 	//	ourGUI.addItem(new POIdata("Kwik-e-Mart", "Who needs it?", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "016"));
-	}  */
+	}   */
 
 	/* Custom table model for locationList.
 	 * Implements the data as a vector that is truncated if it exceeds 10 entries.
