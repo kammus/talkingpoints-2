@@ -30,6 +30,26 @@ class POIcomment {
 		datetime = datetime_t;
 		text = text_t;
 	}
+	
+	public String getID() {
+		return comment_id;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public String getUserID() {
+		return user_id;
+	}
+
+	public String getTimestamp() {
+		return datetime;
+	}
+	
+	public String getCommentText() {
+		return text;
+	}
 }
 
 class POIdata {
@@ -83,37 +103,37 @@ class POIdata {
         {
         	return tpid;
         }
-        /*
+        
         public String getHistory()
         {
-        	return history;
+        	return " ";
         }
         
         
         public String hours_array()
         {
-        	return hours;
+        	return " ";
         }
         
         public String getMenu()
         {
-        	return menu;
+        	return " ";
         }
         
         public String getAccess()
         {
-        	return access;
+        	return " ";
         }
         
         public String getSpecials()
         {
-        	return specials;
+        	return " ";
         }
         
         public String comments() {
-        	return comments;
+        	return " ";
         }
-        */
+        
         public String name(){
                 return (name);
         }
