@@ -76,12 +76,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	// adds an item to the list.  If the list is already full, 
 	// the oldest item is thrown out.
 	public void addItem(POIdata p) {
-		POIdata lastread = (POIdata)ourModel.getValueAt(0, 3);
-						
-		if(lastread != p)
-			ourModel.addToTable(p);
+		// Scan the current table contents to see if this POI is already on it.
+		locListModel model = (locListModel)locationList.getModel();
+		if(model.isInTable(p.getTpid()))
+			System.out.println(p.name() + " already exists in table.  Throwing it out.");
 		else
-			System.out.println("Duplicate name found: " + p.name() + " is same as " + lastread.name());
+			ourModel.addToTable(p);
 	}
 
 	
@@ -859,6 +859,15 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		}
 
+		// Test to see if a given TPID is already represented in the table.
+		public boolean isInTable(String tpid) {
+			Enumeration<POIdata> e = data.elements();
+			while(e.hasMoreElements()) 
+				if(e.nextElement().getTpid() == tpid)
+					return true;
+			
+			return false;
+		}
 		
 		// Add a new POI data to the vector.  If
 		// the vector is larger than 10, the 11th item is thrown out.
