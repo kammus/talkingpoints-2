@@ -6,11 +6,11 @@ public class TagReaderTest {
 	// Please note: this will never die. You'll have to kill it manually.
 	public static void main (String args[]){
 		ClientMessageHandler clientMessageHandler;
-		if (args[0] == "1")
+		if (args[0].compareTo("1") == 0)
 		{
 			clientMessageHandler = new ClientMessageHandler(1);
 		}
-		else if (args[0] == "2")
+		else if (args[0].compareTo("2") == 0)
 		{
 			clientMessageHandler = new ClientMessageHandler(2);	
 		}
