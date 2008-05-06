@@ -480,7 +480,11 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 				s = createCoreInfoString(cachedData);
 				String prevstate = viewingHistory.peek();
 				System.out.println("Previous state was: " +  prevstate);
-				if(prevstate.compareTo(MAINPANE) == 0)
+				// if oldvalue=true and newvalue=false, then we haven't changed POIs, and the menu panel
+				// doesn't need to be updated.
+				// if oldvalue=false and newvalue=true, then the user has just clicked on the recent POI
+				// list, and we need to rebuild the menu panel.
+				if((e.getOldValue().toString().compareTo("false") == 0) && (e.getNewValue().toString().compareTo("true") == 0))
 					configureMenuPanel();
 				coreInfo.setText(s);
 				cl.show(centralPane, MOREINFO);
@@ -608,7 +612,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 						if(cachedData != null) {
 							viewingHistory.push(currentState);
 							locationList.clearSelection();
-							centralPane.firePropertyChange(MOREINFO, true, false);
+							centralPane.firePropertyChange(MOREINFO, false, true);
 						}
 					}	
 				}	
@@ -672,15 +676,16 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		moreInfoMenu.add(core);
 		ImageIcon forwardsm = (ImageIcon)core.getIcon();
-		
-		for(Enumeration<String> e = extrainfo.keys() ; e.hasMoreElements() ; ) {
-			String s = e.nextElement();
-			menuItems.add(new JRadioButton(s, forwardsm));
-			JRadioButton newbutton = menuItems.lastElement();
-			newbutton.setActionCommand(s);
-			newbutton.addActionListener(this);
-			moreInfoMenu.add(newbutton);
-			buttonsAdded++;
+		if(extrainfo != null) {
+			for(Enumeration<String> e = extrainfo.keys() ; e.hasMoreElements() ; ) {
+				String s = e.nextElement();
+				menuItems.add(new JRadioButton(s, forwardsm));
+				JRadioButton newbutton = menuItems.lastElement();
+				newbutton.setActionCommand(s);
+				newbutton.addActionListener(this);
+				moreInfoMenu.add(newbutton);
+				buttonsAdded++;
+			}
 		}
 			
 		moreInfoMenu.add(comments);
@@ -694,7 +699,7 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 	
 	/**
 	 * @param args is unused
-	 */  /*
+	 */  
 	public static void main(String[] args) throws InterruptedException {
 		TalkingPointsGUI ourGUI = new TalkingPointsGUI();
 			
@@ -722,12 +727,12 @@ public class TalkingPointsGUI implements ActionListener, TableModelListener, Lis
 		
 		ourGUI.addItem(p); 
 				
-	//	ourGUI.addItem(new POIdata("Alan Smithee's", "Pseudonym", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "1-3 MWF","junk","junk","junk","The quick brown fox jumped over the lazy dog.", "012"));
+		ourGUI.addItem(new POIdata("Bob Schmelding's", "That one place", "empty", "ugh", "what", "bleh", "duder", "blah", "schmelding", "etc", "011"));
 	//	ourGUI.addItem(new POIdata("Bob Schmelding's", "Some guy", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "013"));
 	//	ourGUI.addItem(new POIdata("Shemp's", "Not Curly", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "014"));
 	//	ourGUI.addItem(new POIdata("Blip's Arkaid", "Arcade", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "015"));
 	//	ourGUI.addItem(new POIdata("Kwik-e-Mart", "Who needs it?", "empty", "stuff", "words", "bleh", "duder", "blah", "schmelding", "etc", "2-5 Sat","junk","junk","junk","junk", "016"));
-	}   */
+	}   
 
 	/* Custom table model for locationList.
 	 * Implements the data as a vector that is truncated if it exceeds 10 entries.
