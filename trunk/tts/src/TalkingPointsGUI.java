@@ -1,6 +1,6 @@
-/* TODO: Put some sort of documentation/description up here
- * 
- */
+/* TalkingPointsGUI.java
+ * Created 4/30/08 by Peter M. Kretschman
+ * - Contains all classes relating to the visual (GUI) aspects of Talking Points. */ 
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
