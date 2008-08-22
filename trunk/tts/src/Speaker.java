@@ -13,6 +13,7 @@ import javax.speech.recognition.RuleParse;
 import java.net.URL;
 import java.io.*;
 import java.util.*;
+import java.util.TimerTask;
 
 
 /*
@@ -38,6 +39,8 @@ public class Speaker {
     private String toSpeak;
     private boolean inSession;
     private boolean grammarCreated;
+    private boolean listening;
+    private Timer listenTimer;
 	public Speaker()
 	{
 		locationCache = new LinkedList<POIdata>();
@@ -108,8 +111,12 @@ public class Speaker {
 	
 	public void listener()
 	{ 
-		boolean flag = true;
-		while(flag)
+		listening = true;
+		// Set up timer that will automatically cause exit from while loop after 10 sec have elapsed
+		listenTimer = new Timer();
+		listenTimer.schedule(new TimerTask() { public void run() { System.out.println("Timer reports: 10 sec elapsed"); listening=false; }}, 10000);
+		
+		while(listening)
 		{	
 			System.out.println("Starting recording");
 			microphone.startRecording();
@@ -127,22 +134,34 @@ public class Speaker {
 		        	if (ruleParse != null) {
 		        		result = null;
 		        		System.out.println("You said: " + resultText);
-		        		flag = resultHandler(resultText);
+		        		listening = resultHandler(resultText);
 		        	}
 		        	else
-		        		System.out.println("Coult not recognize!");
+		        		System.out.println("Could not recognize!");
 		        } catch(GrammarException e) {
 		        	System.out.println("Recognizer error!" + e.getMessage());
 		        }
+		        listenTimer.cancel();
+		        listenTimer = new Timer();
+		        listenTimer.schedule(new TimerTask() { public void run() { System.out.println("Timer reports: 10 sec elapsed"); listening=false; }}, 10000);
 			} 
 		    else if (menuStatus != HOME) 
 		    {
 				String error = "I can't hear or understand what you said.";
+				// pause the timer while speaking
+				try {
+					listenTimer.wait();
+				}
+				catch(InterruptedException e) {
+					System.out.println("Interrupted!");
+				}
 				dbVoice.speak(error);
 				dbVoice.speak(toSpeak);
+				listenTimer.notify();
 			}
 			microphone.clear();
 		}
+		listenTimer.cancel();
 		inSession = false;
 		this.notify();
 	}
