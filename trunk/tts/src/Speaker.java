@@ -100,10 +100,10 @@ public class Speaker {
 				testTime = System.currentTimeMillis();
 		}
 		else
-			locationCache.push(incoming);
+			locationCache.add(incoming); // add at the back
 		
 		if (locationCache.size() == 11)
-			locationCache.pop();
+			locationCache.remove(0); // remove from the front--this should be the oldest one --mwn
 		if (!inSession) {
 		   grammarCreated = false;
 		}
