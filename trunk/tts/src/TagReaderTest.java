@@ -23,7 +23,19 @@ public class TagReaderTest {
 			tagReader.initBluetoothSearch();				// search Bluetooth MacAddress
 			
 		}catch(IOException e){
-			System.out.println("This device is not Bluetooth Capable! Exiting now.");
+			System.out.println("This device is not Bluetooth Capable! Entering Test mode");
+			System.out.println("Three detection events will be generated each 10 seconds apart.");
+			long time = System.currentTimeMillis();
+			int counter = 0;
+			while (counter < 3) {
+				if (System.currentTimeMillis() == time + 10000)
+				{
+					tagReader.generateFakeEvent();
+					time += 10000;
+					++counter;
+				}
+			}
+			
 		}	
 	}
 }
