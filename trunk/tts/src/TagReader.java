@@ -50,7 +50,7 @@ public class TagReader implements DiscoveryListener{
 		// TODO: currently, the audioplayer will stop the looping wav and play the "point discovered" wav
 		// regardless of whether the detected bluetooth device is a valid talking point or not.
 		AudioPlayer altplayer = new AudioPlayer("sounds/timesup.wav", false);
-		altplayer.start();
+		altplayer.startPlayback();
 			
 		clientMessageHandler.tagWasRead(MacAddress);
 		}catch(Exception e){
@@ -69,7 +69,7 @@ public class TagReader implements DiscoveryListener{
 		// Starting playing searching sound
 		if(!player.isPlaying()) {
 			player = new AudioPlayer("sounds/jeopardy.wav", true);
-			player.start();
+			player.startPlayback();
 		}
 		agent.startInquiry(DiscoveryAgent.GIAC, this);
 		
