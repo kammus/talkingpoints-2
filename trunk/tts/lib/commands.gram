@@ -14,6 +14,7 @@ public <pause> = (Pause);
 public <continue> = (Continue);
 public <more> = (More);
 public <previous>= (Previous);
+public <help>= (Help);
 /*
 public <comments> = (Comments);
 public <specials> = (Specials);
