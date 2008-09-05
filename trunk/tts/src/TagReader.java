@@ -19,9 +19,10 @@ public class TagReader implements DiscoveryListener{
 
 	private AudioPlayer player;
 	
-	// fakeMacAdress list
-	String fakeMacAddress[] = new String [] { "001C623FA0B8" , "0123456789cd", "1234567890ef"};
-	//The Macaddress of Espresso Royale, TCF, Underground Printing in order
+
+	// Three mac addresses for counting purposes
+	String fakeMacAddress[] = new String [] { "001124af738e" , "001124aebd16", "00191503965E"};
+
 	int currentIndex = 0;
 
 	// make default constructor private to ensure it's never called. Can't make a TagReader w/o a message handler!
