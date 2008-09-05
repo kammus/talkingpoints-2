@@ -49,10 +49,10 @@ public class Speaker {
 	    VoiceManager voiceManager = VoiceManager.getInstance();
 	    dbVoice = voiceManager.getVoice(voiceName);
 	    /* some control over whether or not to speak here */ 
-	    toSpeak =  " At any time you can say STOP to stop listening to the current Talking-Point or " +
-	    		   "HELP to get help on the available voice commands" + 
-	    		   "Enjoy your walking journey" +
-	    		   "Starting to search for Talking-Points";
+	    toSpeak =  "Welcome to Talking Points. At any time you can say STOP to stop listening to the current Talking-Point or " +
+	    		   "HELP to get help on the available voice commands. " + 
+	    		   "Enjoy your walking journey. " +
+	    		   "Starting to search for Talking-Points. ";
 		
 		System.out.println("Startup string: " + toSpeak);
 	
@@ -117,6 +117,7 @@ public class Speaker {
 			System.out.println("Starting recording");
 			microphone.startRecording();
 			System.out.println("Recording Started");
+			/* timer here */
 			Result result = recognizer.recognize();
 		
 			System.out.println("Trying to stop recording");
@@ -186,7 +187,7 @@ public class Speaker {
 		
 			grammarCreated = true;
 			menuStatus = ENCOUNTER; 
-			toSpeak = currentLocation.name() + " " + currentLocation.location_type() + "For more information sa MORE";
+			toSpeak = currentLocation.name() + " " + currentLocation.location_type() + ". For more information say MORE.";
 			System.out.println("toSpeak: " + toSpeak);
 			dbVoice.speak(toSpeak);
 			if (listen)
@@ -248,13 +249,30 @@ public class Speaker {
 				toSpeak = "Stopped listening to " + currentLocation.name(); 
 				toSpeak += "Searching for new Talking-Points.";
 				dbVoice.speak(toSpeak);
+				System.out.println(toSpeak);
 				return false;
 			}
 			else if(result.toLowerCase().compareTo("help") == 0)
 			{
 				System.out.println("In the help menu ");
-				toSpeak = "You can say: " + currentLocation.getHash().toString();
-				System.out.println("");
+				Hashtable<String,String> table = currentLocation.getHash();
+				Hashtable<String,Object> commentTable = currentLocation.getComment();
+				toSpeak = "You can say: ";
+				if (table.size() != 0)
+				{
+					Enumeration<String> keys = table.keys();
+					
+					while (keys.hasMoreElements())
+						toSpeak += (", " + keys.nextElement());
+					if (commentTable.size() != 0)
+						toSpeak += ", comments";
+					toSpeak += ".";
+				}
+				else
+					toSpeak = "This location has no extra info.";
+				dbVoice.speak(toSpeak);
+				System.out.println(toSpeak);
+				
 			}
 			else 
 			{
@@ -279,8 +297,9 @@ public class Speaker {
 					for (int x = 0; x < end; ++x)
 					{
 						POIcomment comment = (POIcomment) individualComments.nextElement();
-						toSpeak = "User " + comment.getUsername() + " says " + comment.getCommentText();
+						toSpeak = "User " + comment.getUsername() + " said " + comment.getCommentText() + " " + comment.getTimestamp();
 						System.out.println("toSpeak: " + toSpeak);
+		
 						dbVoice.speak(toSpeak);
 					}
 				}
@@ -288,6 +307,7 @@ public class Speaker {
 					String error = "I'm sorry, there is no " + result.toLowerCase() + "available for " + currentLocation.name();
 					dbVoice.speak(error);
 				}
+				System.out.println(toSpeak);
 				return true;
 				
 			}
@@ -299,8 +319,22 @@ public class Speaker {
 			}
 			else if (result.toLowerCase().compareTo("help") == 0)
 			{
-			   toSpeak = "You can say:  MORE, STOP, HELP, or REPEAT.";
+				Hashtable<String,String> table = currentLocation.getHash();
+				Hashtable<String,Object> commentTable = currentLocation.getComment();
+				toSpeak = "You can say: ";
+				if (table.size() != 0)
+				{
+					Enumeration<String> keys = table.keys();
+					
+					while (keys.hasMoreElements())
+						toSpeak += (", " + keys.nextElement());
+					if (commentTable.size() != 0)
+						toSpeak += ", comments";
+					toSpeak += ".";
+				}
+			   toSpeak += "MORE, STOP, HELP, or REPEAT.";
 			   dbVoice.speak(toSpeak);
+			   System.out.println(toSpeak);
 			   return true;
 			}
 			else if (result.toLowerCase().compareTo("more") == 0)
@@ -338,8 +372,37 @@ public class Speaker {
 			}
 			else
 			{
-				String error  = "I'm sorry that command is not available at this menu. Please try again.";
-				dbVoice.speak(error);
+				System.out.println(result.toLowerCase());
+				Hashtable<String,String> table = currentLocation.getHash();
+				if (table.containsKey(result.toLowerCase()))
+				{
+					System.out.println("Location has key!");
+					toSpeak = table.get(result.toLowerCase());
+					System.out.println("toSpeak: " + toSpeak);
+					dbVoice.speak(toSpeak);
+				}
+				else if (result.toLowerCase().compareTo("comments") == 0)
+				{
+					int end;
+					if (currentLocation.getComment().size() == 1)
+						end = 1;
+					else
+						end = 2;
+					Hashtable<String, Object> comments = currentLocation.getComment();
+					Enumeration<Object> individualComments = comments.elements();
+					for (int x = 0; x < end; ++x)
+					{
+						POIcomment comment = (POIcomment) individualComments.nextElement();
+						toSpeak = "User " + comment.getUsername() + " said " + comment.getCommentText() + " " + comment.getTimestamp();
+						System.out.println("toSpeak: " + toSpeak);
+		
+						dbVoice.speak(toSpeak);
+					}
+				}
+				else {
+					String error = "I'm sorry, there is no " + result.toLowerCase() + "available for " + currentLocation.name();
+					dbVoice.speak(error);
+				}
 				return true;
 			}
 			break;
@@ -371,7 +434,7 @@ public class Speaker {
 			}
 			else
 			{
-				toSpeak = "I'm sorry that command is not available at this men. Please try again.";
+				toSpeak = "I'm sorry that command is not available at this point. Please try again.";
 				dbVoice.speak(toSpeak);
 			}
 			break;

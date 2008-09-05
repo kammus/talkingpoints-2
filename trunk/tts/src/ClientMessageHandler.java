@@ -4,20 +4,22 @@ import java.net.URL;
 
    
 
-public class ClientMessageHandler {
+public class ClientMessageHandler 
+{
 	 
 	ClientDataModel clientDataModel;
-	LocationMinder locMinder;
+	//LocationMinder locMinder;
 	
 	public ClientMessageHandler(int option){
-		locMinder = new LocationMinder(60000);
-		locMinder.start();
+		//locMinder = new LocationMinder(60000);
+		//locMinder.start();
 		clientDataModel = new ClientDataModel(option);  //changing 
 	}
 	
-	public void tagWasRead(String macAddress) throws Exception{
+	public void tagWasRead(String macAddress) throws Exception
+	{
 		
-		if(!locMinder.wasRecentlyEncountered(macAddress)) {
+		//if(!locMinder.wasRecentlyEncountered(macAddress)) {
 		
 			URL url = new URL("http://grocs.dmc.dc.umich.edu:3000/locations/show_by_bluetooth_mac/");
 		
@@ -48,13 +50,13 @@ public class ClientMessageHandler {
 				return;
 			}
 			else {
-				locMinder.insertItem(macAddress);
+			//	locMinder.insertItem(macAddress);
 				conn.disconnect();
 			}
 		
 		}
-		else {
+	/*	else {
 			System.out.println("Location is in recently-seen list.  Ignoring.");
-		}
-	}	
-}
+		}*/
+	
+}	
