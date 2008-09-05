@@ -13,8 +13,10 @@ import javax.speech.recognition.RuleParse;
 import java.net.URL;
 import java.io.*;
 import java.util.*;
-import java.util.TimerTask;
-
+/*
+ * NOTES FROM DEMO AUGUST 26TH 2008
+ * 
+ */
 
 /*
  * 	To do: 
@@ -39,8 +41,6 @@ public class Speaker {
     private String toSpeak;
     private boolean inSession;
     private boolean grammarCreated;
-    private boolean listening;
-    private Timer listenTimer;
 	public Speaker()
 	{
 		locationCache = new LinkedList<POIdata>();
@@ -49,10 +49,10 @@ public class Speaker {
 	    VoiceManager voiceManager = VoiceManager.getInstance();
 	    dbVoice = voiceManager.getVoice(voiceName);
 	    /* some control over whether or not to speak here */ 
-	    toSpeak =  "Welcome to Talking Points." + 
-		"To stop any information about a talking point, say STOP or SKIP. " +
-		"To return to the previous menu, say BACK." +
-		"To hear again what was just said, say REPEAT.";
+	    toSpeak =  " At any time you can say STOP to stop listening to the current Talking-Point or " +
+	    		   "HELP to get help on the available voice commands" + 
+	    		   "Enjoy your walking journey" +
+	    		   "Starting to search for Talking-Points";
 		
 		System.out.println("Startup string: " + toSpeak);
 	
@@ -100,10 +100,10 @@ public class Speaker {
 				testTime = System.currentTimeMillis();
 		}
 		else
-			locationCache.add(incoming); // add at the back
+			locationCache.push(incoming);
 		
 		if (locationCache.size() == 11)
-			locationCache.remove(0); // remove from the front--this should be the oldest one --mwn
+			locationCache.pop();
 		if (!inSession) {
 		   grammarCreated = false;
 		}
@@ -111,17 +111,14 @@ public class Speaker {
 	
 	public void listener()
 	{ 
-		listening = true;
-		// Set up timer that will automatically cause exit from while loop after 10 sec have elapsed
-		listenTimer = new Timer();
-		listenTimer.schedule(new TimerTask() { public void run() { System.out.println("Timer reports: 10 sec elapsed"); listening=false; }}, 10000);
-		
-		while(listening)
+		boolean flag = true;
+		while(flag)
 		{	
 			System.out.println("Starting recording");
 			microphone.startRecording();
 			System.out.println("Recording Started");
 			Result result = recognizer.recognize();
+		
 			System.out.println("Trying to stop recording");
 			microphone.stopRecording();
 			System.out.println("Recording stopped");
@@ -134,39 +131,26 @@ public class Speaker {
 		        	if (ruleParse != null) {
 		        		result = null;
 		        		System.out.println("You said: " + resultText);
-		        		listening = resultHandler(resultText);
+		        		flag = resultHandler(resultText);
 		        	}
 		        	else
-		        		System.out.println("Could not recognize!");
+		        		System.out.println("Coult not recognize!");
 		        } catch(GrammarException e) {
 		        	System.out.println("Recognizer error!" + e.getMessage());
 		        }
-		        listenTimer.cancel();
-		        listenTimer = new Timer();
-		        listenTimer.schedule(new TimerTask() { public void run() { System.out.println("Timer reports: 10 sec elapsed"); listening=false; }}, 10000);
 			} 
 		    else if (menuStatus != HOME) 
 		    {
 				String error = "I can't hear or understand what you said.";
-				// pause the timer while speaking
-				try {
-					listenTimer.wait();
-				}
-				catch(InterruptedException e) {
-					System.out.println("Interrupted!");
-				}
 				dbVoice.speak(error);
 				dbVoice.speak(toSpeak);
-				listenTimer.notify();
 			}
 			microphone.clear();
 		}
-		listenTimer.cancel();
 		inSession = false;
 		this.notify();
 	}
 	
-
 	
 	public void createDialog(boolean listen, Integer tpid)
 	{
@@ -202,7 +186,7 @@ public class Speaker {
 		
 			grammarCreated = true;
 			menuStatus = ENCOUNTER; 
-			toSpeak = currentLocation.name() + " " + currentLocation.location_type();
+			toSpeak = currentLocation.name() + " " + currentLocation.location_type() + "For more information sa MORE";
 			System.out.println("toSpeak: " + toSpeak);
 			dbVoice.speak(toSpeak);
 			if (listen)
@@ -240,9 +224,8 @@ public class Speaker {
 			System.out.println("Error building grammar: " + e.getMessage());
 			System.exit(1);
 		}
-		
-
 	}
+	
 	public boolean resultHandler(String result)
 	{
 		switch(menuStatus)
@@ -262,9 +245,19 @@ public class Speaker {
 			{
 				menuStatus = HOME;
 				System.out.println("Welcome home");
+				toSpeak = "Stopped listening to " + currentLocation.name(); 
+				toSpeak += "Searching for new Talking-Points.";
+				dbVoice.speak(toSpeak);
 				return false;
 			}
-			else {
+			else if(result.toLowerCase().compareTo("help") == 0)
+			{
+				System.out.println("In the help menu ");
+				toSpeak = "You can say: " + currentLocation.getHash().toString();
+				System.out.println("");
+			}
+			else 
+			{
 				System.out.println(result.toLowerCase());
 				Hashtable<String,String> table = currentLocation.getHash();
 				if (table.containsKey(result.toLowerCase()))
@@ -296,11 +289,19 @@ public class Speaker {
 					dbVoice.speak(error);
 				}
 				return true;
+				
 			}
+			
 		case ENCOUNTER:
 			if (result.toLowerCase().compareTo("repeat") == 0)
 			{
 				createDialog(false, Integer.valueOf(0));
+			}
+			else if (result.toLowerCase().compareTo("help") == 0)
+			{
+			   toSpeak = "You can say:  MORE, STOP, HELP, or REPEAT.";
+			   dbVoice.speak(toSpeak);
+			   return true;
 			}
 			else if (result.toLowerCase().compareTo("more") == 0)
 			{
@@ -330,7 +331,9 @@ public class Speaker {
 					|| result.toLowerCase().compareTo("skip") == 0 || result.toLowerCase().compareTo("stop") == 0)
 			{
 				menuStatus = HOME;
-				System.out.println("Welcome Home");
+				toSpeak = "Stopped listening to " + currentLocation.name();
+				toSpeak += "Searching for new Talking-Points.";
+				dbVoice.speak(toSpeak);
 				return false;
 			}
 			else
@@ -341,15 +344,35 @@ public class Speaker {
 			}
 			break;
 		case HOME:
-			if (result.toLowerCase().compareTo("previous") == 0)
+			if (result.toLowerCase().compareTo("stop") == 0)
 			{
-				System.out.println("Previous recongized, not doing anything");
-				 /* go to previous location, if available */ 
+				menuStatus = HOME;
+				toSpeak = "Stopped listening to " + currentLocation.name();
+				toSpeak += "Searching for new Talking-Points.";
+				dbVoice.speak(toSpeak);
+				return false;
 			}
-			else if(result.toLowerCase().compareTo("next") == 0)
+			else if (result.toLowerCase().compareTo("start") == 0)
 			{
-				System.out.println("Next recognized, not doing anything");
-				/*go to next location, if available */
+				toSpeak = "Starking talking points. Enjoy your walking journey.";
+				dbVoice.speak(toSpeak);
+				return true;
+			}
+			else if(result.toLowerCase().compareTo("repeat") == 0)
+			{
+				dbVoice.speak(toSpeak);
+				return true;
+			}
+			else if(result.toLowerCase().compareTo("help") == 0)
+			{
+				toSpeak = "You can say Start to start searching or stop to stop searching.";
+				dbVoice.speak(toSpeak);
+				return true;
+			}
+			else
+			{
+				toSpeak = "I'm sorry that command is not available at this men. Please try again.";
+				dbVoice.speak(toSpeak);
 			}
 			break;
 		}
