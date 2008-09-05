@@ -6,14 +6,11 @@
 
 grammar commands;
 
-public <stop> = (Stop | Skip);
+public <stop> = (Stop);
 public <repeat> = (Repeat);
 public <back> = (Back);
-public <next> = (Next);
-public <pause> = (Pause);
-public <continue> = (Continue);
 public <more> = (More);
-public <previous>= (Previous);
+public <help> = (Help);
 public <help>= (Help);
 /*
 public <comments> = (Comments);
