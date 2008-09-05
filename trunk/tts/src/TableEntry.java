@@ -1,50 +1,20 @@
 
-/* Author: Peter Kretschman
- * Created: 3/16/08
- * 
- * Container class for a single line in the locationList table.  
- * Consists of three String objects. 
- */
-
 public class TableEntry {
+	
+	private String bluetooth_MAC;
+	private long timeStamp;
+	
+	public TableEntry(String MAC, long time) {
+		bluetooth_MAC = MAC;
+		timeStamp = time;
+	}
 
-	// Default constructor
-	TableEntry() {
-		System.out.println("New " + this.toString() + "created.");
-		locationName = new String("empty");
-		locationDesc = new String("empty");
+	public String getMAC() {
+		return bluetooth_MAC;
 	}
 	
-	// Getter function for name
-	public String getName() {
-		return locationName;
+	public long getTimeStamp() {
+		return timeStamp;
 	}
-	
-	// Getter function for location
-	public String getLoc() {
-		return locationDesc;
-	}
-	
-	// Setter function
-	public void setValues(POIdata p) {
-		
-		if(locationName == null)
-			locationName = new String();
-		
-		if(locationDesc == null)
-			locationDesc = new String();
-		
-		if(locationType == null)
-			locationType = new String();
-		
-		locationName = p.name();
-		locationDesc = p.description();
-		locationType = p.location_type();
-	}
-	
-	// Private variable definitions
-	private String locationName;
-	private String locationDesc;
-	private String locationType;
 	
 } 
