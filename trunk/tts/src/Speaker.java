@@ -49,12 +49,12 @@ public class Speaker {
 	    VoiceManager voiceManager = VoiceManager.getInstance();
 	    dbVoice = voiceManager.getVoice(voiceName);
 	    /* some control over whether or not to speak here */ 
-	    toSpeak =  "Welcome to Talking Points. At any time you can say STOP to stop listening to the current Talking-Point or " +
+	    toSpeak =  "Welcome to Talking Points. At. any time you .can say STOP to .stop..... listening to the current Talking-Point or " +
 	    		   "HELP to get help on the available voice commands. " + 
 	    		   "Enjoy your walking journey. " +
 	    		   "Starting to search for Talking-Points. ";
 		
-		System.out.println("Startup string: " + toSpeak);
+		
 	
 	    /* Set up for recognizer */
 	    url = Speaker.class.getResource("talkingpoints-config.xml");
@@ -82,10 +82,12 @@ public class Speaker {
         	System.err.println("Problem creating Recognizer: " + e);
         	e.printStackTrace();
         }
-	    System.out.println("Done loading!");
+	    
 	    dbVoice.allocate();
+	    System.out.println("Done loading!");
 	    inSession = false;
-	    dbVoice.speak(toSpeak);
+	    System.out.println("Startup string: " + toSpeak);
+	    speakWithPauses(toSpeak);
 	}
 	public void addPOI(POIdata incoming)
 	{
@@ -106,6 +108,24 @@ public class Speaker {
 			locationCache.pop();
 		if (!inSession) {
 		   grammarCreated = false;
+		}
+	}
+	
+	public void speakWithPauses(String speakString)
+	{
+		String [] speakArray;
+		speakArray = speakString.split(".");
+		for(int x = 0; x < speakArray.length; ++x)
+		{
+			dbVoice.speak(speakArray[x]);
+			try 
+			{
+				Thread.sleep(200);
+			}
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}	
 		}
 	}
 	
@@ -189,7 +209,7 @@ public class Speaker {
 			menuStatus = ENCOUNTER; 
 			toSpeak = currentLocation.name() + " " + currentLocation.location_type() + ". For more information say MORE.";
 			System.out.println("toSpeak: " + toSpeak);
-			dbVoice.speak(toSpeak);
+			speakWithPauses(toSpeak);
 			if (listen)
 			{
 				listener();
@@ -234,7 +254,7 @@ public class Speaker {
 		case MORE_INFO:  //menu
 			if (result.toLowerCase().compareTo("repeat") == 0)
 			{
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				return true; 
 			}
 			else if(result.toLowerCase().compareTo("back") == 0)
@@ -248,7 +268,7 @@ public class Speaker {
 				System.out.println("Welcome home");
 				toSpeak = "Stopped listening to " + currentLocation.name(); 
 				toSpeak += "Searching for new Talking-Points.";
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				System.out.println(toSpeak);
 				return false;
 			}
@@ -270,7 +290,7 @@ public class Speaker {
 				}
 				else
 					toSpeak = "This location has no extra info.";
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				System.out.println(toSpeak);
 				
 			}
@@ -299,13 +319,13 @@ public class Speaker {
 						POIcomment comment = (POIcomment) individualComments.nextElement();
 						toSpeak = "User " + comment.getUsername() + " said " + comment.getCommentText() + " " + comment.getTimestamp();
 						System.out.println("toSpeak: " + toSpeak);
-		
-						dbVoice.speak(toSpeak);
+						speakWithPauses(toSpeak);
+						
 					}
 				}
 				else {
 					String error = "I'm sorry, there is no " + result.toLowerCase() + "available for " + currentLocation.name();
-					dbVoice.speak(error);
+					speakWithPauses(toSpeak);
 				}
 				System.out.println(toSpeak);
 				return true;
@@ -333,7 +353,7 @@ public class Speaker {
 					toSpeak += ".";
 				}
 			   toSpeak += "MORE, STOP, HELP, or REPEAT.";
-			   dbVoice.speak(toSpeak);
+			   speakWithPauses(toSpeak);
 			   System.out.println(toSpeak);
 			   return true;
 			}
@@ -358,7 +378,7 @@ public class Speaker {
 				}
 				
 				System.out.println("toSpeak: " + toSpeak);
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				return true;
 			}
 			else if(result.toLowerCase().compareTo("back") == 0 || result.toLowerCase().compareTo("home") == 0 
@@ -366,8 +386,8 @@ public class Speaker {
 			{
 				menuStatus = HOME;
 				toSpeak = "Stopped listening to " + currentLocation.name();
-				toSpeak += "Searching for new Talking-Points.";
-				dbVoice.speak(toSpeak);
+				toSpeak += " Searching for new Talking-Points.";
+				speakWithPauses(toSpeak);
 				return false;
 			}
 			else
@@ -379,7 +399,7 @@ public class Speaker {
 					System.out.println("Location has key!");
 					toSpeak = table.get(result.toLowerCase());
 					System.out.println("toSpeak: " + toSpeak);
-					dbVoice.speak(toSpeak);
+					speakWithPauses(toSpeak);
 				}
 				else if (result.toLowerCase().compareTo("comments") == 0)
 				{
@@ -396,12 +416,12 @@ public class Speaker {
 						toSpeak = "User " + comment.getUsername() + " said " + comment.getCommentText() + " " + comment.getTimestamp();
 						System.out.println("toSpeak: " + toSpeak);
 		
-						dbVoice.speak(toSpeak);
+						speakWithPauses(toSpeak);
 					}
 				}
 				else {
 					String error = "I'm sorry, there is no " + result.toLowerCase() + "available for " + currentLocation.name();
-					dbVoice.speak(error);
+					speakWithPauses(toSpeak);
 				}
 				return true;
 			}
@@ -412,30 +432,30 @@ public class Speaker {
 				menuStatus = HOME;
 				toSpeak = "Stopped listening to " + currentLocation.name();
 				toSpeak += "Searching for new Talking-Points.";
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				return false;
 			}
 			else if (result.toLowerCase().compareTo("start") == 0)
 			{
 				toSpeak = "Starking talking points. Enjoy your walking journey.";
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				return true;
 			}
 			else if(result.toLowerCase().compareTo("repeat") == 0)
 			{
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				return true;
 			}
 			else if(result.toLowerCase().compareTo("help") == 0)
 			{
 				toSpeak = "You can say Start to start searching or stop to stop searching.";
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 				return true;
 			}
 			else
 			{
 				toSpeak = "I'm sorry that command is not available at this point. Please try again.";
-				dbVoice.speak(toSpeak);
+				speakWithPauses(toSpeak);
 			}
 			break;
 		}
