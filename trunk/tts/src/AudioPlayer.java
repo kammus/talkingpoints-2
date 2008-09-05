@@ -1,3 +1,5 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
@@ -10,7 +12,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 // Takes the filename of a sound file to play, and starts playing it when the inherited 
 // .start() method is invoked.  Playback can be halted by calling the stopPlayback() method.
-public class AudioPlayer extends Thread {
+public class AudioPlayer implements ActionListener {
 
 	private String filename;
 	
@@ -18,11 +20,17 @@ public class AudioPlayer extends Thread {
 	private boolean loopSound;
 	private boolean playing;
 	
+	private audioThread ourPlayer;
+	
 	// Default constructor
 	public AudioPlayer(String fileToPlay, boolean loop) {
 		filename = fileToPlay;
 		loopSound = loop;
 		playing = false;
+	}
+	
+	public void startPlayback() {
+		ourPlayer = new audioThread();
 	}
 	
 	public void stopPlayback() {
@@ -34,78 +42,100 @@ public class AudioPlayer extends Thread {
 		return playing;
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Thread#run()
-	 */
+	
 	@Override
-	public void run() {
-		File soundFile = new File(filename);
-		if(!soundFile.exists()) {
-			System.out.println("Sound file not found: " + filename);
-			return;
+	public void actionPerformed(ActionEvent actEv) {
+		String action = actEv.getActionCommand();
+		
+		if(action.compareTo("play") == 0) {
+			
 		}
 		
-		keepGoing = true;
-		
-		AudioInputStream audioInputStream = null;
-		try {
-			audioInputStream = AudioSystem.getAudioInputStream(soundFile);
-		} catch(UnsupportedAudioFileException e) {
-			e.printStackTrace();
-			return;
-		} catch(IOException e) {
-			e.printStackTrace();
-			return;
+		if(action.compareTo("stop") == 0) {
+			
 		}
-		
-		AudioFormat audioFormat = audioInputStream.getFormat();
-		SourceDataLine audioLine = null;
-		DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-		
-		try {
-			audioLine = (SourceDataLine) AudioSystem.getLine(info);
-			audioLine.open();
-		} catch (LineUnavailableException e) {
-			e.printStackTrace();
-			return;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-		
-		audioLine.start();
-		
-		int bytesPerLoop = audioFormat.getFrameSize() * 6;
-		int numBytesRead = 0;
-		byte [] abData = new byte[bytesPerLoop];
-		playing = true;		
-		
-		try {
-			while((numBytesRead != -1) && keepGoing) {
-				numBytesRead = audioInputStream.read(abData, 0, abData.length);
-				if(numBytesRead >= 0)
-					audioLine.write(abData, 0, abData.length);
-				if((numBytesRead == -1) && loopSound) {
-					audioInputStream.close();
-					try {
-						audioInputStream = AudioSystem.getAudioInputStream(soundFile);
-					} catch (UnsupportedAudioFileException e) {
-						e.printStackTrace();
-						return;
-					}
-					numBytesRead = 0;
-				}
-					
-			}
-		} catch(IOException e) {
-			e.printStackTrace();
-			return;
-		} finally {
-			audioLine.drain();
-			audioLine.close();
-		}
-		
 		
 	}
+
+
+
+	class audioThread implements Runnable {
+			
+		audioThread() {
+			Thread ourThread = new Thread(this);
+			ourThread.start();
+		}
+		
+		public void run() {
+				
+			File soundFile = new File(filename);
+				
+			if(!soundFile.exists()) {
+				System.out.println("Sound file not found: " + filename);
+				return;
+			}
+			
+			keepGoing = true;
+	
+			AudioInputStream audioInputStream = null;
+			try {
+				audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+			} catch(UnsupportedAudioFileException e) {
+				e.printStackTrace();
+				return;
+			} catch(IOException e) {
+				e.printStackTrace();
+				return;
+			}
+		
+			AudioFormat audioFormat = audioInputStream.getFormat();
+			SourceDataLine audioLine = null;
+			DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+		
+			try {
+				audioLine = (SourceDataLine) AudioSystem.getLine(info);
+				audioLine.open();
+			} catch (LineUnavailableException e) {
+				e.printStackTrace();
+				return;	
+			} catch (Exception e) {
+				e.printStackTrace();	
+				return;
+			}
+		
+			audioLine.start();
+		
+			int bytesPerLoop = audioFormat.getFrameSize() * 6;
+			int numBytesRead = 0;
+			byte [] abData = new byte[bytesPerLoop];
+			playing = true;		
+		
+			try {
+				while((numBytesRead != -1) && keepGoing) {
+					numBytesRead = audioInputStream.read(abData, 0, abData.length);
+					if(numBytesRead >= 0)
+						audioLine.write(abData, 0, abData.length);
+					if((numBytesRead == -1) && loopSound) {
+						audioInputStream.close();
+						try {
+							audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+						} catch (UnsupportedAudioFileException e) {
+							e.printStackTrace();
+							return;
+						}
+						numBytesRead = 0;
+					}
+					
+				}
+			} catch(IOException e) {
+				e.printStackTrace();
+				return;
+			} finally {
+				audioLine.drain();
+				audioLine.close();
+			}
+		} // end run()	
+		
+	} // End AudioThread()
 	
 }
