@@ -47,12 +47,12 @@ public class AudioPlayer implements ActionListener {
 	public void actionPerformed(ActionEvent actEv) {
 		String action = actEv.getActionCommand();
 		
-		if(action.compareTo("play") == 0) {
-			
+		if(action.compareTo("PLAY") == 0) {
+			this.startPlayback();
 		}
 		
-		if(action.compareTo("stop") == 0) {
-			
+		if(action.compareTo("STOP") == 0) {
+			this.stopPlayback();
 		}
 		
 	}
@@ -105,7 +105,7 @@ public class AudioPlayer implements ActionListener {
 		
 			audioLine.start();
 		
-			int bytesPerLoop = audioFormat.getFrameSize() * 6;
+			int bytesPerLoop = audioFormat.getFrameSize() * 3;
 			int numBytesRead = 0;
 			byte [] abData = new byte[bytesPerLoop];
 			playing = true;		

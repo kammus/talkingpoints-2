@@ -8,18 +8,18 @@ public class ClientMessageHandler
 {
 	 
 	ClientDataModel clientDataModel;
-	//LocationMinder locMinder;
+	LocationMinder locMinder;
 	
 	public ClientMessageHandler(int option){
-		//locMinder = new LocationMinder(60000);
-		//locMinder.start();
+		locMinder = new LocationMinder(180000);
+		locMinder.start();
 		clientDataModel = new ClientDataModel(option);  //changing 
 	}
 	
 	public void tagWasRead(String macAddress) throws Exception
 	{
 		
-		//if(!locMinder.wasRecentlyEncountered(macAddress)) {
+		if(!locMinder.wasRecentlyEncountered(macAddress)) {
 		
 			URL url = new URL("http://grocs.dmc.dc.umich.edu:3000/locations/show_by_bluetooth_mac/");
 		
@@ -38,9 +38,6 @@ public class ClientMessageHandler
 			conn.setRequestProperty("Content-Type","text/xml");
 			//conn.connect();
 		
-			// TODO: Can we figure out if we encountered a valid talking point here, before the 
-			// server response is parsed?
-		
 			InputStream in = conn.getInputStream(); // Inputstream for xml data
 		
 			System.out.println("MacAddress was read: " + macAddress);
@@ -50,13 +47,17 @@ public class ClientMessageHandler
 				return;
 			}
 			else {
-			//	locMinder.insertItem(macAddress);
+				locMinder.insertItem(macAddress);
 				conn.disconnect();
 			}
-		
 		}
-	/*	else {
+		else {
 			System.out.println("Location is in recently-seen list.  Ignoring.");
-		}*/
+		}
+	}
+	
+	public void passListener(AudioPlayer audio) {
+		clientDataModel.addActionListener(audio);
+	}
 	
 }	

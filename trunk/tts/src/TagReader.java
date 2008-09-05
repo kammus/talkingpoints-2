@@ -33,8 +33,8 @@ public class TagReader implements DiscoveryListener{
 	// constructor with ClientMessageHandler
 	public TagReader(ClientMessageHandler cmh) {
 		clientMessageHandler = cmh;
-		player = new AudioPlayer("sounds/timesup.wav", false);
-	}
+		player = new AudioPlayer("sounds/timesup.wav", false); //  This is just to make sure we don't get a null pointer exception
+	}														   //  when calling AudioPlayer.isPlaying()
 	
 	// Temporarily, making fakeTag
 	public void generateFakeEvent() {
@@ -46,12 +46,7 @@ public class TagReader implements DiscoveryListener{
 	private void notifyMacAddressWasRead(String MacAddress) {
 		try{
 			System.out.println(MacAddress);
-		player.stopPlayback();
-		// TODO: currently, the audioplayer will stop the looping wav and play the "point discovered" wav
-		// regardless of whether the detected bluetooth device is a valid talking point or not.
-		AudioPlayer altplayer = new AudioPlayer("sounds/timesup.wav", false);
-		altplayer.startPlayback();
-			
+	
 		clientMessageHandler.tagWasRead(MacAddress);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -69,6 +64,7 @@ public class TagReader implements DiscoveryListener{
 		// Starting playing searching sound
 		if(!player.isPlaying()) {
 			player = new AudioPlayer("sounds/jeopardy.wav", true);
+			clientMessageHandler.passListener(player);
 			player.startPlayback();
 		}
 		agent.startInquiry(DiscoveryAgent.GIAC, this);
