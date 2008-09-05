@@ -16,8 +16,9 @@ public class TagReader implements DiscoveryListener{
 	
 	private static Vector<RemoteDevice> vecDevices=new Vector<RemoteDevice>();
 	private static String macAddress;
-	
 
+	private AudioPlayer player;
+	
 	// fakeMacAdress list
 	String fakeMacAddress[] = new String [] { "001C623FA0B8" , "0123456789cd", "1234567890ef"};
 	//The Macaddress of Espresso Royale, TCF, Underground Printing in order
@@ -31,6 +32,7 @@ public class TagReader implements DiscoveryListener{
 	// constructor with ClientMessageHandler
 	public TagReader(ClientMessageHandler cmh) {
 		clientMessageHandler = cmh;
+		player = new AudioPlayer("sounds/timesup.wav", false);
 	}
 	
 	// Temporarily, making fakeTag
@@ -43,6 +45,11 @@ public class TagReader implements DiscoveryListener{
 	private void notifyMacAddressWasRead(String MacAddress) {
 		try{
 			System.out.println(MacAddress);
+		player.stopPlayback();
+		// TODO: currently, the audioplayer will stop the looping wav and play the "point discovered" wav
+		// regardless of whether the detected bluetooth device is a valid talking point or not.
+		AudioPlayer altplayer = new AudioPlayer("sounds/timesup.wav", false);
+		altplayer.start();
 			
 		clientMessageHandler.tagWasRead(MacAddress);
 		}catch(Exception e){
@@ -58,6 +65,11 @@ public class TagReader implements DiscoveryListener{
 		DiscoveryAgent agent = localDevice.getDiscoveryAgent();
 	
 		System.out.println("Starting device inquiry...");
+		// Starting playing searching sound
+		if(!player.isPlaying()) {
+			player = new AudioPlayer("sounds/jeopardy.wav", true);
+			player.start();
+		}
 		agent.startInquiry(DiscoveryAgent.GIAC, this);
 		
 		try {
