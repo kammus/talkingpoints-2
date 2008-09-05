@@ -256,7 +256,8 @@ public class ClientDataModel{
             
           }
            
-        public void parseXML(InputStream in) {
+        // Returns true if the server gave us valid talking point information, false if not.
+        public boolean parseXML(InputStream in) {
             String name = null, type = null, description= null, country= null, postalCode= null;
             String street= null, phone= null, url= null, state= null, city= null, mac= null;
             String tpid = null, wifiMac = null, rfid = null, latitude = null, longitude = null;
@@ -278,7 +279,7 @@ public class ClientDataModel{
                  {
                 	 System.out.println("THIS IS NOT A VALID TALKING POINT");
                 	 in.close();
-                	 return;
+                	 return false;
                  }
                  
                  /*
@@ -413,6 +414,8 @@ public class ClientDataModel{
                  }catch (Throwable t) {
                          t.printStackTrace ();
                  }	
+                 
+                 return true;
         }
         
         public ClientDataModel() {
