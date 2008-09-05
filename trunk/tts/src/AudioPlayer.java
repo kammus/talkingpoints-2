@@ -18,8 +18,6 @@ public class AudioPlayer extends Thread {
 	private boolean loopSound;
 	private boolean playing;
 	
-	private final int EXTERNAL_BUFFER_SIZE = 6144;
-	
 	// Default constructor
 	public AudioPlayer(String fileToPlay, boolean loop) {
 		filename = fileToPlay;
