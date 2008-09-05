@@ -1,5 +1,10 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.InputStream;
 import java.util.Hashtable;
+
+import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -203,7 +208,7 @@ class SpeechThread extends Thread
    }
 }
 
-public class ClientDataModel{
+public class ClientDataModel extends AbstractButton {
 		
         long tpid;
         boolean matched = false;
@@ -213,6 +218,8 @@ public class ClientDataModel{
         private POIcomment POIcomment;
         TalkingPointsGUI ourGUI;
         Speaker locationSpeaker;
+        AudioPlayer ourPlayer;
+        
         public ClientDataModel (int option)
         {
         	sighted = false;
@@ -232,7 +239,10 @@ public class ClientDataModel{
         		sighted = true;
         		blind = true;
         	}
-        		
+        	
+        	this.setVisible(false);
+        	ourPlayer = new AudioPlayer("sounds/timesup.wav", false);
+        	
         	System.out.println("sighted: " + sighted + " blind: " + blind);
         		
         }
@@ -282,6 +292,13 @@ public class ClientDataModel{
                 	 return false;
                  }
                  
+                 // Stop the searching sound, and play the "POI discovered" sound.
+                 fireActionPerformed(new ActionEvent(this, 0, "STOP"));
+                 ActionListener [] temp = getActionListeners();
+                 for(int x = 0 ; x < temp.length ; x++)
+                	 removeActionListener(temp[x]);
+                 ourPlayer.startPlayback();
+                 
                  /*
                   * Core information Parsing
                   * First Part > always filled 
@@ -290,7 +307,7 @@ public class ClientDataModel{
                   * name
                   * description
                   */
-                
+                               
                  tpid = getString(doc, "tpid", 0); //tpid
                  name = getString(doc, "name", 0);
                  description = getString(doc, "description",0);
@@ -402,7 +419,7 @@ public class ClientDataModel{
                  {
                 	 ourGUI.addItem(data); 
                 	 SpeechThread speakThread= new SpeechThread(locationSpeaker, data);
-                    speakThread.run();
+                     speakThread.run();
                  }
                           
                  }catch (SAXParseException err) {
