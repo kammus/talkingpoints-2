@@ -114,7 +114,7 @@ public class Speaker {
 	public void speakWithPauses(String speakString)
 	{
 		String [] speakArray;
-		speakArray = speakString.split(".");
+		speakArray = speakString.split("\\.");
 		for(int x = 0; x < speakArray.length; ++x)
 		{
 			dbVoice.speak(speakArray[x]);
