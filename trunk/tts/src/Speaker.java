@@ -49,7 +49,7 @@ public class Speaker {
 	    VoiceManager voiceManager = VoiceManager.getInstance();
 	    dbVoice = voiceManager.getVoice(voiceName);
 	    /* some control over whether or not to speak here */ 
-	    toSpeak =  "Welcome to Talking Points. At. any time you .can say STOP to .stop..... listening to the current Talking-Point or " +
+	    toSpeak =  "Welcome to Talking Points. At any time you can say cancel to stop listening to the current Talking-Point or " +
 	    		   "HELP to get help on the available voice commands. " + 
 	    		   "Enjoy your walking journey. " +
 	    		   "Starting to search for Talking-Points. ";
@@ -259,11 +259,31 @@ public class Speaker {
 			}
 			else if(result.toLowerCase().compareTo("back") == 0)
 			{
-				menuStatus = ENCOUNTER;
-				createDialog(false, Integer.valueOf(0));
+				/* repeat initial more information*/
+				menuStatus = MORE_INFO;
+				toSpeak = "";
+				
+				Hashtable<String,String> table = currentLocation.getHash();
+				Hashtable<String,Object> commentTable = currentLocation.getComment(); 
+				if (table.size() == 0)
+					toSpeak ="I'm sorry. This location has no extra info.";
+				else {
+					toSpeak = currentLocation.description() + ". You can say ";
+					Enumeration<String> keys = table.keys();
+					
+					while (keys.hasMoreElements())
+						toSpeak += (", " + keys.nextElement());
+					if (commentTable.size() != 0)
+						toSpeak += ", comments";
+					toSpeak += ".";
+				}
+				
+				System.out.println("toSpeak: " + toSpeak);
+				speakWithPauses(toSpeak);
 				return true;
+
 			}
-			else if(result.toLowerCase().compareTo("stop") == 0 || result.toLowerCase().compareTo("skip") == 0)
+			else if(result.toLowerCase().compareTo("cancel") == 0)
 			{
 				menuStatus = HOME;
 				System.out.println("Welcome home");
@@ -293,7 +313,7 @@ public class Speaker {
 					toSpeak = "This location has no extra info.";
 				speakWithPauses(toSpeak);
 				System.out.println(toSpeak);
-				
+				return true;
 			}
 			else 
 			{
@@ -355,7 +375,7 @@ public class Speaker {
 				}
 			   if (table.size() != 0)
 				   toSpeak += ", ";
-			   toSpeak += " MORE, STOP, HELP, or REPEAT.";
+			   toSpeak += " MORE, cancel, HELP, or REPEAT.";
 			   speakWithPauses(toSpeak);
 			   System.out.println(toSpeak);
 			   return true;
@@ -385,7 +405,7 @@ public class Speaker {
 				return true;
 			}
 			else if(result.toLowerCase().compareTo("back") == 0 || result.toLowerCase().compareTo("home") == 0 
-					|| result.toLowerCase().compareTo("skip") == 0 || result.toLowerCase().compareTo("stop") == 0)
+					 || result.toLowerCase().compareTo("cancel") == 0)
 			{
 				menuStatus = HOME;
 				System.out.println("You said: " + result.toLowerCase());
@@ -431,7 +451,7 @@ public class Speaker {
 			}
 			break;
 		case HOME:
-			if (result.toLowerCase().compareTo("stop") == 0)
+			if (result.toLowerCase().compareTo("cancel") == 0)
 			{
 				menuStatus = HOME;
 				toSpeak = "Stopped listening to " + currentLocation.name();
@@ -452,7 +472,7 @@ public class Speaker {
 			}
 			else if(result.toLowerCase().compareTo("help") == 0)
 			{
-				toSpeak = "You can say Start to start searching or stop to stop searching.";
+				toSpeak = "You can say Start to start searching or cancel to stop searching.";
 				speakWithPauses(toSpeak);
 				return true;
 			}
