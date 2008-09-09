@@ -261,6 +261,7 @@ public class Speaker {
 			{
 				menuStatus = ENCOUNTER;
 				createDialog(false, Integer.valueOf(0));
+				return true;
 			}
 			else if(result.toLowerCase().compareTo("stop") == 0 || result.toLowerCase().compareTo("skip") == 0)
 			{
@@ -281,7 +282,7 @@ public class Speaker {
 				if (table.size() != 0)
 				{
 					Enumeration<String> keys = table.keys();
-					
+					toSpeak += ( keys.nextElement());
 					while (keys.hasMoreElements())
 						toSpeak += (", " + keys.nextElement());
 					if (commentTable.size() != 0)
@@ -345,14 +346,16 @@ public class Speaker {
 				if (table.size() != 0)
 				{
 					Enumeration<String> keys = table.keys();
-					
+					toSpeak += (keys.nextElement());
 					while (keys.hasMoreElements())
 						toSpeak += (", " + keys.nextElement());
 					if (commentTable.size() != 0)
 						toSpeak += ", comments";
-					toSpeak += ".";
+					
 				}
-			   toSpeak += "MORE, STOP, HELP, or REPEAT.";
+			   if (table.size() != 0)
+				   toSpeak += ", ";
+			   toSpeak += " MORE, STOP, HELP, or REPEAT.";
 			   speakWithPauses(toSpeak);
 			   System.out.println(toSpeak);
 			   return true;
@@ -385,6 +388,7 @@ public class Speaker {
 					|| result.toLowerCase().compareTo("skip") == 0 || result.toLowerCase().compareTo("stop") == 0)
 			{
 				menuStatus = HOME;
+				System.out.println("You said: " + result.toLowerCase());
 				toSpeak = "Stopped listening to " + currentLocation.name();
 				toSpeak += " Searching for new Talking-Points.";
 				speakWithPauses(toSpeak);
