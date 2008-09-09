@@ -6,7 +6,7 @@
 
 grammar commands;
 
-public <stop> = (Stop);
+public <stop> = (Cancel);
 public <repeat> = (Repeat);
 public <back> = (Back);
 public <more> = (More);
