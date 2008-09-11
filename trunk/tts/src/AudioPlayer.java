@@ -47,7 +47,6 @@ public class AudioPlayer implements ActionListener {
 	}
 	
 	
-	@Override
 	public void actionPerformed(ActionEvent actEv) {
 		String action = actEv.getActionCommand();
 		
