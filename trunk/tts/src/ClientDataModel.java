@@ -241,7 +241,8 @@ public class ClientDataModel extends AbstractButton {
         	}
         	
         	this.setVisible(false);
-        	ourPlayer = new AudioPlayer("sounds/timesup.wav", false, 0);
+        	
+        	ourPlayer = new AudioPlayer("sounds/timesup.wav", false, 0.0F);
         	
         	System.out.println("sighted: " + sighted + " blind: " + blind);
         		
@@ -298,6 +299,7 @@ public class ClientDataModel extends AbstractButton {
                  for(int x = 0 ; x < temp.length ; x++)
                 	 removeActionListener(temp[x]);
                  ourPlayer.startPlayback();
+                 Thread.sleep(500);
                  
                  /*
                   * Core information Parsing
