@@ -33,7 +33,7 @@ public class TagReader implements DiscoveryListener{
 	// constructor with ClientMessageHandler
 	public TagReader(ClientMessageHandler cmh) {
 		clientMessageHandler = cmh;
-		player = new AudioPlayer("sounds/timesup.wav", false); //  This is just to make sure we don't get a null pointer exception
+		player = new AudioPlayer("sounds/timesup.wav", false, 0); //  This is just to make sure we don't get a null pointer exception
 	}														   //  when calling AudioPlayer.isPlaying()
 	
 	// Temporarily, making fakeTag
@@ -63,7 +63,7 @@ public class TagReader implements DiscoveryListener{
 		System.out.println("Starting device inquiry...");
 		// Starting playing searching sound
 		if(!player.isPlaying()) {
-			player = new AudioPlayer("sounds/jeopardy.wav", true);
+			player = new AudioPlayer("sounds/jeopardy.wav", true, -4.0F);
 			clientMessageHandler.passListener(player);
 			player.startPlayback();
 		}

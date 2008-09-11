@@ -6,6 +6,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -21,12 +22,15 @@ public class AudioPlayer implements ActionListener {
 	private boolean playing;
 	
 	private audioThread ourPlayer;
+	float gain;
 	
 	// Default constructor
-	public AudioPlayer(String fileToPlay, boolean loop) {
+	public AudioPlayer(String fileToPlay, boolean loop, float newGain) {
 		filename = fileToPlay;
 		loopSound = loop;
 		playing = false;
+		if(newGain < 6.0206);
+			gain = newGain;
 	}
 	
 	public void startPlayback() {
@@ -103,6 +107,10 @@ public class AudioPlayer implements ActionListener {
 				return;
 			}
 		
+			// Set volume
+			FloatControl gainControl = (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
+			gainControl.setValue(gain); 
+			
 			audioLine.start();
 		
 			int bytesPerLoop = audioFormat.getFrameSize() * 3;
