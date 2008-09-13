@@ -7,7 +7,7 @@ import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
-//import javax.bluetooth.*;
+import com.intel.bluetooth.BlueCoveImpl;
 
 public class TagReader implements DiscoveryListener{
 	 
@@ -57,7 +57,7 @@ public class TagReader implements DiscoveryListener{
 	// bluetoothSearch function
 	public void initBluetoothSearch() throws IOException{
 		LocalDevice localDevice = LocalDevice.getLocalDevice();
-		
+		BlueCoveImpl.setConfigProperty("bluecove.inquiry.duration", "5"); //set bluetooth inquiry duration
 		DiscoveryAgent agent = localDevice.getDiscoveryAgent();
 	
 		System.out.println("Starting device inquiry...");
@@ -79,35 +79,17 @@ public class TagReader implements DiscoveryListener{
 			e.printStackTrace();
 		}
 		
-		int deviceCount = vecDevices.size();
-		if(deviceCount <= 0){
-			System.out.println("No Devices Found .");
-		}
-		else
-		{
-			//System.out.println("Bluetooth Devices: ");
-			macAddress = vecDevices.elementAt(1).toString(); // get string macAddress
-			notifyMacAddressWasRead(macAddress);
-			//System.out.println(macAddress); // print macAddress
-		}
 		initBluetoothSearch();
-		 
-		 
-		
+
 	}
 	
 	
 	public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-
 		System.out.println("Device discovered: "+btDevice.getBluetoothAddress());
-		//macAddress = btDevice.getBluetoothAddress()
-
-			macAddress = btDevice.getBluetoothAddress(); // get string macAddress
-			notifyMacAddressWasRead(macAddress);
-
-			//notifyMacAddressWasRead(macAddress);
-
+		macAddress = btDevice.getBluetoothAddress(); // get string macAddress
+		notifyMacAddressWasRead(macAddress);
 	}
+	
 	public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
 	}
 	
