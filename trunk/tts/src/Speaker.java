@@ -298,7 +298,7 @@ public class Speaker {
 				System.out.println("In the help menu ");
 				Hashtable<String,String> table = currentLocation.getHash();
 				Hashtable<String,Object> commentTable = currentLocation.getComment();
-				toSpeak = "You can say: ";
+				toSpeak = "Help menu. You can say: ";
 				if (table.size() != 0)
 				{
 					Enumeration<String> keys = table.keys();
@@ -335,10 +335,12 @@ public class Speaker {
 						end = 2;
 					Hashtable<String, Object> comments = currentLocation.getComment();
 					Enumeration<Object> individualComments = comments.elements();
+					toSpeak = "Comments on " + currentLocation.name() + ".";
+					speakWithPauses(toSpeak);
 					for (int x = 0; x < end; ++x)
 					{
 						POIcomment comment = (POIcomment) individualComments.nextElement();
-						toSpeak = "User " + comment.getUsername() + " said " + comment.getCommentText() + " " + comment.getTimestamp();
+						toSpeak = "User " + comment.getUsername() + " said " + comment.getTimestamp() + "." + comment.getCommentText();
 						System.out.println("toSpeak: " + toSpeak);
 						speakWithPauses(toSpeak);
 						
@@ -362,7 +364,7 @@ public class Speaker {
 			{
 				Hashtable<String,String> table = currentLocation.getHash();
 				Hashtable<String,Object> commentTable = currentLocation.getComment();
-				toSpeak = "You can say: ";
+				toSpeak = "Help Menu. You can say: ";
 				if (table.size() != 0)
 				{
 					Enumeration<String> keys = table.keys();
