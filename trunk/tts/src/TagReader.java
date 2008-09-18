@@ -63,7 +63,7 @@ public class TagReader implements DiscoveryListener{
 		System.out.println("Starting device inquiry...");
 		// Starting playing searching sound
 		if(!player.isPlaying()) {
-			player = new AudioPlayer("sounds/jeopardy.wav", true, -4.0F);
+			player = new AudioPlayer("sounds/jeopardy.wav", true, -12.0F);
 			clientMessageHandler.passListener(player);
 			player.startPlayback();
 		}
