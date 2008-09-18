@@ -11,7 +11,7 @@ public class ClientMessageHandler
 	LocationMinder locMinder;
 	
 	public ClientMessageHandler(int option){
-		locMinder = new LocationMinder(180000);
+		locMinder = new LocationMinder(60000);
 		locMinder.start();
 		clientDataModel = new ClientDataModel(option);  //changing 
 	}
