@@ -390,7 +390,7 @@ public class ClientDataModel extends AbstractButton {
                 				}	
                 			}
 
-                			POIcomment = new POIcomment(comment_tag[1], comment_tag[3], comment_tag[5], comment_tag[7], comment_tag[9]);
+                			POIcomment = new POIcomment(comment_tag[1], comment_tag[3], comment_tag[5], comment_tag[11], comment_tag[9]);
                 			comments.put(comment_tag[1], POIcomment);
                 		}
                 	 }
