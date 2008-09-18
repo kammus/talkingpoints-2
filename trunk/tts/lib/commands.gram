@@ -11,7 +11,7 @@ public <repeat> = (Repeat);
 public <back> = (Back);
 public <more> = (More);
 public <help> = (Help);
-public <help>= (Help);
+
 /*
 public <comments> = (Comments);
 public <specials> = (Specials);
