@@ -1,0 +1,37 @@
+#summary How to get talking points source work
+
+= Introduction =
+
+Talking Points is freely accessible source. It is programmed based on JAVA SE, JRE 1.6. also several open sources, BlueCove and FreeTTS, CMUSphinx. This wiki page explains how to get program sources work. 
+
+
+= Details =
+
+*Fastest way*
+: Using svn, checkout our recent version, currently Ver 1.0 (Sept 20, 2008), following this command:
+
+svn checkout http://talkingpoints-2.googlecode.com/svn/tags/release-1.0 tts-read-only
+
+: Main class is located at 'TagReaderTest.Java'.
+
+*Without SVN*
+: For whatever reason, if you can't get SVN work, you can go around using this way.
+
+  # Download talkingpoints-1.0-sources.tar.gz
+  # Unpack it, and unpack src.tar.gz as well
+  # Create lib folder
+
+Now your root folder should look like this
+{{{
+* tts - src      // every java file should be located here
+      - lib      // every supporting library should be located here
+      - sounds   // currently, we are using two sounds, 
+}}}
+4) Download libraries from the following links
+
+sphinx4.jar 
+WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
+jsapi.jar
+BareBonesBrowserLaunch.jar
+freetts.jar
+bluecove-2.0.3.jar http://code.google.com/p/bluecove/
