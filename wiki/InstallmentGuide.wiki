@@ -10,7 +10,7 @@ Talking Points is freely accessible source. It is programmed based on JAVA SE, J
 *Fastest way*
 : Using svn, checkout our recent version, currently Ver 1.0 (Sept 20, 2008), following this command:
 
-svn checkout http://talkingpoints-2.googlecode.com/svn/tags/release-1.0 tts-read-only
+_svn checkout http://talkingpoints-2.googlecode.com/svn/tags/release-1.0 tts-read-only_
 
 : Main class is located at 'TagReaderTest.Java'.
 
@@ -29,9 +29,9 @@ Now your root folder should look like this
 }}}
 4) Download libraries from the following links
 
-sphinx4.jar 
-WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
-jsapi.jar
-BareBonesBrowserLaunch.jar
-freetts.jar
-bluecove-2.0.3.jar http://code.google.com/p/bluecove/
+  * sphinx4.jar 
+  * WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
+  * jsapi.jar
+  * BareBonesBrowserLaunch.jar
+  * freetts.jar
+  * bluecove-2.0.3.jar http://code.google.com/p/bluecove/
