@@ -8,7 +8,7 @@ Talking Points is freely accessible source. It is programmed based on JAVA SE, J
 
 = Details =
 
-*Fastest way*
+*Easiest & Fastest way*
 : Using svn, checkout our recent version, currently Ver 1.0 (Sept 20, 2008), following this command:
 
 _svn checkout http://talkingpoints-2.googlecode.com/svn/tags/release-1.0 tts-read-only_
@@ -36,3 +36,5 @@ Now your root folder should look like this
   * BareBonesBrowserLaunch.jar
   * freetts.jar
   * bluecove-2.0.3.jar http://code.google.com/p/bluecove/
+
+*If you have any question, please send email at talkingpoints@umich.edu*
