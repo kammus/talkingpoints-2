@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<location xml:lang="en">
+	<name>Undergroup Printing</name>
+	<type>T-Shirt Printing</type>
+	<description>Retailer of custom shirts &amp; other apparel</description>
+	
+	<tpid>125</tpid>
+	<bluetoothMac>01:23:45:67:89:ab</bluetoothMac>
+	<wifiMac>01:23:45:67:89:ab</wifiMac>
+	<rfid></rfid>
+	<gps>
+		<lat>98.7654321</lat>
+    	<lng>12.3456789</lng>
+    </gps>
+	
+	<address>
+		<street>1103 South University Street</street>
+		<city>Ann Arbor</city>
+		<state>MI</state>
+		<postalCode>48104</postalCode>
+		<country>US</country>
+	</address>
+	
+	<url>http://www.undergroundshirts.com/</url>
+	<email>ugpaa@undergroundshirts.com</email>
+	<phone>734-929-6648</phone>
+	<fax>734-929-6627</fax>
+	
+	<hours>
+		<mon>10:00-19:00</mon>
+		<tue>10:00-19:00</tue>
+		<wed>10:00-19:00</wed>
+		<thu>10:00-19:00</thu>
+		<fri>10:00-19:00</fri>
+		<sat>By Appointment</sat>
+		<sun>By Appointment</sun>
+	</hours>
+</location>
