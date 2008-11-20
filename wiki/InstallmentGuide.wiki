@@ -11,6 +11,8 @@ Talking Points is freely accessible source. It is programmed based on JAVA SE, J
 *Easiest & Fastest way*
 : Using svn, checkout our recent version, currently Ver 1.0 (Sept 20, 2008), following this command:
 
+[Get Talking-Points running using Eclipse]
+
 _svn checkout http://talkingpoints-2.googlecode.com/svn/tags/release-1.0 tts-read-only_
 
 : Main class is located at 'TagReaderTest.Java'.
