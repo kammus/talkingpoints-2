@@ -2,6 +2,8 @@
 
 = Get Eclipse =
 
+*Prerequisite* is a recent version of Sun's [http://java.com Java Runtime Environment] (JRE)  
+
 First you need to download Eclipse (it is a very popular open source Integrated Development Environment written in Java).
 
 You basically just need some version of Eclipse that includes all the necessary tools to develop and run Java code.  This is a good choice:
@@ -15,17 +17,17 @@ Note:  Eclipse doesn't have to be "installed", you just unzip it and run eclipse
 
 Subclipse is a module for Eclipse that allows you to use the Subversion (SVN) code repostoty.
 
-# Start Eclipse (exlipse.exe)
-# Pick a location for your workspace
-# Skip the intro to the workbench
-# Go to Help > Sofware Updates ..
-# Go to the Available Software tab
-# Go to 'Add Site..' and enter this URL: http://subclipse.tigris.org/update_1.4.x
-# Expand the subclise entry you created
-# Check 'JavaHL Adapter' and 'Subclipse' and click 'Install...'
-# wait :)
-# Click 'Next', 'Accept agreement', 'Finish'
-# Restart Eclipse
+  # Start Eclipse (exlipse.exe)
+  # Pick a location for your workspace
+  # Skip the intro to the workbench
+  # Go to Help > Sofware Updates ..
+  # Go to the Available Software tab
+  # Go to 'Add Site..' and enter this URL: http://subclipse.tigris.org/update_1.4.x
+  # Expand the subclise entry you created
+  # Check 'JavaHL Adapter' and 'Subclipse' and click 'Install...'
+  # wait :)
+  # Click 'Next', 'Accept agreement', 'Finish'
+  # Restart Eclipse
 
 If you get stuck,  you can find more documentation about installing Subclipse here: http://subclipse.tigris.org/install.html
 
@@ -34,22 +36,30 @@ If you get stuck,  you can find more documentation about installing Subclipse he
 
 Now you have to check out (download) the code from the code repository
 
-# Go to 'Window' > 'Open perspective' > 'Other'
-# Select 'SVN Repository Exploring'
-# Right-click in the 'SVN Repositories' area on the right and select 'New' > 'Repository location'
-# Enter this URL: http://talkingpoints-2.googlecode.com/svn/tags/release-1.0
-# Right-click on the created repository and chose 'Checkout'
-# Select 'Finish'
-# Wait until the code has been checked out
+  # Go to 'Window' > 'Open perspective' > 'Other'
+  # Select 'SVN Repository Exploring'
+  # Right-click in the 'SVN Repositories' area on the right and select 'New' > 'Repository location'
+  # Enter this URL: http://talkingpoints-2.googlecode.com/svn/tags/release-1.0
+  # Right-click on the created repository and chose 'Checkout'
+  # Select 'Finish'
+  # Wait until the code has been checked out
 
 
 = Configure the application =
 
-# Switch to the 'Java' or 'Java Browsing' perspective
-# Click on 'Run' > 'Run configurations'
-# Select 'Java Application' (double click)
-# Enter "TagReaderTest.java" as the Main class
-# Go to arguments and add the following line to the Program arguments: ""
+  # Switch to the 'Java' or 'Java Browsing' perspective
+  # Click on 'Run' > 'Run configurations'
+  # Select 'Java Application' (double click) to create a new configuration
+  # For the Main class click on 'Search..' and select the "TagReaderTest.java" class as the Main class
+  # Go to arguments tab and add the following parameters
+  # Program arguments can be either "1" (SUI only), "2" (GUI only), or "3" (SUI+GUI)
+  # The VM arguments need to be "-Xmx200m" to allocate enough memory to the VM for the speech recognition to work
+  # Apply the configuration
+
+Now you can run the application either through the 'Run' menu or by hitting 'Crtl+F11'
+
+If Bluetooth is disabled it will detect 3 virtual Bluetooth tags,  otherwise it will start searching for real Bluetooth devices.
+
 
 
 
