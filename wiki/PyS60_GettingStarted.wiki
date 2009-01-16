@@ -12,6 +12,11 @@ I found this to be useful instructions on how to install the !PyS60 emulator:
 
 http://wiki.opensource.nokia.com/projects/Installing_PyS60#Emulator_installation
 
+
+= Documentation =
+
+http://superb-east.dl.sourceforge.net/sourceforge/pys60/PythonForS60_1_4_5_doc.pdf
+
 = Books =
 
 Rapid GUI programming with Python and Qt
@@ -21,4 +26,3 @@ http://proquest.safaribooksonline.com.proxy.lib.umich.edu/9780132354189
 Learning Python
 
 http://proquest.safaribooksonline.com.proxy.lib.umich.edu/9780596513986 
-
