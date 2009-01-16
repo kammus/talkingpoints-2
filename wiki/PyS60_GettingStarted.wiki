@@ -1,0 +1,24 @@
+#summary Getting started with Python on Symbian S60
+
+= Version =
+
+We decided that we are going to develop for "S60 3rd Edition FP1".
+
+(I just saw that this does not seem to be the latest version of S60, since there are also "3rd Edition FP2" and "5th Edition" out there.  But I think 3rd FP1 is running on our N95, so we should go with that for now)
+
+= Installation =
+
+I found this to be useful instructions on how to install the !PyS60 emulator:
+
+http://wiki.opensource.nokia.com/projects/Installing_PyS60#Emulator_installation
+
+= Books =
+
+Rapid GUI programming with Python and Qt
+
+http://proquest.safaribooksonline.com.proxy.lib.umich.edu/9780132354189
+
+Learning Python
+
+http://proquest.safaribooksonline.com.proxy.lib.umich.edu/9780596513986 
+
