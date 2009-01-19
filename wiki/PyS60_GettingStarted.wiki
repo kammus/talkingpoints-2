@@ -21,14 +21,38 @@ I found this to be useful instructions on how to install the !PyS60 emulator:
 http://wiki.opensource.nokia.com/projects/Installing_PyS60#Emulator_installation
 
 
+
 == Documentation ==
 
 http://superb-east.dl.sourceforge.net/sourceforge/pys60/PythonForS60_1_4_5_doc.pdf
 
 
-== Tools & Editors ==
+
+== IDE ==
+
+You need an Eclipse based IDE to use PyDev:
+
+http://www.eclipse.org/downloads/  or
+
+http://www.aptana.com/studio/download
+
+
+Then you can install the PyDev plug-in:
 
 http://pydev.sourceforge.net/
+
+
+Once you have PyDev installed you have to make this setting for it to work with PyS60
+
+http://wiki.forum.nokia.com/index.php/Eclipse_%2B_PyDev
+
+
+You also need an Subversion client to connect to the repository.  Subclipse is a good option for that and I think Aptana already comes with it.
+
+Here is more option about connecting to the Google Code repository:
+
+http://code.google.com/p/talkingpoints-2/source/checkout
+
 
 
 == Books ==
