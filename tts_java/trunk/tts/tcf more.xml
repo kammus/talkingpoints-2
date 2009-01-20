@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<location>
+	<tpid>2</tpid>
+	
+	<accessibility>
+		The ATM is located to the left of the door, at waist height. Accessible parking available around the corner on Church Street.
+	</accessibility>
+	
+	<history>
+		This bank has a long history.
+	</history
+	
+	<comments>
+		<comment user="Studi247" user_id="x" datetime="format ?">
+			This branch of TCF is always extremely busy the first two weeks a semester begins at the university.
+		</comment>
+		<comment user="EvilUser" user_id="x" datetime="format ?">
+			All Banks are evil!
+		</comment>
+		<comment user="InterestingGal" user_id="x" datetime="format ?">
+			They have a great interest rate.
+		</comment>
+	</comments>
+	
+	<hours>
+		<mon>9:00-19:00</mon>
+		<tue>9:00-19:00</tue>
+		<wed>9:00-19:00</wed>
+		<thu>9:00-19:00</thu>
+		<fri>9:00-19:00</fri>
+		<sat>11:00-16:00</sat>
+	</hours>
+</location>
