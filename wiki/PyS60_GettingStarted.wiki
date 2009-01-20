@@ -64,3 +64,8 @@ http://proquest.safaribooksonline.com.proxy.lib.umich.edu/9780132354189
 Learning Python
 
 http://proquest.safaribooksonline.com.proxy.lib.umich.edu/9780596513986 
+
+Mobile Programming in Python using PyS60: UI controls
+:Here is a document that briefly explains UI controls in PyS60.
+
+http://www.devshed.com/c/a/Python/Mobile-Programming-in-Python-using-PyS60-UI-Controls/
