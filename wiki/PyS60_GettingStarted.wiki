@@ -19,6 +19,9 @@ I found this to be useful instructions on how to install the !PyS60 emulator:
 
 http://wiki.opensource.nokia.com/projects/Installing_PyS60#Emulator_installation
 
+This link explains how to install pys60 on nokia phones:
+
+http://www.mobilenin.com/pys60/pys60_installation_resources.php
 
 
 == Documentation ==
