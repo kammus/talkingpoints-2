@@ -32,6 +32,9 @@ PyS60 Wiki:
 
 http://wiki.forum.nokia.com/index.php/Category:Python
 
+PyS60 extension modules:
+
+http://wiki.forum.nokia.com/index.php/C%2B%2B_Python_Extensions
 
 == IDE ==
 
