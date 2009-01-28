@@ -40,7 +40,7 @@ http://wiki.forum.nokia.com/index.php/C%2B%2B_Python_Extensions
 
 http://wiki.opensource.nokia.com/projects/PyS60_IRC_channel
 
-You can use the free browser IRC client at http://chat.mibbit.com/
+You can use the free browser IRC client at http://mibbit.com/chat/
 
 Just pick a nickname, select the freenode server and connect to the channel #pys60
 
