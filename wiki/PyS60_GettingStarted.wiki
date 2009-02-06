@@ -85,6 +85,26 @@ http://proquest.safaribooksonline.com.proxy.lib.umich.edu/9780596513986
 
 == Articles/Documents ==
 
+1) How to build an application? -> 9 steps that can be helpful
+http://www.mobilenin.com/pys60/info_%20how_to_build_an_pys60_app.htm
+
+2) Reading Chapter 3 and 4 in the Pys60 1.4.5 doc
+
+3) Attached 2 PDF Files: A good explanation about thread and process,
+the structure of Symbian OS.
+
+4) http://wiki.forum.nokia.com/index.php/Basic_PyS60_Application:_Series1
+http://wiki.forum.nokia.com/index.php/Basic_PyS60_Application:_Series2
+http://wiki.forum.nokia.com/index.php/Basic_PyS60_Application:_Series3
+
+Just as a side note, this is a link for a pervasive computing course using
+PyS60 at MIT. If interested, follow this link:
+http://people.csail.mit.edu/rudolph/Teaching/Lectures07/
+
+Socket Programming:
+http://www.python.org/doc/2.2.3/lib/module-socket.html
+
+
 Very cool tutorial:
 http://symbianresources.com/tutorials/general/python/Python.pdf
 
