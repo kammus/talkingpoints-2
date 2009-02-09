@@ -1,4 +1,4 @@
-#summary Tutorial on how to get Talking-Points running with Eclipse (on Windows)
+#summary Tutorial on how to get the "old" Talking-Points Java-version running with Eclipse (on Windows)
 
 = Get Eclipse =
 
@@ -59,8 +59,6 @@ Now you have to check out (download) the code from the code repository
 Now you can run the application either through the 'Run' menu or by hitting 'Crtl+F11'
 
 If Bluetooth is disabled it will detect 3 virtual Bluetooth tags,  otherwise it will start searching for real Bluetooth devices.
-
-
 
 
 
