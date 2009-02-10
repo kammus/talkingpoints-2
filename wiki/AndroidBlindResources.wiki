@@ -1,4 +1,4 @@
-#Resources on Android for the blind.
+#summary Resources on Android for the blind.
 
 = Apps =
 
