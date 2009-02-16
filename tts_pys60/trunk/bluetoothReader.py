@@ -3,15 +3,20 @@ import socket
 import time
 
 HOST= '127.0.0.1'
-PORT = 7067
+BACKEND_PORT = 843
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-s.bind((HOST, PORT)) #SERVER
+
+# allow the socket to be re-use immediately after a close
+#s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+s.bind((HOST, BACKEND_PORT)) #SERVER
 s.listen(1) 
 
 #Waiting for client connecion
 conn, addr = s.accept()
-conn.send('0')
-time.sleep(5) # wait 10 seconds
-conn.send('1')
-time.sleep(5)	
+while 1:
+	conn.send('0')
+	time.sleep(3)
+	conn.send('1')
+	time.sleep(3)	
 s.close()
