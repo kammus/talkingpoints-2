@@ -3,8 +3,9 @@ import socket
 import e32
 import time
 
-e32.start_server('e:\\Python\\tpBackend.py')
+e32.start_server('e:\\python\\tpBackend.py')
 e32.start_server('e:\\python\\bluetoothReader.py')
+e32.start_server('e:\\python\\gpsLocationProvider.py')
 
 #wait until server is running
 time.sleep(5)
