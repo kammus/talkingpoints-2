@@ -39,7 +39,7 @@ Now you have to check out (download) the code from the code repository
   # Go to 'Window' > 'Open perspective' > 'Other'
   # Select 'SVN Repository Exploring'
   # Right-click in the 'SVN Repositories' area on the right and select 'New' > 'Repository location'
-  # Enter this URL: http://talkingpoints-2.googlecode.com/svn/tags/release-1.0
+  # Enter this URL: http://talkingpoints-2.googlecode.com/svn/tts_java/tags/release-1.0
   # Right-click on the created repository and chose 'Checkout'
   # Select 'Finish'
   # Wait until the code has been checked out
@@ -59,6 +59,4 @@ Now you have to check out (download) the code from the code repository
 Now you can run the application either through the 'Run' menu or by hitting 'Crtl+F11'
 
 If Bluetooth is disabled it will detect 3 virtual Bluetooth tags,  otherwise it will start searching for real Bluetooth devices.
-
-
 
