@@ -1,0 +1,16 @@
+<div class="box">
+	<h1>Latest Locations</h1>
+	
+	<ul style="list-style-type: none;">
+		<% @locations.each do |location| %>
+		<li>
+			<%= link_to image_tag('forward.png'), location_path(location) %>
+			<%= link_to location.name, location_path(location) %>
+			<span class="colored">[<%=h location.location_type.name %>]</span>
+		</li>
+		<% end %>
+	</ul>
+	<br />
+	
+	<%= link_to('Create new location', new_location_path) if logged_in %>
+</div>

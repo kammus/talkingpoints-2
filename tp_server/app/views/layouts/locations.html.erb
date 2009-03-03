@@ -1,0 +1,36 @@
+<%= render :partial => 'layouts/header' %>
+
+<h1 id="location_title" class="box">
+	<%= @location.name %>
+	<span class="colored">[<%= @location.location_type.name %>]</span>
+</h1>
+
+<div id="location_sections" class="box">
+	<ul style="list-style-type: none; padding-left: 0px;">
+		<li<% if(params[:controller]=='locations') %> class="current"<% end %>>
+			<%= link_to(image_tag('forward.png', {:class => 'forward'}), location_path(@location)) %>
+			<%= link_to('Core', location_path(@location)) %>
+		</li>
+		
+		<% for section in @location.sections %>
+			<li<% if(params[:id]==section.id.to_s) %> class="current"<% end %>>
+				<%= link_to(image_tag('forward.png', {:class => 'forward'}), location_section_path(@location, section)) %>
+				<%= link_to(section.name, location_section_path(@location, section)) %>
+			</li>
+		<% end %>
+		
+		<li<% if(params[:controller]=='comments') %> class="current"<% end %>>
+			<%= link_to(image_tag('forward.png', {:class => 'forward'}), location_comments_path(@location)) %>
+			<%= link_to('Comments', location_comments_path(@location)) %>
+		</li>
+	</ul>
+	<%= link_to 'Edit sections', location_sections_url(@location) %> 
+</div>
+
+<div id="location_content" class="box">
+
+<%= yield  %>
+
+</div>
+
+<%= render :partial => 'layouts/footer' %>

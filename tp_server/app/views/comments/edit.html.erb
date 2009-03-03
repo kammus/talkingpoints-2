@@ -1,0 +1,21 @@
+<h2>Editing comment</h2>
+
+<%= error_messages_for :comment %>
+
+<% form_for(@comment, :url => location_comment_path(@location, @comment)) do |f| %>
+  <p>
+    <label for="comment_title">Title</label><br />
+    <%= f.text_field :title %>
+  </p>
+
+  <p>
+    <label for="comment_text">Text</label><br />
+    <%= f.text_area :text %>
+  </p>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', location_comments_path(@location) %>
