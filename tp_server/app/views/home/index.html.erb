@@ -1,0 +1,9 @@
+<h2>Welcome to Talking-Points</h2>
+
+<% unless logged_in %>
+<div id="login">
+<%= render :partial => 'login_form' %>
+</div>
+<% end %>
+
+<%= render :partial => 'locations/list' %>

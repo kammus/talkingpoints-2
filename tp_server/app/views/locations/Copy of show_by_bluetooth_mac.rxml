@@ -1,0 +1,59 @@
+xml.instruct! :xml, :version=>"1.0" 
+xml.location {
+  if @location == nil
+    xml.core_information {
+      xml.location_type("ERROR") 
+    }
+    
+  else
+    xml.core_information {
+      xml.tpid(@location.id)
+      xml.location_type(@location.location_type.name)
+      xml.status('Currently open for another 4 hours until 11pm')
+      
+      Location.content_columns.each do |column|
+        xml.tag!(column.name, @location.send(column.name))
+        # xml.tag!(column.name, @location.send(column.name), true)
+      end
+    }
+      
+    xml.sections {
+      xml.section('menu')
+      xml.section('specials')
+      xml.section('comments')
+      xml.section('hours')
+      xml.section('accessibility')
+      xml.section('history')
+    }
+    
+    xml.additional_information {
+      xml.menu('Espresso $1.35<br />Coffee $1.86')
+      
+      xml.specials('$2 Latte on Tuesdays<br />$1 Tea on Thursdays')
+      
+      xml.comments {
+        xml.comment {
+          xml.comment_id(1)
+          xml.username('Studi247')
+          xml.user_id(1)
+          xml.datetime('yesterday')
+          xml.text('This branch of TCF is always extremely busy the first two weeks a semester begins at the university.')
+        }
+        
+        xml.comment {
+          xml.comment_id(2)
+          xml.username('EvilUser')
+          xml.user_id(2)
+          xml.datetime('2 days ago')
+          xml.text('All Banks are evil.')
+        }
+      }
+      
+      xml.hours('Monday to Sunday from 7am to 11pm')
+      
+      xml.accessibility('The ATM is located to the left of the door, at waist height. Accessible parking available around the corner on Church Street.')
+      
+      xml.history('This place has a long and exciting history.')
+    }
+  end
+}

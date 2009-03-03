@@ -1,0 +1,53 @@
+<h2>Comments</h2>
+
+<% unless @comments.empty? %>
+<ul id="comments">
+	<% @comments.each do |comment| %>
+		<li>
+			<strong><%=h comment.title %></strong>
+			(
+			posted <%= distance_of_time_in_words_to_now(comment.created_at) %> ago
+			by <%= link_to comment.user.username, user_path(comment.user), {:class => 'colored'} %>
+			)<br />
+			
+			<div class="text"><%=h comment.text %></div>
+			
+			<% if session[:user_id]==comment.user_id %>
+			<div class="edit_links">
+				<%= link_to 'edit', edit_location_comment_path(@location, comment) %> |
+				<%= link_to 'delete', location_comment_path(@location, comment), :confirm => 'Are you sure?', :method => :delete %>
+			</div>
+			<% end %>
+		</li>
+	<% end %>
+</ul>
+<% else %>
+<p>
+	There are no comments on this locations yet.
+	<% if logged_in %>Be the first to comment!<% end %>
+</p>
+<% end %>
+
+<% if logged_in %>
+	<h2>New comment</h2>
+
+	<%= error_messages_for :comment %>
+	
+	<% form_for(@comment, :url => location_comments_path(@location)) do |f| %>
+	  <p>
+	    <label for="comment_title">Title</label><br />
+	    <%= f.text_field :title %>
+	  </p>
+	
+	  <p>
+	    <label for="comment_text">Text</label><br />
+	    <%= f.text_area :text %>
+	  </p>
+	
+	  <p>
+	    <%= f.submit "Post Comment" %>
+	  </p>
+	<% end %>
+<% else %>
+	<%= link_to 'Login to post a comment', '/home/login' %>
+<% end %>

@@ -1,0 +1,49 @@
+xml.instruct! :xml, :version=>"1.0", :encoding=>"UTF-8" 
+xml.location {
+  if @location == nil
+    xml.core_information {
+      xml.location_type("ERROR") 
+    }
+    
+  else
+    xml.core_information {
+      xml.tpid(@location.id)
+      xml.location_type(@location.location_type.name)
+      xml.status('Currently open for another 4 hours until 11pm')
+      
+      Location.content_columns.each do |column|
+        xml.tag!(column.name, @location.send(column.name))
+        # xml.tag!(column.name, @location.send(column.name), true)
+      end
+    }
+		
+		xml.sections{
+			for section in @location.sections
+				xml.section(section.name)
+			end
+			if !@location.comments.empty?
+				xml.section('comments')
+			end
+		}
+    
+    xml.additional_information {
+			for section in @location.sections
+				#xml.section_name(section.name)
+				xml.tag!(section.name, section.text)
+			end
+			
+      xml.comments {
+				for comment in @location.comments
+	        xml.comment {
+	          xml.comment_id(comment.id)
+	          xml.username(comment.user.username)
+	          xml.user_id(comment.user.id)
+            xml.datetime(comment.created_at)
+	          xml.text(comment.text)
+            xml.datetime_in_words(distance_of_time_in_words_to_now(comment.created_at)+' ago')
+	        }
+				end
+			}
+    }
+  end
+}
