@@ -1,7 +1,8 @@
 class ServerAPI:
-	import json
-	
+
 	def __init__(self):
+		import json
+		import urllib
 		self.server_host = "http://test.talking-points.org"
 		
 	def get_location(tpid):
