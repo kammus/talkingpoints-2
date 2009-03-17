@@ -8,7 +8,7 @@ class ServerAPI:
 		self.server_host = "http://test.talking-points.org"
 		
 	def get_location(self, tpid):
-		request_url = self.server_host + "/locations/show/" + tpid + ".json"
+		request_url = self.server_host + "/locations/show/" + str(tpid) + ".json"
 		response = urllib.urlopen(request_url).read()
 		if response == "error":
 			return null
