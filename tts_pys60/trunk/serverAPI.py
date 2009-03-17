@@ -1,4 +1,5 @@
 class ServerAPI:
+	import json
 	
 	def __init__(self):
 		self.server_host = "http://test.talking-points.org"
