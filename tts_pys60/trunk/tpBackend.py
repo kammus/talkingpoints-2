@@ -37,7 +37,7 @@ backendConnection.connectionClose()
 class ServerAPI:
 	
 	def __init__(self):
-		self.server_host = "http://grocs.dmc.dc.umich.edu:3000"
+		self.server_host = "http://test.talking-points.org"
     
 	def get_location_by_bluetooth_mac(mac): 
 		request_url = self.server_host + "/locations/show_by_bluetooth_mac/" + mac + ".json"
@@ -45,6 +45,7 @@ class ServerAPI:
         return json.read(response)
 
 	def get_nearby_locations(lat, lng):
+		
 		request_url = self.server_host + "/locations/get_nearby/" + lat + ";" + lng + ".json"
         response = urllib.urlopen(request_url).read()
         return json.read(response)
