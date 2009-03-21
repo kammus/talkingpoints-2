@@ -8,12 +8,14 @@ class LocationCache:
 	def __init__(self):
 		self.detected_locations = {}
 	
+	# ---- backend methods ----
+	
 	# check if a location with this MAC address is already detected
 	def checkLocationsForBluetoothMAC(self, mac):
-		for i,v in self.detected_locations.iteritems():
-			if v['bluetooth_mac'] == str(mac):
-				self.seenLocation(v['tpid'])
-				return v['tpid']
+		for key,value in self.detected_locations.iteritems():
+			if value['bluetooth_mac'] == str(mac):
+				self.seenLocation(value['tpid'])
+				return value['tpid']
 			else:
 				return false
 	
@@ -25,22 +27,35 @@ class LocationCache:
 	# updates the timestamp of a location identified by tpid
 	def seenLocation(self, tpid):
 		self.detected_locations[ tpid ]['last_seen'] = time.clock()
-		
-	# ---- for the GUI ----
+	
+	# ---- GUI methods ----
 	
 	# returns the current detected_locations as a list for the ListBox UI element
 	def getCurrentLocationList(self):
 		list = []
-		for i,v in self.detected_locations.iteritems():
-			if (time.clock() - v['last_seen']) < 60:
+		for key,value in self.detected_locations.iteritems():
+			if (time.clock() - value['last_seen']) < 60: # location has been seen no longer than 60 seconds ago
 				# append (name, location_type) tupel to the list
-				list.append( ( unicode(v['name']), unicode(v['location_type']) ) )
-				
+				list.append( ( unicode(value['name']), unicode(value['location_type']) ) )
 		return list
 	
 	# return a location identified by tpid
 	def getLocation(self, tpid):
 		return self.detected_locations[tpid]
+	
+	# returns main menu options (sections) for a location
+	def getLocationMenuList(self, tpid):
+		list = [u"General Description", u"Menu", u"Hours", u"Comments", u"Bookmark" , u"Hide"]
+		#for key,value in self.detected_locations[tpid]['sections']:
+		#	list.append( unicode(key) )
+		return list
+	
+	# returns list of comments for a certain location
+	def getLocationCommentsList(self, tpid):
+		list = []
+		for key,value in self.detected_locations[tpid]['sections']['Comments']:
+			list.append( unicode(value['text']) )
+		return list
 			
 
 # ---------------- TEST code --------------------------
