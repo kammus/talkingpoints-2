@@ -1,6 +1,6 @@
 import sys
-sys.path.append("C:\\python\\tp") # for emulator testing
-import ServerAPI
+#sys.path.append("C:\\python\\tp") # for emulator testing
+#import ServerAPI
 import time
 
 class LocationCache:
@@ -23,6 +23,8 @@ class LocationCache:
 	def appendLocation(self, loc):
 		loc['last_seen'] = time.clock()
 		self.detected_locations[ loc['tpid'] ] = loc
+		
+		#GUI.notifyOfNewLocation(loc['name'] + " [" + loc['type'] + "]")
 	
 	# updates the timestamp of a location identified by tpid
 	def seenLocation(self, tpid):
@@ -60,22 +62,22 @@ class LocationCache:
 
 # ---------------- TEST code --------------------------
 
-server = ServerAPI.ServerAPI()
-location_cache = LocationCache()
-location_cache.appendLocation(server.get_location(1))
-location_cache.appendLocation(server.get_location(2))
-
-print "* loc 1: " + str(location_cache.detected_locations[1]['last_seen']) + " seconds\n"
-print "* loc 2: " + str(location_cache.detected_locations[2]['last_seen']) + " seconds\n"
-print "* since loc 1: " + str(time.clock() - location_cache.detected_locations[1]['last_seen']) + " seconds\n"
-
-location_cache.checkLocationsForBluetoothMAC('1234567890ab')
-
-print "* loc 1: " + str(location_cache.detected_locations[1]['last_seen']) + " seconds\n"
-
-location_cache.seenLocation(1)
-
-print "* loc 1: " + str(location_cache.detected_locations[1]['last_seen']) + " seconds\n"
+#server = ServerAPI.ServerAPI()
+#location_cache = LocationCache()
+#location_cache.appendLocation(server.get_location(1))
+#location_cache.appendLocation(server.get_location(2))
+#
+#print "* loc 1: " + str(location_cache.detected_locations[1]['last_seen']) + " seconds\n"
+#print "* loc 2: " + str(location_cache.detected_locations[2]['last_seen']) + " seconds\n"
+#print "* since loc 1: " + str(time.clock() - location_cache.detected_locations[1]['last_seen']) + " seconds\n"
+#
+#location_cache.checkLocationsForBluetoothMAC('1234567890ab')
+#
+#print "* loc 1: " + str(location_cache.detected_locations[1]['last_seen']) + " seconds\n"
+#
+#location_cache.seenLocation(1)
+#
+#print "* loc 1: " + str(location_cache.detected_locations[1]['last_seen']) + " seconds\n"
 
 
 
