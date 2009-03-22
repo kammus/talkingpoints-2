@@ -15,9 +15,9 @@ class LocationCache:
 		for key,value in self.detected_locations.iteritems():
 			if value['bluetooth_mac'] == str(mac):
 				self.seenLocation(value['tpid'])
-				return value['tpid']
-			else:
-				return false
+				return True
+							
+		return False
 	
 	# adds a location data structure to the detected_location dictionary
 	def appendLocation(self, loc):

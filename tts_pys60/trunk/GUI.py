@@ -1,3 +1,6 @@
+import sys
+sys.path.append("e:\\python")
+
 import e32
 import appuifw
 import LocationCache
@@ -16,12 +19,12 @@ class GUI:
 		
 		self.lock = app_lock
 		appuifw.app.exit_key_handler = self.close		
-		
 		self.location_cache = LocationCache.LocationCache()
+		#print "GUI completed"
 		
 	def notifyOfNewLocation(self, location_name):
 		if self.notifyable == True:
-			apuifw.note(unicode("You are getting close to " + location_name), 'info')
+			appuifw.note(u"You are getting close to " + str(location_name), 'info')
 			self.drawLocationList()
 	
 	def drawLocationList(self):
