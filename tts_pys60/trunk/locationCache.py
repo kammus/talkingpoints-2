@@ -16,7 +16,7 @@ class LocationCache:
 			if value['bluetooth_mac'] == str(mac):
 				self.seenLocation(value['tpid'])
 				return value['tpid']
-		return False
+		return 0
 	
 	def checkLocationsForTPID(self, TPID):
 		for key,value in self.detected_locations.iteritems():
@@ -24,7 +24,7 @@ class LocationCache:
 				self.seenLocation(value['tpid'])
 				return value['tpid']
 		
-		return False
+		return 0
 	
 	# adds a location data structure to the detected_location dictionary
 	def appendLocation(self, loc):
@@ -59,10 +59,25 @@ class LocationCache:
 	
 	# returns main menu options (sections) for a location
 	def getLocationMenuList(self, tpid):
-		list = [u"General Description", u"Menu", u"Hours", u"Comments", u"Bookmark" , u"Hide"]
-		#for key,value in self.detected_locations[tpid]['sections']:
-		#	list.append( unicode(key) )
-		return list
+		output = {}
+		
+		output['list'] = [u"General Description"]
+		output['mapping'] = {0: unicode(self.detected_locations[tpid]['description'])}
+		
+		i = 1
+		#list = [u"General Description", u"Menu", u"Hours", u"Comments", u"Bookmark" , u"Hide"]
+		for key in self.detected_locations[tpid]['sections']:
+			if key != "Comments":
+				output['list'].append( unicode(key) )
+				output['mapping'][i] = unicode(self.detected_locations[tpid]['sections'][key])
+				i += 1
+		
+		output['list'] += [u"Comments", u"Bookmark" , u"Hide"]
+		output['mapping'][i] = "Comments"
+		output['mapping'][i+1] = "Bookmark"
+		output['mapping'][i+2] = "Hide location"
+		
+		return output
 	
 	# returns list of comments for a certain location
 	def getLocationCommentsList(self, tpid):
