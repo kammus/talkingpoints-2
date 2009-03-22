@@ -10,10 +10,10 @@ class GUI:
 		appuifw.app.screen = 'normal'
 		appuifw.app.title = u"Talking Points"
 		
-		self.location_list = []
-		self.location_list_mapping = {}
-		self.location_list_mapping[0] = 1 # list index => tpid
-		self.location_list_mapping[1] = 2
+		self.location_listbox = []
+		self.location_listbox_mapping = {}
+#		self.location_list_mapping[0] = 1 # list index => tpid
+#		self.location_list_mapping[1] = 2
 		self.location_menu_list = []
 		self.comment_list = []
 		self.notifyable = True
@@ -21,14 +21,8 @@ class GUI:
 		self.current_tpid = None
 		
 		self.lock = app_lock
-		appuifw.app.exit_key_handler = self.close		
+		appuifw.app.exit_key_handler = self.exit		
 		self.location_cache = LocationCache.LocationCache()
-	
-	def exit_confirm(self):
-		yesno = appuifw.query(u"Do you want to exit", "query")
-		if yesno == 1:
-			self.close()
-
 		
 	def locationCommentCallback(self):
 		comment_selected = self.comment_listbox.current()
@@ -42,13 +36,24 @@ class GUI:
 	def drawLocationList(self):
 		self.notifyable = True
 		self.current_tpid = None
-		appuifw.app.exit_key_handler = self.exit_confirm
+		appuifw.app.exit_key_handler = self.exit
 		
-		self.location_list = appuifw.Listbox(
-			self.location_cache.getCurrentLocationList(),
-			self.locationListCallback
-		)
-		appuifw.app.body = self.location_list
+		tmp = self.location_cache.getCurrentLocationList()
+		if len(tmp['list']) > 0:
+			location_list = tmp['list']
+			self.location_listbox_mapping = tmp['mapping']
+			self.location_listbox = appuifw.Listbox(
+				location_list,
+				self.locationListCallback
+			)
+			appuifw.app.body = self.location_listbox
+			
+#			e32.ao_sleep(30)
+#			for every 30 sec:
+#				if loc_cache.check == expired
+#					self.drawLocationList
+		else:
+			appuifw.app.body = appuifw.Text( unicode("Searching ...") )
 			
 	
 
@@ -57,7 +62,7 @@ class GUI:
 		appuifw.app.exit_key_handler = self.drawLocationList
 		
 		if self.current_tpid == None:
-			self.current_tpid = self.location_list_mapping[self.location_list.current()]
+			self.current_tpid = self.location_listbox_mapping[self.location_listbox.current()]
 		
 		self.location_menu_list = appuifw.Listbox(
 			self.location_cache.getLocationMenuList(self.current_tpid),
@@ -93,6 +98,7 @@ class GUI:
 		elif menu_item_selected == 5: # hide POI
 			hide_POI()
 		
-	
-	def close(self):
-		self.lock.signal()
+	def exit(self):
+		yesno = appuifw.query(u"Do you want to exit", "query")
+		if yesno == 1:
+			self.lock.signal()
