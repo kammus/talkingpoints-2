@@ -31,31 +31,13 @@ class BluetoothReader:
 
 	def notifyMacAddress(self, macAddress):
 		flag = 0
-#		print macAddress		
-#		if(macAddress == "001ff3b01a1e"): #for test
-		#see if this mac address has been detected
-		#for key,value in self.myGUI.location_cache.detected_locations.iteritems():
-		#	if value['bluetooth_mac'] == str(macAddress): #if this has been detected
-		#		flag = 1
-		#		break
 		result = self.myGUI.location_cache.checkLocationsForBluetoothMAC(macAddress)
 		if result == 0:
 			loc = self.serverAPI.get_location_by_bluetooth_mac(macAddress)
 			if loc is not None:
 				self.myGUI.location_cache.appendLocation(loc)
-	#			print loc['name']				
 				self.myGUI.notifyOfNewLocation(str(loc['name']) + " [" + str(loc['location_type']) + "]")	
 
-#		if result == 0:
-#			print "start game"				
-#			if v['bluetooth_mac'] == str(macAddress): #if this has been detected
-#				flag = 1
-#				break		
-#		if flag == 0 :
-#			loc = self.serverAPI.get_location_by_bluetooth_mac(macAddress)
-#			if loc is not None:
-#				self.myGUI.location_cache.appendLocation(loc)
-#				self.myGUI.notifyOfNewLocation(str(loc['name']) + " [" + str(loc['location_type']) + "]")	
 								
 	def __callback(self, error, mac, name, fp): #Different Thread
 		global count
@@ -79,7 +61,8 @@ class BluetoothReader:
 		global macAddress
 		try:
 			self.resolver.open()
-			print "Bluetooth Search Start"
+			#print "Bluetooth Search Start"
+			GUI.drawLocationList()
 			cont = lambda: self.resolver.discover(self.__callback, self.notifyMacAddress)
 			while cont:
 				cont()
@@ -103,11 +86,5 @@ btReader = BluetoothReader(GUI)
 
 #Bluetooth Discovery Start
 btReader.btSearch()
-
-
-#GUI.location_cache.appendLocation(server.get_location(1))
-#GUI.location_cache.appendLocation(server.get_location(2))
-
-#GUI.drawLocationList()
 
 app_lock.wait() #wait for user input
