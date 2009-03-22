@@ -15,7 +15,7 @@ import json
 #sys.path.append('C:\python')
 import serverAPI
 
-keep_scanning = True
+keep_scanning = 1
 
 class GpsLocProvider:
     
@@ -28,7 +28,7 @@ class GpsLocProvider:
         self.farTolerance = fardist #how far we must be from a POI before it's removed from the recent list
     
         self.actives = [ ]
-        self.newActives = False
+        self.newActives = 0
         
         # save a local reference to the GUI object
         self.GUI = GUIref
@@ -41,15 +41,14 @@ class GpsLocProvider:
     
     def exit_thread(self):
         global keep_scanning
-        keep_scanning = False
+        keep_scanning = 0
     
     
     def getCurrentLocation(self):
        #print "Querying position module..."
         tempDict = positioning.position()
         self.currentLoc = {"lat":tempDict["position"]["latitude"], "lng":tempDict["position"]["longitude"]}
-        #print "New loc:"
-        #print self.currentLoc
+        
         return self.currentLoc
     
     
@@ -97,7 +96,7 @@ class GpsLocProvider:
                
             self.actives = self.get_active_list()
             if len(self.actives) != 0:
-                self.newActives = True
+                self.newActives = 1
        #     for poi in actives:
         #        self.GUI.location_cache.appendLocation(poi)       
          #       self.GUI.notifyOfNewLocation(poi["name"])
