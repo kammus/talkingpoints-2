@@ -34,12 +34,17 @@ class LocationCache:
 	
 	# returns the current detected_locations as a list for the ListBox UI element
 	def getCurrentLocationList(self):
-		list = []
+		output = {}
+		output['list'] = []
+		output['mapping'] = {}
+		i = 0
 		for key,value in self.detected_locations.iteritems():
-			if (time.clock() - value['last_seen']) < 60: # location has been seen no longer than 60 seconds ago
+			if (time.clock() - value['last_seen']) < 30: # location has been seen no longer than 60 seconds ago
 				# append (name, location_type) tupel to the list
-				list.append( ( unicode(value['name']), unicode(value['location_type']) ) )
-		return list
+				output['list'].append( ( unicode(value['name']), unicode(value['location_type']) ) )
+				output['mapping'][i] = value['tpid']
+				i += 1
+		return output
 	
 	# return a location identified by tpid
 	def getLocation(self, tpid):
@@ -55,8 +60,8 @@ class LocationCache:
 	# returns list of comments for a certain location
 	def getLocationCommentsList(self, tpid):
 		list = []
-		for key,value in self.detected_locations[tpid]['sections']['Comments']:
-			list.append( unicode(value['text']) )
+		for key in self.detected_locations[tpid]['sections']['Comments']:
+			list.append( unicode(self.detected_locations[tpid]['sections']['Comments'][key]['text']) )
 		return list
 			
 
