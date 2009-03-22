@@ -1,4 +1,8 @@
 import string
+import sys
+
+sys.path.append("e:\\python")
+
 import json
 import urllib
 
@@ -16,10 +20,10 @@ class ServerAPI:
 			return json.read(response)
     
 	def get_location_by_bluetooth_mac(self, mac): 
-		request_url = self.server_host + "/locations/show_by_bluetooth_mac/" + mac + ".json"
+		request_url = self.server_host + "/locations/show_by_bluetooth_mac/" + str(mac) + ".json"
 		response = urllib.urlopen(request_url).read()
 		if response == "error":
-			return null
+			return None
 		else:
 			return json.read(response)
 
