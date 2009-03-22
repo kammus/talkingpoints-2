@@ -102,5 +102,5 @@ class GUI:
 	def exit(self):
 		yesno = appuifw.query(u"Do you want to exit", "query")
 		if yesno == 1:
-            self.terminated = True
+			self.terminated = True
 			self.lock.signal()
