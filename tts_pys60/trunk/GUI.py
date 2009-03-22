@@ -76,6 +76,7 @@ class GUI:
 		else:
 			appuifw.app.body = appuifw.Text( unicode("Searching ...") )
 			
+			
 	
 
 	def locationListCallback(self):
