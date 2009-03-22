@@ -19,7 +19,7 @@ gui.drawLocationList()
 
 timer = e32.Ao_timer()
 
-while 1:
+while not gui.terminated:
 	if gps.newActives == True:
 		localActives = gps.actives
 		for poi in localActives:
@@ -29,4 +29,4 @@ while 1:
 	e32.ao_yield()
 	timer.after(1)
 	
-app_lock.wait()
+#app_lock.wait()
