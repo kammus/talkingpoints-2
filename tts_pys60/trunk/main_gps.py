@@ -1,7 +1,7 @@
 import e32
 import sys
 if e32.in_emulator():
-	sys.path.append("C:\\python\\tp") # for emulator testing
+	sys.path.append("C:\\python\\") # for emulator testing
 import appuifw
 import gpsLocationProvider
 import ServerAPI
@@ -20,7 +20,7 @@ gui.drawLocationList()
 timer = e32.Ao_timer()
 
 while not gui.terminated:
-	if gps.newActives == True:
+	if gps.newActives == 1:
 		localActives = gps.actives
 		for poi in localActives:
 			if not gui.location_cache.checkLocationsForTPID(poi["tpid"]):
