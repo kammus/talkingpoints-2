@@ -17,7 +17,8 @@ class GUI:
 		self.location_menu_list = []
 		self.comment_list = []
 		self.notifyable = True
-		
+		self.terminated = False
+        
 		self.current_tpid = None
 		
 		self.lock = app_lock
@@ -101,4 +102,5 @@ class GUI:
 	def exit(self):
 		yesno = appuifw.query(u"Do you want to exit", "query")
 		if yesno == 1:
+            self.terminated = True
 			self.lock.signal()
