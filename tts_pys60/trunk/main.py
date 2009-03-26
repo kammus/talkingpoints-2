@@ -29,7 +29,7 @@ class BluetoothReader:
 		self.serverAPI = ServerAPI.ServerAPI()	
 		self.server_host = "http://test.talking-points.org"
 
-	def notifyMacAddress(self, macAddress):
+	def notifyMacAddress(self, macAddress): #For exposition, put filtering here
 		flag = 0
 		result = self.myGUI.location_cache.checkLocationsForBluetoothMAC(macAddress)
 		if result == 0:
@@ -52,8 +52,12 @@ class BluetoothReader:
 		else:
 			count += 1
 			macAddress = mac
-			fp(macAddress)	
+			if macAddress == '001c623fa0b8': #Jakob's phone 
+				fp(macAddress)	
+			elif macAddress == '00194fa4e262': #Nokia Tablet
+				fp(macAddress)
 				
+					
 			cont = self.resolver.next
 		myLock.signal()
 
@@ -67,6 +71,8 @@ class BluetoothReader:
 			while cont:
 				cont()
 				myLock.wait()
+				if(self.myGUI.terminated == 1): #if this lock is resolved by the GUI
+					break
 
 		finally:
 			self.resolver.close()
@@ -81,10 +87,8 @@ apid = select_access_point()  #Prompts you to select the access point
 apo = access_point(apid)      #apo is the access point you selected
 set_default_access_point(apo) #Sets apo as the default access point
 
-GUI = GUI.GUI(app_lock)
+GUI = GUI.GUI(myLock)
 btReader = BluetoothReader(GUI) 
 
 #Bluetooth Discovery Start
 btReader.btSearch()
-
-app_lock.wait() #wait for user input
