@@ -47,7 +47,7 @@ class LocationCache:
 		output['mapping'] = {}
 		i = 0
 		for key,value in self.detected_locations.iteritems():
-			if (time.clock() - value['last_seen']) < 30: # location has been seen no longer than 60 seconds ago
+			if (time.clock() - value['last_seen']) < 6000: # location has been seen no longer than 60 seconds ago
 				# append (name, location_type) tupel to the list
 				output['list'].append( ( unicode(value['name']), unicode(value['location_type']) ) )
 				output['mapping'][i] = value['tpid']
@@ -57,6 +57,12 @@ class LocationCache:
 	# return a location identified by tpid
 	def getLocation(self, tpid):
 		return self.detected_locations[tpid]
+	
+	# return a location identified by tpid
+	def getLocationName(self, tpid):
+		if tpid in self.detected_locations:
+			return self.detected_locations[tpid]['name']
+		return 0
 	
 	# returns main menu options (sections) for a location
 	def getLocationMenuList(self, tpid):
@@ -76,7 +82,7 @@ class LocationCache:
 		output['list'] += [u"Comments", u"Bookmark" , u"Hide"]
 		output['mapping'][i] = "Comments"
 		output['mapping'][i+1] = "Bookmark"
-		output['mapping'][i+2] = "Hide location"
+		output['mapping'][i+2] = "Hide"
 		
 		return output
 	
