@@ -118,7 +118,9 @@ class GpsLocProvider:
                 dist = self.calcDistance(self.current_location, tempDict) #poi must have "lat" and "lng" entries
                 if dist <= self.nearTolerance:
                     if not self.GUI.location_cache.checkLocationsForTPID(tempDict['tpid']):
-                        activeList.append(self.server.get_location(tempDict['tpid']))
+                        new_active = self.server.get_location(tempDict['tpid'])
+                        new_active["distance"] = dist
+                        activeList.append(new_active)
                 if dist >= self.farTolerance:
                     self.nearbyPOIs.remove(poi)
         self.nearbyLock.release()
@@ -152,8 +154,11 @@ class GpsLocProvider:
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         d = R * c
         
-        distInMiles = d * 1.1508
-        return distInMiles
+        distance_in_meters = d * 1852
+        return distance_in_meters
+        
+        #distInMiles = d * 1.1508
+        #return distInMiles
     
 # test code begins here    
 #repeat = 0
