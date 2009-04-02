@@ -5,8 +5,8 @@ import urllib
 import thread
 import positioning
 import math
-import string
 import time
+import string
 import sys
 if e32.in_emulator():
     sys.path.append('e:\python\libs')
@@ -22,7 +22,7 @@ class GpsLocProvider:
     # neardist = how close a POI needs to be in order to be "triggered" (in mi.)
     # fardist = how far away a POI must be to be removed from the active list (in mi.)
     def __init__(self, neardist, fardist, GUIref):
-        self.currentLoc = { }
+        self.current_location = { }
         self.nearbyPOIs = [ ] #should be a list of dictionaries
         self.nearTolerance = neardist #how close we need to be to a POI to trigger it
         self.farTolerance = fardist #how far we must be from a POI before it's removed from the recent list
@@ -47,9 +47,10 @@ class GpsLocProvider:
     def getCurrentLocation(self):
        #print "Querying position module..."
         tempDict = positioning.position()
-        self.currentLoc = {"lat":tempDict["position"]["latitude"], "lng":tempDict["position"]["longitude"]}
-        
-        return self.currentLoc
+        currentTime = time.clock()
+        self.current_location = {"lat":tempDict["position"]["latitude"], "lng":tempDict["position"]["longitude"], "timestamp":currentTime}
+        self.GUI.current_position = self.current_location
+        return self.current_location
     
     
     # incPOIs: list of new POIs (which are dictionaries)
@@ -77,22 +78,18 @@ class GpsLocProvider:
                              "data":"GpsLocProvider"}])  
         global keep_scanning
         
-        while keep_scanning:
-            initialTime = time.clock() 
+        while keep_scanning: 
             # get current location, compare to old current location
             newLoc = self.getCurrentLocation()
             # if no(or little) change, don't do anything
-            latDif = math.fabs(newLoc["lat"] - self.currentLoc["lat"])
-            lngDif = math.fabs(newLoc["lng"] - self.currentLoc["lng"])
+            latDif = math.fabs(newLoc["lat"] - self.current_location["lat"])
+            lngDif = math.fabs(newLoc["lng"] - self.current_location["lng"])
             # if latDif < 0.0001 or lngDif < .001:
             #     print "Haven't moved far enough.  Cancelling update."
-            #     return activeList
-            # else:
-            #print "Updated current location."
-            self.currentLoc = newLoc
+            self.current_location = newLoc
             
             #self.nearbyLock.signal()
-            self.addPOIs(self.get_nearby_locations(self.currentLoc["lat"], self.currentLoc["lng"]))
+            self.addPOIs(self.get_nearby_locations(self.current_location["lat"], self.current_location["lng"]))
                
             self.actives = self.get_active_list()
             if len(self.actives) != 0:
@@ -118,7 +115,7 @@ class GpsLocProvider:
         for poi in self.nearbyPOIs:
             for key in poi:
                 tempDict = poi[key]
-                dist = self.calcDistance(self.currentLoc, tempDict) #poi must have "lat" and "lng" entries
+                dist = self.calcDistance(self.current_location, tempDict) #poi must have "lat" and "lng" entries
                 if dist <= self.nearTolerance:
                     if not self.GUI.location_cache.checkLocationsForTPID(tempDict['tpid']):
                         activeList.append(self.server.get_location(tempDict['tpid']))
