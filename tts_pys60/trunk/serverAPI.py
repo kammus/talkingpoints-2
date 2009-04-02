@@ -28,6 +28,7 @@ class ServerAPI:
 			return json.read(response)
 
 	def get_nearby_locations(self, lat, lng):
+		# convert commas into dots in order to not screw up the Rails URL
 		latstr = str(lat)
 		lngstr = str(lng)
 		lat = string.replace(latstr, '.', ',')
@@ -38,3 +39,17 @@ class ServerAPI:
 			return null
 		else:
 			return json.read(response)
+		
+	def getAddress(self, lat, lng):
+		# convert commas into dots in order to not screw up the Rails URL
+		latstr = str(lat)
+		lngstr = str(lng)
+		lat = string.replace(latstr, '.', ',')
+		lng = string.replace(lngstr, '.', ',')
+		request_url = self.server_host + "/locations/get_address/" + lat + ";" + lng + ".json"
+		response = urllib.urlopen(request_url).read()
+		if response == "error":
+			return null
+		else:
+			return response
+		
