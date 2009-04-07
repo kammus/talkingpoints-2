@@ -11,7 +11,7 @@ import GUI
 app_lock = e32.Ao_lock()
 server = ServerAPI.ServerAPI()
 gui = GUI.GUI(app_lock)
-gps = gpsLocationProvider.GpsLocProvider(10000, 100000, gui)
+gps = gpsLocationProvider.GpsLocProvider(15, 50, gui)
 
 gui.location_cache.appendLocation(server.get_location(1))
 gui.location_cache.appendLocation(server.get_location(2))
