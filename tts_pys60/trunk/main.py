@@ -52,13 +52,11 @@ class BluetoothReader:
 		else:
 			count += 1
 			macAddress = mac
-			if macAddress == '001c623fa0b8': #Jakob's phone 
-				fp(macAddress)	
-			elif macAddress == '00194fa4e262': #Nokia Tablet
-				fp(macAddress)
-				
-					
+			# filtering       #Jakob's phone    #Nokia Tablet                   #Dell Axim
+			if macAddress == '001c623fa0b8' or macAddress == '00194fa4e262' or macAddress == '0010c65e9224':
+				fp(macAddress)						
 			cont = self.resolver.next
+		
 		myLock.signal()
 
 	def btSearch(self):
@@ -83,9 +81,9 @@ class BluetoothReader:
 			
 app_lock = e32.Ao_lock() #app_lock (Only GUI will use this one from this point)
 
-apid = select_access_point()  #Prompts you to select the access point
-apo = access_point(apid)      #apo is the access point you selected
-set_default_access_point(apo) #Sets apo as the default access point
+#apid = select_access_point()  #Prompts you to select the access point
+#apo = access_point(apid)      #apo is the access point you selected
+#set_default_access_point(apo) #Sets apo as the default access point
 
 GUI = GUI.GUI(myLock)
 btReader = BluetoothReader(GUI) 
