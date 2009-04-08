@@ -8,8 +8,10 @@ import gpsLocationProvider
 import ServerAPI
 import GUI
 
+inet_mode = "offline"
+
 app_lock = e32.Ao_lock()
-server = ServerAPI.ServerAPI()
+server = ServerAPI.ServerAPI(inet_mode)
 gui = GUI.GUI(app_lock)
 gps = gpsLocationProvider.GpsLocProvider(15, 50, gui)
 
