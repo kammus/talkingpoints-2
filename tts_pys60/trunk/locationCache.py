@@ -13,24 +13,25 @@ class LocationCache:
 	# check if a location with this MAC address is already detected
 	def checkLocationsForBluetoothMAC(self, mac):
 		for key,value in self.detected_locations.iteritems():
-			if value['bluetooth_mac'] == str(mac):
-				self.seenLocation(value['tpid'])
+			if str(value['bluetooth_mac']) == str(mac):
+				self.seenLocation( value['tpid'] )
 				return 1
 
 		return 0
 	
-	def checkLocationsForTPID(self, TPID):
+	def checkLocationsForTPID(self, tpid):
 		for key,value in self.detected_locations.iteritems():
-			if str(value['tpid']) == str(TPID):
-				self.seenLocation(value['tpid'])
+			if str(value['tpid']) == str(tpid):
+				self.seenLocation( value['tpid'] )
 				return value['tpid']
 		
 		return 0
 	
 	# adds a location data structure to the detected_location dictionary
 	def appendLocation(self, loc):
-		loc['last_seen'] = time.clock()
-		self.detected_locations[ loc['tpid'] ] = loc
+		if not loc == None:
+			loc['last_seen'] = time.clock()
+			self.detected_locations[ loc['tpid'] ] = loc
 		
 		#GUI.notifyOfNewLocation(loc['name'] + " [" + loc['type'] + "]")
 	
@@ -89,9 +90,14 @@ class LocationCache:
 	# returns list of comments for a certain location
 	def getLocationCommentsList(self, tpid):
 		list = []
-		for key in self.detected_locations[tpid]['sections']['Comments']:
-			list.append( unicode(self.detected_locations[tpid]['sections']['Comments'][key]['text']) )
-		return list
+		if self.detected_locations[tpid]['sections'].get('Comments') != None: # if key 'Comments' exists
+			for key in self.detected_locations[tpid]['sections']['Comments']:
+				list.append( unicode(self.detected_locations[tpid]['sections']['Comments'][key]['text']) )
+			return list
+		else:
+			return None
+			
+		
 			
 
 # ---------------- TEST code --------------------------

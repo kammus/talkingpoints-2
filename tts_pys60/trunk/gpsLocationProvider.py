@@ -1,18 +1,19 @@
-#GPS Reader
-import appuifw
 import e32
-import urllib
+import sys
+if e32.in_emulator(): # for emulator testing
+	sys.path.append("c:\\python")
+	sys.path.append("c:\\python\\tp")
+else:
+	sys.path.append("e:\\python")
+	sys.path.append("e:\\python\\tp")
+	
+import appuifw
 import thread
 import positioning
 import math
 import time
 import string
-import sys
-if e32.in_emulator():
-    sys.path.append('e:\python\libs')
-import json
-#sys.path.append('e:\python')
-#sys.path.append('C:\python')
+
 import serverAPI
 
 keep_scanning = 1
@@ -33,7 +34,7 @@ class GpsLocProvider:
         # save a local reference to the GUI object
         self.GUI = GUIref
     
-        self.server = serverAPI.ServerAPI()
+        self.server = serverAPI.ServerAPI("offline")
    
         self.nearbyLock = thread.allocate_lock()
         self.updateThread = thread.start_new_thread(self.Update, () )

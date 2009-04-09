@@ -1,16 +1,12 @@
 import sys
-sys.path.append("c:\\python\\tp") # for emulator testing
-sys.path.append("c:\\python\\tp\\lib")
+sys.path.append("c:\\python\\tp")
 sys.path.append("e:\\python\\tp")
-sys.path.append("e:\\python\\tp\\lib")
 
 from pyaosocket import AoResolver
 from socket import *
 
 import e32
 import appuifw
-import urllib
-import json
 
 import serverAPI #do we need this?
 import GUI
@@ -85,11 +81,11 @@ class BluetoothReader:
 			
 app_lock = e32.Ao_lock() #app_lock (Only GUI will use this one from this point)
 
-apid = select_access_point()  #Prompts you to select the access point
-if apid != 0:
-	apo = access_point(apid)      #apo is the access point you selected
-	set_default_access_point(apo) #Sets apo as the default access point
-	inet_mode = "online"
+#apid = select_access_point()  #Prompts you to select the access point
+#if apid != 0:
+#	apo = access_point(apid)      #apo is the access point you selected
+#	set_default_access_point(apo) #Sets apo as the default access point
+#	inet_mode = "online"
 
 GUI = GUI.GUI(myLock)
 btReader = BluetoothReader(GUI)

@@ -1,26 +1,23 @@
 import sys
-sys.path.append("C:\\python\\tp") # for emulator testing
+sys.path.append("c:\\python\\tp")
+sys.path.append("e:\\python\\tp")
+
 import e32
 import appuifw
 
-import ServerAPI
+import serverAPI
 import GUI
 
-app_lock = e32.Ao_lock()
-server = ServerAPI.ServerAPI()
-GUI = GUI.GUI(app_lock)
+inet_mode = "offline"
 
-## check if alreay detected
-#if GUI.location_cache.checkLocationsForTPID(tpid) == False
-#	loc = server.get_location(tpid)
-#	GUI.location_cache.appendLocation(loc)
-#	GUI.notify(loc['name'])
+app_lock = e32.Ao_lock()
+server = serverAPI.ServerAPI(inet_mode)
+GUI = GUI.GUI(app_lock)
+GUI.server = server
 
 GUI.location_cache.appendLocation(server.get_location(1))
 GUI.location_cache.appendLocation(server.get_location(2))
 
 GUI.drawLocationList()
-
-#print str(GUI.location_cache.getLocationCommentsList(1))
 
 app_lock.wait()
