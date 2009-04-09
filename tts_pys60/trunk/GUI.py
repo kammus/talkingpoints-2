@@ -5,6 +5,7 @@ import e32
 import appuifw
 import LocationCache
 import LocationStore
+import serverAPI
 
 class GUI:
     def __init__(self, app_lock):
@@ -21,11 +22,17 @@ class GUI:
 		self.terminated = 0
         
 		self.current_tpid = None
+		self.current_position = {} # will be updated by GPS
 		
 		self.lock = app_lock
 		appuifw.app.exit_key_handler = self.exit		
 		self.location_cache = LocationCache.LocationCache()
 		self.location_store = LocationStore.LocationStore()
+		
+		self.return_gui_state = None # saves states in the GUI to return too
+		self.current_gui_state = None
+		
+		self.server = None
 		
 #    def drawText(self, string):
 #        text = appuifw.Text() 
@@ -45,7 +52,7 @@ class GUI:
 
 		
     def locationCommentCallback(self):
-		
+		self.current_gui_state = locationCommentCallback
 		comment_selected = self.comment_listbox.current()
 		appuifw.app.exit_key_handler = self.locationMenuCallback
 		self.drawText (self.comment_list[comment_selected])
@@ -63,7 +70,7 @@ class GUI:
     #== dummy callback functions from Global menu=================================        
     def gpsNotification(self):
         appuifw.note(u"Does this need to be called from gpsLocationProvider?")
-
+	
     def drawBookmarkedLocationList(self):
     	appuifw.app.exit_key_handler = self.drawLocationList
     	tmp = self.location_store.getBookmarkedLocationsList()
@@ -75,8 +82,17 @@ class GUI:
 				self.bookmarkedListCallback
 			)
 			appuifw.app.body = self.bookmarked_listbox
+			appuifw.app.menu = [(u"Delete", self.deleteBookmark), (u"Select", self.bookmarkedListCallback)]
         else:
 			appuifw.note(u"No bookmarked locations")
+			
+#	def deleteBookmark(self):
+#		appuifw.note(u"delete bookmark")
+##		if self.current_tpid == None:
+##			self.current_tpid = self.bookmarked_listbox_mapping[self.bookmarked_listbox.current()]
+##		
+##		self.location_store.unbookmark(self.current_tpid)
+##		#self.drawBookmarkedLocationList()
 			
     def bookmarkedListCallback(self):
 		self.notifyable = 0
@@ -99,7 +115,6 @@ class GUI:
     def drawHiddenLocationList(self):
 		appuifw.app.exit_key_handler = self.drawLocationList
 		tmp = self.location_store.getHiddenLocationsList()
-		print str(tmp)
 		if len(tmp['list']) > 0:
 			hidden_list = tmp['list']
 			self.hidden_listbox_mapping = tmp['mapping']
@@ -130,27 +145,55 @@ class GUI:
 		appuifw.app.body = self.location_menu_listbox
     
     # --submenus of "Settings"--    
-    def talkingSpeed(self):
-        appuifw.note(u"talking speed option will be implemented soon")
+    def whereAmI(self):
+    	appuifw.app.body = appuifw.Text( unicode("Retrieving the current address ...") )
+    	
+    	if self.server == None:  self.server = serverAPI.ServerAPI("offline")
+    	
+    	if len(self.current_position) > 0:
+    		address = self.server.getCurrentAddress(self.current_position['lat'], self.current_position['lng'])
+    		freshness = int(time.clock() - self.current_position['timestamp'])
+        else: #dummy data
+        	address = self.server.getCurrentAddress(42.2749661, -83.736541)
+        	freshness = 1
+        
+        if address != None:
+        	appuifw.app.body = appuifw.Text(u"You were at: " + address + ", " + str(freshness) + " seconds ago")
+        else:
+        	appuifw.app.body = appuifw.Text(u"Sorry, we could not get the current address")
+        
+    def nearby(self):
+        appuifw.note(u"get nearby locations of a certain type")
+        
+    def search(self):
+        appuifw.note(u"search for locations")
         
     def inputMode(self):
         appuifw.note(u"input mode won't be implemented this time. Only Key input allowed")
 	
+	def deleteBookmark(self):
+		appuifw.note(u"input mode won't be implemented this time. Only Key input allowed")
+	
     def fontSize(self):
         appuifw.note(u"Font size option will be available soon")
     
-    #---------------------------
-    #=============================================================================]
+    # ---------------------------
+    
     def drawLocationList(self):
         self.notifyable = 1
         self.current_tpid = None
         appuifw.app.exit_key_handler = self.exit
-        appuifw.app.menu = [(u"Navigate", self.gpsNotification), 
+        appuifw.app.menu = [(u"Navigate", (
+								(u"Where am I?", self.whereAmI),
+                                (u"Nearby", self.nearby),
+                                (u"Search", self.search))
+                            ), 
                             (u"Bookmarked Locations", self.drawBookmarkedLocationList),
                             (u"Hidden Locations", self.drawHiddenLocationList),
-                            (u"Settings", ((u"Talking Speed", self.talkingSpeed),
-                                           (u"Input Mode", self.inputMode),
-                                           (u"Font Size", self.fontSize)))]
+                            (u"Settings", (
+                                (u"Input Mode", self.inputMode),
+                                (u"Font Size", self.fontSize))
+                            )]
                             #seleting global menu by left softkey
         
         tmp = self.location_cache.getCurrentLocationList()
@@ -197,16 +240,18 @@ class GUI:
 	
     def locationMenuCallback(self):
 		self.notifyable = 0
-		appuifw.app.exit_key_handler = self.locationListCallback
 		
 		menu_item_nr_selected = self.location_menu_listbox.current()
 		menu_item_text_selected = self.location_menu_mapping[menu_item_nr_selected]
 		
 		if menu_item_text_selected == "Comments":
-			appuifw.app.exit_key_handler = self.locationListCallback
 			self.comment_list = self.location_cache.getLocationCommentsList(self.current_tpid)
-			self.comment_listbox = appuifw.Listbox(self.comment_list, self.locationCommentCallback)
-			appuifw.app.body = self.comment_listbox
+			if self.comment_list != None:
+				appuifw.app.exit_key_handler = self.locationListCallback
+				self.comment_listbox = appuifw.Listbox(self.comment_list, self.locationCommentCallback)
+				appuifw.app.body = self.comment_listbox
+			else:
+				appuifw.note(u"There are no comments yet")
 			
 		elif menu_item_text_selected == "Bookmark":
 			msg = self.location_store.bookmark(self.current_tpid, self.location_cache.getLocationName(self.current_tpid))
@@ -217,8 +262,9 @@ class GUI:
 			appuifw.note(unicode(msg))
 			
 		else:
+			appuifw.app.exit_key_handler = self.locationListCallback
 			appuifw.app.body = appuifw.Text( menu_item_text_selected )
-		
+	
     def exit(self):
 		yesno = appuifw.query(u"Do you want to exit", "query")
 		if yesno == 1:
