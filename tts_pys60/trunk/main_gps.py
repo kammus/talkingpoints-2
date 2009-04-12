@@ -7,7 +7,8 @@ else:
 	sys.path.append("e:\\python\\")
 	sys.path.append("e:\\python\\tp")
 	
-	
+
+import string
 import time
 import appuifw
 
@@ -37,7 +38,8 @@ while not gui.terminated:
 		for poi in localActives:
 			if not gui.location_cache.checkLocationsForTPID(poi["tpid"]):
 				gui.location_cache.appendLocation(poi)
-				gui.notifyOfNewLocation(poi["name"] + " [" + str(int(poi["distance"])) + "m away]")
+				distance = string.split(str(poi["distance"]), ".")[0]
+				gui.notifyOfNewLocation(poi["name"] + " [" + distance + "m away]")
 	e32.ao_yield()
 	timer.after(1)
 	
