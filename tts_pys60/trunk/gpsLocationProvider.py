@@ -34,7 +34,7 @@ class GpsLocProvider:
         # save a local reference to the GUI object
         self.GUI = GUIref
     
-        self.server = serverAPI.ServerAPI("offline")
+        self.server = None
    
         self.nearbyLock = thread.allocate_lock()
         self.updateThread = thread.start_new_thread(self.Update, () )
@@ -50,6 +50,7 @@ class GpsLocProvider:
         tempDict = positioning.position()
         currentTime = time.clock()
         self.current_location = {"lat":tempDict["position"]["latitude"], "lng":tempDict["position"]["longitude"], "timestamp":currentTime}
+        # log here
         self.GUI.current_position = self.current_location
         return self.current_location
     
@@ -83,11 +84,11 @@ class GpsLocProvider:
             # get current location, compare to old current location
             newLoc = self.getCurrentLocation()
             # if no(or little) change, don't do anything
-            latDif = math.fabs(newLoc["lat"] - self.current_location["lat"])
-            lngDif = math.fabs(newLoc["lng"] - self.current_location["lng"])
+            #latDif = math.fabs(newLoc["lat"] - self.current_location["lat"])
+            #lngDif = math.fabs(newLoc["lng"] - self.current_location["lng"])
             # if latDif < 0.0001 or lngDif < .001:
             #     print "Haven't moved far enough.  Cancelling update."
-            self.current_location = newLoc
+            #self.current_location = newLoc
             
             #self.nearbyLock.signal()
             self.addPOIs(self.get_nearby_locations(self.current_location["lat"], self.current_location["lng"]))
