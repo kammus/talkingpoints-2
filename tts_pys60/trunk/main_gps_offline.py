@@ -16,12 +16,13 @@ import gpsLocationProvider
 import serverAPI
 import GUI
 
-inet_mode = "online"
+inet_mode = "offline"
 
 app_lock = e32.Ao_lock()
 server = serverAPI.ServerAPI(inet_mode)
 gui = GUI.GUI(app_lock)
 gps = gpsLocationProvider.GpsLocProvider(25, 50, gui)
+gps.server = server
 
 #gui.location_cache.appendLocation(server.get_location(1))
 #gui.location_cache.appendLocation(server.get_location(2))
