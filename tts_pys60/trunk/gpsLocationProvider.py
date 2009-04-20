@@ -1,4 +1,5 @@
 import e32
+import os, os.path
 import sys
 if e32.in_emulator(): # for emulator testing
 	sys.path.append("c:\\python")
@@ -22,18 +23,29 @@ class GpsLocProvider:
     
     # neardist = how close a POI needs to be in order to be "triggered" (in mi.)
     # fardist = how far away a POI must be to be removed from the active list (in mi.)
-    def __init__(self, neardist, fardist, GUIref):
+    def __init__(self, GUIref, neardist=25, fardist=50, logmode=0):
         self.current_location = { }
         self.nearbyPOIs = [ ] #should be a list of dictionaries
         self.nearTolerance = neardist #how close we need to be to a POI to trigger it
         self.farTolerance = fardist #how far we must be from a POI before it's removed from the recent list
-    
+        self.logmode = logmode
+        if logmode:
+        	if e32.in_emulator():
+        		logdir = u"c:\\python\\gps_log"
+        	else:
+        		logdir = u"e:\\python\\gps_log"
+        	self.logpath = unicode(logdir + "\\gps_log.txt")
+        	if not os.path.exists(logdir):
+		    	os.makedirs(logdir)
+        
+        self.FILE = None
         self.actives = [ ]
         self.newActives = 0
         
         # save a local reference to the GUI object
         self.GUI = GUIref
     
+    	# server field defaults to None, must be set by object that owns gpsLocationProvider
         self.server = None
    
         self.nearbyLock = thread.allocate_lock()
@@ -46,11 +58,15 @@ class GpsLocProvider:
     
     
     def getCurrentLocation(self):
-       #print "Querying position module..."
+    	previous_time = time.clock()
         tempDict = positioning.position()
         currentTime = time.clock()
         self.current_location = {"lat":tempDict["position"]["latitude"], "lng":tempDict["position"]["longitude"], "timestamp":currentTime}
-        # log here
+        # write to the log if necessary.
+        if self.logmode:
+        	logtext = "GPS query completed in " + str(currentTime-previous_time) + " sec.\r"
+        	self.FILE.write(logtext)
+        	
         self.GUI.current_position = self.current_location
         return self.current_location
     
@@ -62,10 +78,17 @@ class GpsLocProvider:
         self.nearbyLock.acquire()
         try:
             if len(incPOIs) != 0: #len generates a TypeError exception
+                if self.logmode:
+                	self.FILE.write("Found " + str(len(incPOIs)) + " new POIs.\r")
                 for poi in incPOIs: #poi is a key
                     newDict = { poi:incPOIs[poi] }
                     if newDict not in self.nearbyPOIs:
-                        self.nearbyPOIs.append(newDict) 
+                        self.nearbyPOIs.append(newDict)
+                        if(self.logmode):
+                    	    self.FILE.write("Adding: ")
+                    	    self.FILE.write(str(newDict)) 
+                    	    self.FILE.write("\r")
+        
         except TypeError:
             self.nearbyLock.release()
             return
@@ -78,6 +101,11 @@ class GpsLocProvider:
         positioning.set_requestors([{"type":"service", 
                              "format":"application",
                              "data":"GpsLocProvider"}])  
+        
+        # open log file
+        if(self.logmode):
+            self.FILE = open(self.logpath, "w+")
+       
         global keep_scanning
         
         while keep_scanning: 
@@ -102,9 +130,11 @@ class GpsLocProvider:
                 
           #  print "Update in :" + str(time.clock() - initialTime) + " ms."       
                                             
+            self.FILE.flush()
             e32.ao_yield()
             e32.ao_sleep(5)
         
+        self.FILE.close()
         print "Update thread done."
             
     # returns list of dictionaries that contain full POI data
@@ -126,6 +156,8 @@ class GpsLocProvider:
                 if dist >= self.farTolerance:
                     self.nearbyPOIs.remove(poi)
         self.nearbyLock.release()
+        if self.logmode:
+        	self.FILE.write(str(len(activeList)) + " POIs are active.\r")
         return activeList
                     
                     
@@ -161,19 +193,4 @@ class GpsLocProvider:
         
         #distInMiles = d * 1.1508
         #return distInMiles
-    
-# test code begins here    
-#repeat = 0
-#GPS = GpsLocProvider(1.1, 3.0)
-#while repeat < 10:
-#    repeat += 1
-#    print "repetition #" + str(repeat)
-#    actives = GPS.get_active_list()
-#    if len(actives) != 0:
-#        for poi in actives:
-#            notestring = (u"You are getting close to " + str(poi['name']))
-#            appuifw.note(notestring, "info")
-#    e32.ao_yield()
-#    e32.ao_sleep(10)
-#
-#GPS.exit_thread()
+
