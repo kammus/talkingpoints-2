@@ -21,7 +21,8 @@ inet_mode = "online"
 app_lock = e32.Ao_lock()
 server = serverAPI.ServerAPI(inet_mode)
 gui = GUI.GUI(app_lock)
-gps = gpsLocationProvider.GpsLocProvider(25, 50, gui)
+gps = gpsLocationProvider.GpsLocProvider(gui, 25, 50, 1)
+gps.server = server
 
 #gui.location_cache.appendLocation(server.get_location(1))
 #gui.location_cache.appendLocation(server.get_location(2))
@@ -51,5 +52,6 @@ while not gui.terminated:
 		
 	e32.ao_yield()
 	timer.after(1)
+	gui.drawGPSIndicator()
 	
 #app_lock.wait()
