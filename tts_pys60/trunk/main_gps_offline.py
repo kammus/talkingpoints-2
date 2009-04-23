@@ -21,7 +21,7 @@ inet_mode = "offline"
 app_lock = e32.Ao_lock()
 server = serverAPI.ServerAPI(inet_mode)
 gui = GUI.GUI(app_lock)
-gps = gpsLocationProvider.GpsLocProvider(25, 50, gui)
+gps = gpsLocationProvider.GpsLocProvider(gui, 25, 50, 1)
 gps.server = server
 
 #gui.location_cache.appendLocation(server.get_location(1))
@@ -36,8 +36,6 @@ draw_time = time.clock() # time the UI has last been updated
 while not gui.terminated:
 	if gps.newActives == 1:
 		localActives = gps.actives
-		#print localActives
-		#e32.ao_sleep(30)
 		for poi in localActives:
 			if not gui.location_cache.checkLocationsForTPID(poi["tpid"]):
 				gui.location_cache.appendLocation(poi)
