@@ -3,6 +3,7 @@ sys.path.append("c:\\python\tp")
 
 import e32
 import appuifw
+import time
 import LocationCache
 import LocationStore
 import serverAPI
@@ -66,12 +67,9 @@ class GUI:
 		if self.notifyable == 1:
 			appuifw.note(unicode("You are getting close to " + location_name), 'info')
 			self.drawLocationList()
-    
-    #== dummy callback functions from Global menu=================================        
-    def gpsNotification(self):
-        appuifw.note(u"Does this need to be called from gpsLocationProvider?")
 	
     def drawBookmarkedLocationList(self):
+    	self.notifyable = 0
     	appuifw.app.exit_key_handler = self.drawLocationList
     	tmp = self.location_store.getBookmarkedLocationsList()
     	if len(tmp['list']) > 0:
@@ -113,6 +111,7 @@ class GUI:
 		appuifw.app.body = self.location_menu_listbox
         
     def drawHiddenLocationList(self):
+		self.notifyable = 0
 		appuifw.app.exit_key_handler = self.drawLocationList
 		tmp = self.location_store.getHiddenLocationsList()
 		if len(tmp['list']) > 0:
@@ -146,6 +145,8 @@ class GUI:
     
     # --submenus of "Settings"--    
     def whereAmI(self):
+    	self.notifyable = 0
+    	appuifw.app.exit_key_handler = self.drawLocationList
     	appuifw.app.body = appuifw.Text( unicode("Retrieving the current address ...") )
     	
     	if self.server == None:  self.server = serverAPI.ServerAPI("offline")
@@ -228,6 +229,7 @@ class GUI:
         appuifw.app.body = self.location_menu_listbox
    
    	def drawLocationMenu(self):
+   		self.notifyable = 0
    		tmp = self.location_cache.getLocationMenuList(self.current_tpid)
         self.location_menu_list = tmp['list']
         self.location_menu_mapping = tmp['mapping']
