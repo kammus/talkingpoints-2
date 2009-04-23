@@ -66,6 +66,8 @@ class GpsLocProvider:
         if self.logmode:
         	logtext = "GPS query completed in " + str(currentTime-previous_time) + " sec.\r"
         	self.FILE.write(logtext)
+        	logtext = "New position is: " + str(self.current_location["lat"]) + ", " + str(self.current_location["lng"]) + "\r"
+        	self.FILE.write(logtext)
         	
         self.GUI.current_position = self.current_location
         return self.current_location
@@ -79,10 +81,10 @@ class GpsLocProvider:
         try:
             if len(incPOIs) != 0: #len generates a TypeError exception
                 if self.logmode:
-                	self.FILE.write("Found " + str(len(incPOIs)) + " new POIs.\r")
+                	self.FILE.write("Server returned " + str(len(incPOIs)) + " POIs.\r")
                 for poi in incPOIs: #poi is a key
                     newDict = { poi:incPOIs[poi] }
-                    if newDict not in self.nearbyPOIs:
+                    if newDict not in self.nearbyPOIs: # is this evaluating as true when it shouldn't?
                         self.nearbyPOIs.append(newDict)
                         if(self.logmode):
                     	    self.FILE.write("Adding: ")
@@ -105,6 +107,10 @@ class GpsLocProvider:
         # open log file
         if(self.logmode):
             self.FILE = open(self.logpath, "w+")
+            self.FILE.write("LOGFILE START:")
+            self.FILE.write("GPS Modules detected:\r")
+            self.FILE.write(str(positioning.modules()))
+            self.FILE.write("Using default: " + str(positioning.default_module()) + "\r")
        
         global keep_scanning
         
@@ -142,7 +148,7 @@ class GpsLocProvider:
     # for full POI info to the server.
     def get_active_list(self):
         activeList = [ ]
-        
+        new_actives = 0
         self.nearbyLock.acquire()
         for poi in self.nearbyPOIs:
             for key in poi:
@@ -153,11 +159,15 @@ class GpsLocProvider:
                         new_active = self.server.get_location(tempDict['tpid'])
                         new_active["distance"] = dist
                         activeList.append(new_active)
-                if dist >= self.farTolerance:
+                        new_actives += 1
+                if dist >= self.farTolerance: # is this actually working?
+                    if self.logmode:
+                    	self.FILE.write("Removed " + str(key) + " due to distance.\r")
                     self.nearbyPOIs.remove(poi)
         self.nearbyLock.release()
         if self.logmode:
-        	self.FILE.write(str(len(activeList)) + " POIs are active.\r")
+        	self.FILE.write("Added " + str(new_actives) + " POIs this iteration. \r")
+        	self.FILE.write(str(len(activeList)) + " total are active.\r")
         return activeList
                     
                     
