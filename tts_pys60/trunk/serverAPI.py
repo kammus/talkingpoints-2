@@ -17,7 +17,7 @@ class ServerAPI:
 	def __init__(self, inet_mode):
 		self.server_host = "http://test.talking-points.org"
 		self.inet_mode = inet_mode
-		self.mac_tpid_mapping = {'00194fa4e262': 11, '001c623fa0b8': 14, '0010c65e9224': 15}
+		self.mac_tpid_mapping = {'00194fa4e262': 22, '001c623fa0b8': 21, '0010c65e9224': 23}
 		
 		# make sure path exists
 		if e32.in_emulator():  self.dir = u"c:\\python\\tp_offline"
