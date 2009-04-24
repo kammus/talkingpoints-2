@@ -41,6 +41,7 @@ class GpsLocProvider:
         self.FILE = None
         self.actives = [ ]
         self.newActives = 0
+        self.removedActives = [ ]
         
         # save a local reference to the GUI object
         self.GUI = GUIref
@@ -117,6 +118,8 @@ class GpsLocProvider:
         while keep_scanning: 
             # get current location, compare to old current location
             newLoc = self.getCurrentLocation()
+            if newLoc['lat'] != newLoc['lat']: # if we got a "NaN" response from positioning, this will abort and try again
+            	continue
             # if no(or little) change, don't do anything
             #latDif = math.fabs(newLoc["lat"] - self.current_location["lat"])
             #lngDif = math.fabs(newLoc["lng"] - self.current_location["lng"])
@@ -130,6 +133,9 @@ class GpsLocProvider:
             self.actives = self.get_active_list()
             if len(self.actives) != 0:
                 self.newActives = 1
+            else:
+            	self.newActives = 0
+                	
        #     for poi in actives:
         #        self.GUI.location_cache.appendLocation(poi)       
          #       self.GUI.notifyOfNewLocation(poi["name"])
@@ -154,7 +160,7 @@ class GpsLocProvider:
             for key in poi:
                 tempDict = poi[key]
                 dist = self.calcDistance(self.current_location, tempDict) #poi must have "lat" and "lng" entries
-                if dist <= self.nearTolerance:
+                if dist <= self.nearTolerance and dist == dist: 
                     if not self.GUI.location_cache.checkLocationsForTPID(tempDict['tpid']):
                         new_active = self.server.get_location(tempDict['tpid'])
                         new_active["distance"] = dist
@@ -164,9 +170,10 @@ class GpsLocProvider:
                     if self.logmode:
                     	self.FILE.write("Removed " + str(key) + " due to distance.\r")
                     self.nearbyPOIs.remove(poi)
+                    self.removedActives.append(poi[key]['tpid'])
         self.nearbyLock.release()
         if self.logmode:
-        	self.FILE.write("Added " + str(new_actives) + " POIs this iteration. \r")
+        	self.FILE.write(str(new_actives) + " active POIs this iteration. \r")
         	self.FILE.write(str(len(activeList)) + " total are active.\r")
         return activeList
                     
@@ -199,6 +206,10 @@ class GpsLocProvider:
         d = R * c
         
         distance_in_meters = d * 1852
+        #if self.logmode:
+        #	self.FILE.write("calcDistance result for " + str(pointA['lat']) + "," + str(pointA['lng']))
+        #	self.FILE.write(" and " + str(pointB['lat']) + "," + str(pointB['lng']))
+        #	self.FILE.write(" is " + str(distance_in_meters) + ".\r")
         return distance_in_meters
         
         #distInMiles = d * 1.1508
