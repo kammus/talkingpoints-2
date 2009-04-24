@@ -34,17 +34,24 @@ timer = e32.Ao_timer()
 draw_time = time.clock() # time the UI has last been updated
 
 while not gui.terminated:
-	if gps.newActives == 1:
+	gps.nearbyLock.acquire()
+	
+	if len(gps.removedActives) > 0:
+		for tpid in gps.removedActives:
+			gui.location_cache.removeLocation(tpid)
+		gps.removedActives = [ ]
+		
+	gps.nearbyLock.release()
+	
+	if gps.newActives:
 		localActives = gps.actives
-		#print localActives
-		#e32.ao_sleep(30)
 		for poi in localActives:
 			if not gui.location_cache.checkLocationsForTPID(poi["tpid"]):
 				gui.location_cache.appendLocation(poi)
 				distance = string.split(str(poi["distance"]), ".")[0]
 				gui.notifyOfNewLocation(poi["name"] + " [" + distance + "m away]")
 				draw_time = time.clock()
-				
+		
 	elif (time.clock() - draw_time) > 60:
 		if gui.notifyable == 1:
 			gui.drawLocationList()
@@ -52,6 +59,5 @@ while not gui.terminated:
 		
 	e32.ao_yield()
 	timer.after(1)
-	gui.drawGPSIndicator()
 	
 #app_lock.wait()
