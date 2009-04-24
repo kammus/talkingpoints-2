@@ -34,6 +34,11 @@ class LocationCache:
 			self.detected_locations[ loc['tpid'] ] = loc
 		
 		#GUI.notifyOfNewLocation(loc['name'] + " [" + loc['type'] + "]")
+	#removes a location data structure from the dictionary based on tpid
+	def removeLocation(self, tpid):
+		if not tpid == None:
+			if tpid in self.detected_locations:
+				del self.detected_locations['tpid']	
 	
 	# updates the timestamp of a location identified by tpid
 	def seenLocation(self, tpid):
