@@ -4,6 +4,7 @@ sys.path.append("e:\\python\\tp\\lib")
 
 import e32
 import urllib
+import socket
 import os, os.path
 
 import string # do we need this?
@@ -18,6 +19,11 @@ class ServerAPI:
 		self.server_host = "http://test.talking-points.org"
 		self.inet_mode = inet_mode
 		self.mac_tpid_mapping = {'00194fa4e262': 22, '001c623fa0b8': 21, '0010c65e9224': 23}
+		
+		if self.inet_mode == "online":
+			ap_id = socket.select_access_point()
+			apo = socket.access_point(ap_id)
+			socket.set_default_access_point(apo)
 		
 		# make sure path exists
 		if e32.in_emulator():  self.dir = u"c:\\python\\tp_offline"
