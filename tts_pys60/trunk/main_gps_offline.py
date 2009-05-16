@@ -50,7 +50,7 @@ while not gui.terminated:
 			if not gui.location_cache.checkLocationsForTPID(poi["tpid"]):
 				gui.location_cache.appendLocation(poi)
 				distance = string.split(str(poi["distance"]), ".")[0]
-				gui.notifyOfNewLocation(poi["name"] + " [" + distance + "m away]")
+				gui.notifyOfNewLocation(poi["name"]) # + " [" + distance + "m away]")
 				draw_time = time.clock()
 		
 	elif (time.clock() - draw_time) > 60:

@@ -8,7 +8,7 @@ import appuifw
 import serverAPI
 import GUI
 
-inet_mode = "offline"
+inet_mode = "online"
 
 app_lock = e32.Ao_lock()
 server = serverAPI.ServerAPI(inet_mode)
@@ -17,6 +17,9 @@ GUI.server = server
 
 GUI.location_cache.appendLocation(server.get_location(1))
 GUI.location_cache.appendLocation(server.get_location(2))
+GUI.location_cache.appendLocation(server.get_location(28))
+GUI.location_cache.appendLocation(server.get_location(29))
+GUI.location_cache.appendLocation(server.get_location(30))
 
 GUI.drawLocationList()
 

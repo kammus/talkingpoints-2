@@ -15,8 +15,11 @@ server = serverAPI.ServerAPI(inet_mode)
 GUI = GUI.GUI(app_lock)
 GUI.server = server
 
-GUI.location_cache.appendLocation(server.get_location(1))
 GUI.location_cache.appendLocation(server.get_location(2))
+GUI.location_cache.appendLocation(server.get_location(1))
+GUI.location_cache.appendLocation(server.get_location(44))
+GUI.location_cache.appendLocation(server.get_location(43))
+GUI.location_cache.appendLocation(server.get_location(45))
 
 GUI.drawLocationList()
 
