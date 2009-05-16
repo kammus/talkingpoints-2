@@ -18,7 +18,7 @@ class ServerAPI:
 	def __init__(self, inet_mode):
 		self.server_host = "http://test.talking-points.org"
 		self.inet_mode = inet_mode
-		self.mac_tpid_mapping = {'00194fa4e262': 22, '001c623fa0b8': 21, '0010c65e9224': 23}
+		self.mac_tpid_mapping = {'00194fa4e262': 33, '001c623fa0b8': 31, '0010c65e9224': 34}
 		
 		if self.inet_mode == "online":
 			ap_id = socket.select_access_point()

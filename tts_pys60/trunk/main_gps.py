@@ -59,5 +59,7 @@ while not gui.terminated:
 		
 	e32.ao_yield()
 	timer.after(1)
+	#gui.drawGPSIndicator()
+
 	
 #app_lock.wait()
