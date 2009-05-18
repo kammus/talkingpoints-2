@@ -42,6 +42,8 @@ class GpsLocProvider:
         self.actives = [ ]
         self.newActives = 0
         self.removedActives = [ ]
+        self.total_scan_time = 0
+        self.total_scans = 0
         
         # save a local reference to the GUI object
         self.GUI = GUIref
@@ -66,6 +68,8 @@ class GpsLocProvider:
         # write to the log if necessary.
         if self.logmode:
         	logtext = "GPS query completed in " + str(currentTime-previous_time) + " sec.\r"
+        	self.total_scan_time += currentTime-previous_time
+        	self.total_scans += 1
         	self.FILE.write(logtext)
         	logtext = "New position is: " + str(self.current_location["lat"]) + ", " + str(self.current_location["lng"]) + "\r"
         	self.FILE.write(logtext)
@@ -108,7 +112,7 @@ class GpsLocProvider:
         # open log file
         if(self.logmode):
             self.FILE = open(self.logpath, "w+")
-            self.FILE.write("LOGFILE START:")
+            self.FILE.write("LOGFILE START:\r")
             self.FILE.write("GPS Modules detected:\r")
             self.FILE.write(str(positioning.modules()))
             self.FILE.write("Using default: " + str(positioning.default_module()) + "\r")
@@ -141,12 +145,16 @@ class GpsLocProvider:
          #       self.GUI.notifyOfNewLocation(poi["name"])
                 
           #  print "Update in :" + str(time.clock() - initialTime) + " ms."       
-                                            
-            self.FILE.flush()
+                           
+            if self.logmode:                 
+            	self.FILE.flush()
             e32.ao_yield()
             e32.ao_sleep(5)
         
-        self.FILE.close()
+        if self.logmode:
+        	self.FILE.write("Total GPS scans performed: " + str(self.total_scans) + "\r")
+        	self.FILE.write("Avg time per scan: " + str(self.total_scan_time / self.total_scans) + "\r")
+        	self.FILE.close()
         print "Update thread done."
             
     # returns list of dictionaries that contain full POI data
