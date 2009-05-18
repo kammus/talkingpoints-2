@@ -160,7 +160,7 @@ class GpsLocProvider:
             for key in poi:
                 tempDict = poi[key]
                 dist = self.calcDistance(self.current_location, tempDict) #poi must have "lat" and "lng" entries
-                if dist <= self.nearTolerance and dist == dist:
+                if dist <= self.nearTolerance and dist == dist: 
                     if not self.GUI.location_cache.checkLocationsForTPID(tempDict['tpid']):
                         new_active = self.server.get_location(tempDict['tpid'])
                         new_active["distance"] = dist
