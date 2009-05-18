@@ -40,6 +40,7 @@ while not gui.terminated:
 	if len(gps.removedActives) > 0:
 		for tpid in gps.removedActives:
 			gui.location_cache.removeLocation(tpid)
+		gui.drawLocationList()
 		gps.removedActives = [ ]
 		
 	gps.nearbyLock.release()
