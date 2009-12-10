@@ -1,5 +1,9 @@
-#summary How to get talking points source work
+#summary How to get the talking points source work
 #labels Featured,Phase-Deploy,Phase-Design
+
+
+= !!! Disclaimer:  This is outdated since it is about the very early TP prototype from early 2008 !!! =
+
 
 = Introduction =
 
