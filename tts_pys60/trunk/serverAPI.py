@@ -18,7 +18,7 @@ class ServerAPI:
 	def __init__(self, inet_mode):
 		self.server_host = "http://test.talking-points.org"
 		self.inet_mode = inet_mode
-		self.mac_tpid_mapping = {'00194fa4e262': 33, '001c623fa0b8': 31, '0010c65e9224': 34}
+		self.mac_tpid_mapping = {'00194fa4e262': 33, '000272c008cb': 31, '0010c65e9224': 34}
 		
 		if self.inet_mode == "online":
 			ap_id = socket.select_access_point()
@@ -52,13 +52,14 @@ class ServerAPI:
 		if self.inet_mode == "online":
 			request_url = self.server_host + "/locations/show_by_bluetooth_mac/" + str(mac) + ".json"
 			response = urllib.urlopen(request_url).read()
+
 			if response == "error":
 				return None
 			else:
 				return json.read(response)
 			
 		elif self.inet_mode == "offline":
-			print self.mac_tpid_mapping[mac]
+			#print self.mac_tpid_mapping[mac]
 			return self.get_location(self.mac_tpid_mapping[mac])
 			
 
