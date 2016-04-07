@@ -1,0 +1,3 @@
+Talking Points 2 is an open-source project whose purpose is to assist visually-handicapped individuals in navigating a city through the use of Bluetooth beacons placed inside points of interest.  When in the vicinity of a beacon, the software will query a remote database, using the beacon's unique MAC address as key.  The returned information will be displayed, as well as read to the user through the use of text-to-speech.
+
+Prototypes are being coded coded in Java and Python for S60.
